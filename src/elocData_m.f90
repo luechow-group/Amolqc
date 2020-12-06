@@ -65,6 +65,9 @@ MODULE elocData_m
     ! stop when singularity in det is hit?
     logical :: mStopAtSingularity = .true.
 
+    ! activate for maxima calculations
+    logical :: mWavefunctionAndDerivsOnly = .false.
+
     integer(i8) :: mElocCut, mElocCutCount
     integer(i8) :: mDriftCut, mDriftCutCount
 

@@ -117,6 +117,7 @@ set_file_compile_options(mos_m.f90 ${VECTORINFO_FLAGS})
 
 if (${CHKNANUP})
     set_file_compile_options(multiDet_m.f90 "-DCHKNANUP")
+    set_file_compile_options(waveFunction_m.f90 "-DCHKNANUP")
 endif()
 
 if (${WFMAXLINES})

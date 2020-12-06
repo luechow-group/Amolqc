@@ -32,7 +32,7 @@ implicit none
 #else
    integer, parameter :: ndetcsfmax = 120  ! max # of dets per csf
 #endif
-   integer, parameter :: MDET_NONE=0, MDET_LU_ERR=1, MDET_INV_ERR=2
+   integer, parameter :: MDET_NONE=0, MDET_LU_ERR=1, MDET_INV_ERR=2, MDET_LU_ZERO_DET=3
 
    integer, allocatable :: mclist(:,:) ! configuration list
    integer, allocatable :: ndets(:)    ! # dets in k-th CSF
@@ -499,9 +499,8 @@ CONTAINS
 
    end subroutine mdetoutput
 
-   !----------------------------!
    subroutine mdetcalcfast(phi,fgrad,flapli,flapl,w)
-   !----------------------------!
+   !-----------------------------------------------!
    ! uses fast matrix operations to calculate determinants
    ! only supports all electron move so far
    real(r8), intent(inout) :: phi(:)
@@ -720,6 +719,178 @@ CONTAINS
 
 
 
+   subroutine mdetDirectDet(phi, fgrad, flapli, flapl, w, error_code)
+   !----------------------------------------------------------------!
+   ! uses LU decomp to calculate all determinants incl derivatives
+   ! for debugging only !
+   real(r8), intent(inout) :: phi(:)
+   real(r8), intent(inout) :: flapl(:),fgrad(:,:),flapli(:,:)
+   integer, intent(in)     :: w
+   integer, intent(inout)  :: error_code
+
+   real(r8) :: cola(size(deta,1)), colb(size(detb,1))
+   real(r8) :: d, tmp
+   integer :: i, ii, j, k, n, na, nci, orb, error_this_det, offset
+
+
+   offset = 0
+
+   ! CI loop over products of determinants
+   CILOOPA: do nci=1,ndet
+
+   error_this_det = MDET_NONE
+
+   if (detsRepLst(nci, 1) == 0) then !  only for new dets
+      ! Construct matrices for determinants
+      do i = 1, nalpha
+         ii = i + offset
+         do j = 1, nalpha
+            orb = mclist(j + offset,nci)
+            deta(j,i,nci)   = mat(orb,ii,w)
+            det1xa(j,i,nci) = mat1x(orb,ii,w)
+            det1ya(j,i,nci) = mat1y(orb,ii,w)
+            det1za(j,i,nci) = mat1z(orb,ii,w)
+            det2a(j,i,nci)  = mat2(orb,ii,w)
+         end do
+      end do
+
+      cola = 0
+      call lapack_det(nalpha, deta(:,:,nci), cola, 0, d, error_this_det)
+      deter(1, nci) = d
+      do i = 1, nalpha
+         cola = det1xa(:, i, nci)
+         call lapack_det(nalpha, deta(:,:,nci), cola, i, d, error_this_det)
+         dgrad(3*i-2, 1, nci) = d
+         cola = det1ya(:, i, nci)
+         call lapack_det(nalpha, deta(:,:,nci), cola, i, d, error_this_det)
+         dgrad(3*i-1, 1, nci) = d
+         cola = det1za(:, i, nci)
+         call lapack_det(nalpha, deta(:,:,nci), cola, i, d, error_this_det)
+         dgrad(3*i, 1, nci) = d
+         cola = det2a(:, i, nci)
+         call lapack_det(nalpha, deta(:,:,nci), cola, i, d, error_this_det)
+         dlapli(i, 1, nci) = d               
+      end do
+
+   else !detsRepLst already calculated
+
+      do i = 1, nalpha            ! inverse deti is changed on ALL positions
+         dgrad(3*i-2,1,nci) = dgrad(3*i-2,1,detsRepLst(nci,1))
+         dgrad(3*i-1,1,nci) = dgrad(3*i-1,1,detsRepLst(nci,1))
+         dgrad(3*i,1,nci)   = dgrad(3*i,1,detsRepLst(nci,1))
+         dlapli(i,1,nci)    = dlapli(i,1,detsRepLst(nci,1))
+      enddo
+      deter(1,nci) = deter(1,detsRepLst(nci,1))
+
+   end if !detsRepLst
+
+   end do CILOOPA
+
+   ! Now the same with beta!
+   offset = nalpha
+
+   ! CI loop over products of determinants
+   CILOOPB: do nci=1,ndet
+
+   error_this_det = MDET_NONE
+
+   if (detsRepLst(nci, 2) == 0) then ! only for new dets
+      ! Construct matrices for determinants
+      do i = 1, nbeta
+         ii = i + offset
+         do j = 1, nbeta
+            orb = mclist(j + offset,nci)
+            detb(j,i,nci)   = mat(orb,ii,w)
+            det1xb(j,i,nci) = mat1x(orb,ii,w)
+            det1yb(j,i,nci) = mat1y(orb,ii,w)
+            det1zb(j,i,nci) = mat1z(orb,ii,w)
+            det2b(j,i,nci)  = mat2(orb,ii,w)
+         enddo
+      enddo
+
+      colb = 0
+      call lapack_det(nbeta, detb(:,:,nci), colb, 0, d, error_this_det)
+      deter(2, nci) = d
+      do i = 1, nbeta
+         colb = det1xb(:, i, nci)
+         call lapack_det(nbeta, detb(:,:,nci), colb, i, d, error_this_det)
+         dgrad(3*i-2, 2, nci) = d
+         colb = det1yb(:, i, nci)
+         call lapack_det(nbeta, detb(:,:,nci), colb, i, d, error_this_det)
+         dgrad(3*i-1, 2, nci) = d
+         colb = det1zb(:, i, nci)
+         call lapack_det(nbeta, detb(:,:,nci), colb, i, d, error_this_det)
+         dgrad(3*i, 2, nci) = d
+         colb = det2b(:, i, nci)
+         call lapack_det(nbeta, detb(:,:,nci), colb, i, d, error_this_det)
+         dlapli(i, 2, nci) = d
+      end do
+
+   else   !detsRepLst. already calculated
+
+      do i=1,nbeta            ! inverse deti is changed on ALL positions
+
+         dgrad(3*i-2,2,nci) = dgrad(3*i-2,2,detsRepLst(nci,2))
+         dgrad(3*i-1,2,nci) = dgrad(3*i-1,2,detsRepLst(nci,2))
+         dgrad(3*i,2,nci)   = dgrad(3*i,2,detsRepLst(nci,2))
+         dlapli(i,2,nci)    = dlapli(i,2,detsRepLst(nci,2))
+      enddo
+      deter(2,nci) = deter(2,detsRepLst(nci,2))
+
+   endif  !detsRepLst
+
+   enddo CILOOPB
+
+   ! Get orbital part phi and its derivatives
+   phi(w) = 0.0_r8
+   fgrad(1:3*ne,w) = 0.0_r8
+   flapli(1:ne,w) = 0.0_r8
+
+   n = 0
+   na = 3*nalpha
+   if (nbeta > 0) then
+      do k=1,ncsf
+         do j=1,ndets(k)
+            n = n+1
+            tmp = cci(k)*ccsf(j,k)
+            phi(w) = phi(w) + tmp*deter(1,n)*deter(2,n)
+            write(111,'(a,2i5,5g20.12)') "DBG:", k, j, tmp, deter(1,n), deter(2,n), tmp*deter(1,n)*deter(2,n), phi(w)
+            do i=1,na
+               fgrad(i,w) = fgrad(i,w) + tmp*dgrad(i,1,n)*deter(2,n)
+            enddo
+            do i=1,3*nbeta
+               fgrad(na+i,w) = fgrad(na+i,w) + tmp*deter(1,n)*dgrad(i,2,n)
+            enddo
+            do i=1,nalpha
+               flapli(i,w) = flapli(i,w) + tmp*dlapli(i,1,n)*deter(2,n)
+            enddo
+            do i=1,nbeta
+               flapli(nalpha+i,w) = flapli(nalpha+i,w) + tmp*deter(1,n)*dlapli(i,2,n)
+            enddo
+         enddo
+      enddo
+   else    ! no beta electrons => no beta dets
+      do k=1,ncsf
+         do j=1,ndets(k)
+            n = n+1
+            tmp = cci(k)*ccsf(j,k)
+            phi(w) = phi(w) + tmp*deter(1,n)
+            do i=1,na
+               fgrad(i,w) = fgrad(i,w) + tmp*dgrad(i,1,n)
+            enddo
+            do i=1,nalpha
+               flapli(i,w) = flapli(i,w) + tmp*dlapli(i,1,n)
+            enddo
+         enddo
+      enddo
+   endif
+
+   ! Sum individual laplacians to total laplacian
+   flapl(w) = sum(flapli(1:ne,w))
+
+   end subroutine mdetDirectDet
+
+
    subroutine mdetcalc(ie, nec, phi, fgrad, flapli, flapl, error_code)
    !-----------------------------------------------------------------!
 
@@ -734,11 +905,16 @@ CONTAINS
    real(r8), intent(inout)  :: flapl(:),fgrad(:,:),flapli(:,:)  ! derivatives of phi: laplacian and gradient
    integer, intent(out)         :: error_code 
    integer i,j,k,l,orb,ii,ii1,ii2,w
-   integer nci,nnci,n,na,offset,ierr
-   real(r8) tmp,tmp1,tmp2,tmp3,tmp4
+   integer nci,nnci,n,na,offset,ierr, error_this_det
+   real(r8) tmp,tmp1,tmp2,tmp3,tmp4, rerr
+   real(r8) :: cola(size(deta,1)), colb(size(detb,1))
    real(r8) d
    real(r8), parameter :: RELSINGULAR = 1.d-12
-   logical update
+   logical :: update 
+#ifdef CHKNANUP
+   real(r8) :: epsilon
+   logical :: checkMDetError
+#endif
 
    call assert(size(fgrad,1)>=3*ne .and. size(flapli,1)>=ne,'mdetcalc: wrong size of argument (# elecs)')
    call assert(size(phi)>=nec .and. nec<=mMOElecConfigs,'mdetcalc: incorrect size of argument (# elec configs)')
@@ -748,6 +924,11 @@ CONTAINS
    flapl = 0
    fgrad = 0
    flapli = 0
+
+#ifdef CHKNANUP
+   checkMDetError = (getCheckMDetError() > 0)
+   epsilon = getCheckMDetThreshold()
+#endif
 
    ! Note on algorithm:
    ! First ALL alpha dets and then ALL beta dets are calculated
@@ -760,8 +941,11 @@ CONTAINS
    WLOOP: do w=1,nec
 
    if (fastmdet .and. ie == 0) then
-      call mdetcalcfast(phi,fgrad,flapli,flapl,w)
-      goto 888
+      call mdetcalcfast(phi, fgrad, flapli, flapl, w)
+      cycle
+   else if (directDet .and. ie == 0) then
+      call mdetDirectDet(phi, fgrad, flapli, flapl, w, error_code)
+      cycle
    endif
 
    offset = 0
@@ -781,6 +965,8 @@ CONTAINS
 
    ! CI loop over products of determinants
    CILOOPA: do nci=1,ndet
+
+   error_this_det = MDET_NONE
 
    if (detsRepLst(nci,1)==0) then !  only for new dets
       ! Construct matrices for determinants
@@ -809,17 +995,22 @@ CONTAINS
 
                ! calculate inverse matrix of det (LU decomposition) (is O(n**3) )
                ! returns inverse matrix in deti
-               call lapack_inv(nalpha,deta(:,:,nci),detia(:,:,nci),d,ierr)
+               ! Note: ierr==MDET_LU_ZERO_DET means det==0, singular matrix
+               ! det, grad, and lapl exist, but require direct calculation of grad and lapl
+               ! TODO, but see excited dets below 
+               call lapack_inv(nalpha, deta(:,:,nci), detia(:,:,nci), d, ierr)
                if (ierr > 0) then
                   error_code = ierr
+                  write(iull,*) "DBG:a mdet LU error 1st det", ierr
                   goto 999
-               endif
+               end if
                do nnci=2,ndet
                   detia(:nalpha,:nalpha,nnci) = detia(:nalpha,:nalpha,nci)
                   deter(1,nnci) = d
-               enddo
+               end do
             else      ! nci > 1, excited dets
                ! update inverse matrix for all rows (MOs) that are "excited"
+               ! Note: as workaround grad and lapl are set zero if MDET_LU_ZERO_DET
                d = deter(1,nci)
 #ifdef CHKNANUP
                update = .true.
@@ -827,6 +1018,7 @@ CONTAINS
                do j=1,nalpha
                   if (mclist(j+offset,nci) /= mclist(j+offset,1)) then
                      call invrupd(deta(j,:,nci),j,nalpha,nalpha,detia(:,:,nci),d)
+                     !!!write(iull,*) "DBGa", nci, d
 #ifdef CHKNANUP
                      if (.not. (ieee_is_normal(d) .and. ALL(ieee_is_normal(detia(:,:,nci))))) then
                         !!!if (isnan(d) .or. abs(d)/maxval(abs(deta(:,:,nci))) < RELSINGULAR) then
@@ -839,36 +1031,112 @@ CONTAINS
                !!! if a matrix during update is singular calculate without updates
 #ifdef CHKNANUP
                if (.not.update) then
-                  call lapack_inv(nalpha,deta(:,:,nci),detia(:,:,nci),d,ierr)
+                  call lapack_inv(nalpha, deta(:,:,nci), detia(:,:,nci), d, ierr)
+                  !!!write(iull,*) "DBG:a-no update:", nci, d, ierr                    
+
                   if (ierr > 0) then
-                     error_code = ierr
-                     goto 999
-                  endif
-               endif
+                     !!!write(iull,*) 'DBG: .not.update: lapack error', ierr
+                     error_this_det = ierr
+                     if (error_this_det /= MDET_LU_ZERO_DET) then
+                        error_code = error_this_det
+                        write(iull,*) "DBG:a mdet LU error"
+                        goto 999
+                     end if
+                  end if
+               end if
 #endif
-            endif
+            end if
 
          else ! ie > 0, one electron update
 
             ! update inverse matrix deti of det
             d = deter(1,nci)
             ! first arg is "pointer" to ii1-th column, doesn't work for rows
-            call invcupd(deta(1,ii1,nci),ii1,nalpha,nalpha,detia(1,1,nci),d)
-         endif
+            call invcupd(deta(1,ii1,nci), ii1, nalpha, nalpha, detia(1,1,nci), d)
+         end if
 
          ! construct gradients and laplacians of det as scalar prod with deti
          ! this is O(n**2)
-         do i=1,nalpha            ! inverse deti is changed on ALL positions
-            tmp1 = dot_product(det1xa(:,i,nci),detia(i,:,nci))
-            tmp2 = dot_product(det1ya(:,i,nci),detia(i,:,nci))
-            tmp3 = dot_product(det1za(:,i,nci),detia(i,:,nci))
-            tmp4 = dot_product(det2a(:,i,nci),detia(i,:,nci))
-            dgrad(3*i-2,1,nci) = tmp1*d
-            dgrad(3*i-1,1,nci) = tmp2*d
-            dgrad(3*i,1,nci) = tmp3*d
-            dlapli(i,1,nci) =  tmp4*d
-         enddo
-         deter(1,nci) = d
+#ifdef CHKNANUP
+         if (error_this_det == MDET_LU_ZERO_DET) then
+            write(iull,*) 'DBG: LU_ZERO_DET (a) nci=', nci 
+            do i = 1, nalpha
+               ! this is possibly erroneous !
+               ! TODO calculate as determinant
+               dgrad(3*i-2,1,nci) = 0.0_r8    
+               dgrad(3*i-1,1,nci) = 0.0_r8
+               dgrad(3*i,1,nci) = 0.0_r8
+               dlapli(i,1,nci) = 0.0_r8               
+            end do
+            deter(1, nci) = 0.0_r8  ! this is correct
+         else
+#endif
+            do i = 1, nalpha            ! inverse deti is changed on ALL positions
+               tmp1 = dot_product(det1xa(:,i,nci),detia(i,:,nci))
+               tmp2 = dot_product(det1ya(:,i,nci),detia(i,:,nci))
+               tmp3 = dot_product(det1za(:,i,nci),detia(i,:,nci))
+               tmp4 = dot_product(det2a(:,i,nci),detia(i,:,nci))
+               dgrad(3*i-2,1,nci) = tmp1*d
+               dgrad(3*i-1,1,nci) = tmp2*d
+               dgrad(3*i,1,nci) = tmp3*d
+               dlapli(i,1,nci) =  tmp4*d
+            end do
+            deter(1, nci) = d
+#ifdef CHKNANUP
+         end if
+#endif
+
+#ifdef CHKNANUP
+         if (error_this_det == MDET_LU_ZERO_DET .or. abs(d) < getDetInverseThreshold()) then
+            ! recalculate determinant and derivs with LU decomposition 
+
+            cola = 0
+            call lapack_det(nalpha, deta(:,:,nci), cola, 0, d, error_this_det)
+            !!!if (error_this_det > 0) write(iull,*) 'DETSING:deta', nci, error_this_det
+            if (checkMDetError) then
+               rerr = relative_error(d, deter(1, nci))
+               if (rerr > epsilon) write(iull,*) 'DETERR:deta', nci, rerr, d, deter(1, nci), error_this_det
+            end if
+            deter(1, nci) = d
+            do i = 1, nalpha
+               cola = det1xa(:, i, nci)
+               call lapack_det(nalpha, deta(:,:,nci), cola, i, d, error_this_det)
+               !!!if (error_this_det > 0) write(iull,*) 'DETSING:dxa', nci, error_this_det
+               if (checkMDetError) then
+                  rerr = relative_error(d, dgrad(3*i-2, 1, nci))
+                  if (rerr > epsilon) write(iull,*) 'DETERR:dxa', nci, rerr, i, d, dgrad(3*i-2, 1, nci), error_this_det
+               end if
+               dgrad(3*i-2, 1, nci) = d
+
+               cola = det1ya(:, i, nci)
+               call lapack_det(nalpha, deta(:,:,nci), cola, i, d, error_this_det)
+               !!!if (error_this_det > 0) write(iull,*) 'DETSING:dya', nci, error_this_det
+               if (checkMDetError) then
+                  rerr = relative_error(d, dgrad(3*i-1, 1, nci))
+                  if (rerr > epsilon) write(iull,*) 'DETERR:dya', nci, rerr, i, d, dgrad(3*i-1, 1, nci), error_this_det
+               end if
+               dgrad(3*i-1, 1, nci) = d
+
+               cola = det1za(:, i, nci)
+               call lapack_det(nalpha, deta(:,:,nci), cola, i, d, error_this_det)
+               !!!if (error_this_det > 0) write(iull,*) 'DETSING:dza', nci, error_this_det
+               if (checkMDetError) then
+                  rerr = relative_error(d, dgrad(3*i, 1, nci)) 
+                  if (rerr > epsilon) write(iull,*) 'DETERR:dza', nci, rerr, i, d, dgrad(3*i, 1, nci), error_this_det
+               end if
+               dgrad(3*i, 1, nci) = d
+
+               cola = det2a(:, i, nci)
+               call lapack_det(nalpha, deta(:,:,nci), cola, i, d, error_this_det)
+               !!!if (error_this_det > 0) write(iull,*) 'DETSING:d2a', nci, error_this_det
+               if (checkMDetError) then
+                  rerr = relative_error(d, dlapli(i, 1, nci))
+                  if (rerr > epsilon) write(iull,*) 'DETERR:d2a', nci, rerr, i, d, dlapli(i, 1, nci), error_this_det
+               end if
+               dlapli(i, 1, nci) = d               
+            end do
+         end if
+#endif
 
       endif ! nalpha==1
 
@@ -905,6 +1173,8 @@ CONTAINS
    ! CI loop over products of determinants
    CILOOPB: do nci=1,ndet
 
+   error_this_det = MDET_NONE
+
    if (detsRepLst(nci,2)==0) then ! only for new dets
       ! Construct matrices for determinants
       do i=ii1,ii2
@@ -933,7 +1203,8 @@ CONTAINS
                ! calculate inverse matrix of det (LU decomposition) (is O(n**3) )
                ! returns inverse matrix in deti
                call lapack_inv(nbeta,detb(:,:,nci),detib(:,:,nci),d,ierr)
-               if (ierr > 0) then
+               if (ierr > 0) then                        
+                  write(iull,*) "DBG:b mdet LU error 1st det", ierr
                   error_code = ierr
                   goto 999
                endif
@@ -950,10 +1221,12 @@ CONTAINS
                do j=1,nbeta
                   if (mclist(j+offset,nci) /= mclist(j+offset,1)) then
                      call invrupd(detb(j,:,nci),j,nbeta,nbeta,detib(:,:,nci),d)
+                     !!!write(iull,*) "DBGb", nci, d                    
 #ifdef CHKNANUP
                      if (.not. (ieee_is_normal(d) .and. ALL(ieee_is_normal(detib(:,:,nci))))) then
                      !!!if (isnan(d) .or. abs(d)/maxval(abs(deta(:,:,nci))) < RELSINGULAR) then
                         update = .false.
+                        !!!write(iull,*) "DBG:b-singular: redo", nci, d                    
                         exit
                      endif
 #endif
@@ -962,12 +1235,18 @@ CONTAINS
                !!! if a matrix during update is singular calculate without updates
 #ifdef CHKNANUP
                if (.not.update) then
-                  call lapack_inv(nbeta,detb(:,:,nci),detib(:,:,nci),d,ierr)
+                  call lapack_inv(nbeta, detb(:,:,nci), detib(:,:,nci), d, ierr)
+                  !!!write(iull,*) "DBG:b-no update:", nci, d, ierr                    
+
                   if (ierr > 0) then
-                     error_code = ierr
-                     goto 999
-                  endif
-               endif
+                     error_this_det = ierr
+                     if (error_this_det /= MDET_LU_ZERO_DET) then
+                        error_code = error_this_det
+                        write(iull,*) "DBG:b mdet LU error", ierr
+                        goto 999
+                     end if
+                  end if
+               end if
 #endif
             endif
 
@@ -981,19 +1260,89 @@ CONTAINS
 
          ! construct gradients and laplacians of det as scalar prod with deti
          ! this is O(n**2)
-         do i=1,nbeta            ! inverse deti is changed on ALL positions
-            tmp1 = dot_product(det1xb(:,i,nci),detib(i,:,nci))
-            tmp2 = dot_product(det1yb(:,i,nci),detib(i,:,nci))
-            tmp3 = dot_product(det1zb(:,i,nci),detib(i,:,nci))
-            tmp4 = dot_product(det2b(:,i,nci),detib(i,:,nci))
-            dgrad(3*i-2,2,nci) = tmp1*d
-            dgrad(3*i-1,2,nci) = tmp2*d
-            dgrad(3*i,2,nci) = tmp3*d
-            dlapli(i,2,nci) =  tmp4*d
-         enddo
-         deter(2,nci) = d
+#ifdef CHKNANUP
+         if (error_this_det == MDET_LU_ZERO_DET) then
+            write(iull,*) 'DBG: LU_ZERO_DET (b) nci=', nci 
+            do i = 1, nbeta
+               ! this is possibly erroneous !
+               ! TODO calculate as determinant
+               dgrad(3*i-2, 2, nci) = 0.0_r8    
+               dgrad(3*i-1, 2, nci) = 0.0_r8
+               dgrad(3*i, 2, nci) = 0.0_r8
+               dlapli(i, 2, nci) = 0.0_r8               
+            end do
+            deter(2, nci) = 0.0_r8  ! this is correct
+         else
+#endif
+            do i = 1, nbeta            ! inverse deti is changed on ALL positions
+               tmp1 = dot_product(det1xb(:,i,nci),detib(i,:,nci))
+               tmp2 = dot_product(det1yb(:,i,nci),detib(i,:,nci))
+               tmp3 = dot_product(det1zb(:,i,nci),detib(i,:,nci))
+               tmp4 = dot_product(det2b(:,i,nci),detib(i,:,nci))
+               dgrad(3*i-2, 2, nci) = tmp1*d
+               dgrad(3*i-1, 2, nci) = tmp2*d
+               dgrad(3*i, 2, nci) = tmp3*d
+               dlapli(i, 2, nci) =  tmp4*d
+            enddo
+            deter(2, nci) = d
+#ifdef CHKNANUP
+         end if
+#endif
 
-      endif ! nbeta == 1
+#ifdef CHKNANUP
+         if (error_this_det == MDET_LU_ZERO_DET .or. abs(d) < getDetInverseThreshold()) then
+            ! recalculate determinant and derivs with LU decomposition
+
+            colb = 0
+            call lapack_det(nbeta, detb(:,:,nci), colb, 0, d, error_this_det)
+            !!!if (error_this_det > 0) write(iull,*) 'DETSING:detb', nci, error_this_det
+            if (checkMDetError) then
+               rerr = relative_error(d, deter(2, nci)) 
+               if (rerr > epsilon) write(iull,*) 'DETERR:detb', nci, rerr, d, deter(2, nci), error_this_det
+            end if
+            deter(2, nci) = d
+            do i = 1, nbeta
+               colb = det1xb(:, i, nci)
+               call lapack_det(nbeta, detb(:,:,nci), colb, i, d, error_this_det)
+               !!!if (error_this_det > 0) write(iull,*) 'DETSING:dxb', nci, error_this_det
+               if (checkMDetError) then
+                  rerr = relative_error(d, dgrad(3*i-2, 2, nci)) 
+                  if (rerr > epsilon) write(iull,*) 'DETERR:dxb', nci, rerr, i, d, dgrad(3*i-2, 2, nci), error_this_det
+               end if
+               dgrad(3*i-2, 2, nci) = d
+
+               colb = det1yb(:, i, nci)
+               call lapack_det(nbeta, detb(:,:,nci), colb, i, d, error_this_det)
+               !!!if (error_this_det > 0) write(iull,*) 'DETSING:dyb', nci, error_this_det
+               if (checkMDetError) then
+                  rerr = relative_error(d, dgrad(3*i-1, 2, nci)) 
+                  if (rerr > epsilon) write(iull,*) 'DETERR:dyb', nci, rerr, i, d, dgrad(3*i-1, 2, nci), error_this_det
+               end if
+               dgrad(3*i-1, 2, nci) = d
+
+               colb = det1zb(:, i, nci)
+               call lapack_det(nbeta, detb(:,:,nci), colb, i, d, error_this_det)
+               !!!if (error_this_det > 0) write(iull,*) 'DETSING:dzb', nci, error_this_det
+               if (checkMDetError) then
+                  rerr = relative_error(d, dgrad(3*i, 2, nci)) 
+                  if (rerr > epsilon) write(iull,*) 'DETERR:dzb', nci, rerr, i, d, dgrad(3*i, 2, nci), error_this_det
+               end if
+               dgrad(3*i, 2, nci) = d
+
+               colb = det2b(:, i, nci)
+               call lapack_det(nbeta, detb(:,:,nci), colb, i, d, error_this_det)
+               !!!if (error_this_det > 0) write(iull,*) 'DETSING:d2b', nci, error_this_det
+               if (checkMDetError) then
+                  rerr = relative_error(d, dlapli(i, 2, nci)) 
+                  if (rerr > epsilon) write(iull,*) 'DETERR:d2b', nci, rerr, i, d, dlapli(i, 2, nci), error_this_det
+               end if
+               dlapli(i, 2, nci) = d
+            end do
+         end if
+#endif         
+
+
+      end if ! nbeta == 1
    else   !detsRepLst. already calculated
       do i=1,nbeta            ! inverse deti is changed on ALL positions
 
@@ -1024,6 +1373,7 @@ CONTAINS
             n = n+1
             tmp = cci(k)*ccsf(j,k)
             phi(w) = phi(w) + tmp*deter(1,n)*deter(2,n)
+            write(112,'(a,2i5,5g20.12)') "DBG:", k, j, tmp, deter(1,n), deter(2,n), tmp*deter(1,n)*deter(2,n), phi(w)
             do i=1,na
                fgrad(i,w) = fgrad(i,w) + tmp*dgrad(i,1,n)*deter(2,n)
             enddo
@@ -1430,57 +1780,127 @@ CONTAINS
 
    subroutine lapack_inv(N, A, deti, det, error_code)
 
-       integer, parameter :: nb=64      ! Note:  nb=ilaenv(1,'dgetri','u',N,N,-1,-1)
+      integer, parameter :: nb=64      ! Note:  nb=ilaenv(1,'dgetri','u',N,N,-1,-1)
 
-       integer, intent(in)         :: N                     ! real dimension of matrix A
-       real(r8), intent(inout) :: A(:,:)                ! A and deti (A_LU) = P*L*U
-       real(r8), intent(inout) :: deti(:,:)             ! LU decomp. and inverse of A
-       real(r8), intent(out)   :: det                   ! determinant of A
-       integer, intent(out)        :: error_code                 
+      integer, intent(in)         :: N                     ! real dimension of matrix A
+      real(r8), intent(inout) :: A(:,:)                ! A and deti (A_LU) = P*L*U
+      real(r8), intent(inout) :: deti(:,:)             ! LU decomp. and inverse of A
+      real(r8), intent(out)   :: det                   ! determinant of A
+      integer, intent(out)        :: error_code                 
 
-       integer lwork                 ! work space dimensions
-       real(r8)  p                     ! permutation P (see ipiv)
-       real(r8)  work(N*nb)            ! workspace!
-       integer ipiv(N)               ! pivot indices
-       integer info1,info2
-       integer i,j
+      integer lwork                 ! work space dimensions
+      real(r8)  p                     ! permutation P (see ipiv)
+      real(r8)  work(N*nb)            ! workspace!
+      integer ipiv(N)               ! pivot indices
+      integer info1,info2
+      integer i,j
 
-       error_code = MDET_NONE
+      error_code = MDET_NONE
 
-       !  call dcopy(ndmax*ndmax,A,1,deti,1) for a continuous block
-       deti = A
+      !  call dcopy(ndmax*ndmax,A,1,deti,1) for a continuous block
+      deti = A
 
-       !  LU decomposition using Lapack/NAG routine
-       call dgetrf(N,N,deti(1,1),size(deti,1),ipiv(1),info1)
+      !  LU decomposition using Lapack/NAG routine
+      call dgetrf(N,N,deti(1,1),size(deti,1),ipiv(1),info1)
 
-       if (info1 /= 0) then
-          if (logmode >= 2) write(iull,*) " LAPACK/NAG: error in LU decomp. INFO =",info1
-          error_code = MDET_LU_ERR
-          goto 999
-       endif
+      if (info1 == 0) then
 
-       ! calculate determinant
-       det = 1.D0
+         ! calculate determinant
+         det = 1.0_r8
 
-       do i=1,N
-          if (ipiv(i) /= i) then
-             p = -1.D0
-          else
-             p = 1.D0
-          endif
-          det = det*p*deti(i,i)
-       enddo
+         do i=1,N
+            if (ipiv(i) /= i) then
+               p = -1.0_r8
+            else
+               p = 1.0_r8
+            end if
+            det = det * p * deti(i,i)
+         end do
 
-       lwork = size(deti,1)*nb
-       call dgetri(N,deti(1,1),size(deti,1),ipiv(1),work(1),lwork,info2)
+         lwork = size(deti,1)*nb
+         call dgetri(N,deti(1,1),size(deti,1),ipiv(1),work(1),lwork,info2)
 
-       if (info2 /= 0) then
-          if (logmode >= 2) write(iull,*) " LAPACK/NAG: error in inverse INFO =",info2
-          error_code = MDET_INV_ERR
-          goto 999
-       endif
+         if (info2 /= 0) then
+            if (logmode >= 2) write(iull,*) " lapack_inv: LAPACK (dgetri) error in inverse INFO =",info2
+            error_code = MDET_INV_ERR
+         end if
 
-       999 continue
+      else
+
+         det = 0.0_r8
+
+         if (info1 > 0) then
+            error_code = MDET_LU_ZERO_DET
+            if (logmode >= 4) write(iull,*) " lapack_inv: LAPACK (dgetrf) singular matrix in LU decomp. INFO =", info1
+         else
+            error_code = MDET_LU_ERR
+            if (logmode >= 2) write(iull,*) " lapack_inv: LAPACK (dgetrf) error in LU decomp. INFO =", info1
+         end if
+      
+      end if
 
    end subroutine lapack_inv
+
+
+   subroutine lapack_det(N, A, col, k, det, error_code)
+      
+      ! calculate determinant of A with k-th column replaced by col with LU decomposition
+      ! calculate determinant of A for k==0
+      integer, intent(in)  :: N                     ! real dimension of matrix A
+      integer, intent(in)  :: k                     ! replace k-th column
+      real(r8), intent(in) :: A(:,:)                ! A 
+      real(r8), intent(in) :: col(:)                ! column
+      real(r8), intent(inout):: det                   ! determinant of A
+      integer, intent(inout) :: error_code 
+
+      real(r8) :: A1(N, N), p
+      integer ipiv(N)               ! pivot indices
+      integer info, i
+
+      error_code = MDET_NONE
+
+      call assert(size(col)==N .and. size(A,1)==N, "lapack_det: size mismatch")
+
+      A1 = A
+      if (k > 0 .and. k <= N) then
+         A1(:, k) = col 
+      end if
+
+      call dgetrf(N, N, A1, N, ipiv(1), info)
+
+      if (info == 0) then
+
+         ! calculate determinant
+         det = 1.0_r8
+
+         do i = 1, N
+            if (ipiv(i) /= i) then
+               p = -1.0_r8
+            else
+               p = 1.0_r8
+            end if
+            det = det * p * A1(i,i)
+         end do
+
+      else
+         det = 0.0_r8
+         if (info > 0) then
+            error_code = MDET_LU_ZERO_DET
+            if (logmode >= 4) write(iull,*) " lapack_det: LAPACK (dgetrf) singular matrix in LU decomp. INFO =", info
+         else
+            error_code = MDET_LU_ERR
+            if (logmode >= 2) write(iull,*) " lapack_det: LAPACK (dgetrf) error in LU decomp. INFO =", info
+         end if
+      end if
+
+   end subroutine lapack_det
+
+   function relative_error(value1, value2)
+      real(r8), intent(in) :: value1, value2 
+      real(r8) :: relative_error
+      real(r8), parameter :: min_value = 1.0e-15_r8
+      relative_error = abs(value1 - value2) / max(abs(value1), min_value) 
+      if (max(abs(value1), abs(value2)) < min_value) relative_error = min_value
+   end function relative_error
+
 END MODULE multiDet_m

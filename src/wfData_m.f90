@@ -84,8 +84,13 @@ MODULE wfData_m
   integer :: printDet = 0                 ! print level for dets
   logical :: useLAlib_mos = .true.        ! use LA library (BLAS/LAPACK) in mos
   logical :: fastmdet = .false.           ! use fast excited determinant calculation
+  logical :: directDet = .false.          ! use (inefficient) direct LU calculation of all determinants
   logical :: doReorderDets = .true.       ! reorder determinants to max coincidence with 1st det
   logical :: repeatedDetsOpt = .true.     ! optimize calculation of repeated determinants 
+
+  real(r8) :: mDetInverseThreshold = 0.0_r8
+  integer :: mCheckMDetError = 0
+  real(r8) :: mCheckMDetThreshold = 0.0_r8
 
 !------------- Properties----------------------
 
@@ -113,6 +118,33 @@ CONTAINS
   integer pure function getNOrb()
      getNOrb = norb
   end function getNOrb
+
+  real(r8) pure function getDetInverseThreshold()
+     getDetInverseThreshold = mDetInverseThreshold
+  end function getDetInverseThreshold
+  
+  subroutine setDetInverseThreshold(value)
+     real(r8), intent(in) :: value
+     mDetInverseThreshold = value 
+  end subroutine setDetInverseThreshold
+
+  integer pure function getCheckMDetError()
+     getCheckMDetError = mCheckMDetError
+  end function getCheckMDetError
+  
+  subroutine setCheckMDetError(value)
+     integer, intent(in) :: value
+     mCheckMDetError = value 
+  end subroutine setCheckMDetError
+
+  real(r8) pure function getCheckMDetThreshold()
+     getCheckMDetThreshold = mCheckMDetThreshold
+  end function getCheckMDetThreshold
+  
+  subroutine setCheckMDetThreshold(value)
+     real(r8), intent(in) :: value
+     mCheckMDetThreshold = value 
+  end subroutine setCheckMDetThreshold
 
 
   !------------------------------------!
