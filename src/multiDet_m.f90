@@ -854,7 +854,7 @@ CONTAINS
             n = n+1
             tmp = cci(k)*ccsf(j,k)
             phi(w) = phi(w) + tmp*deter(1,n)*deter(2,n)
-            write(111,'(a,2i5,5g20.12)') "DBG:", k, j, tmp, deter(1,n), deter(2,n), tmp*deter(1,n)*deter(2,n), phi(w)
+            !!!write(111,'(a,2i5,5g20.12)') "DBG:", k, j, tmp, deter(1,n), deter(2,n), tmp*deter(1,n)*deter(2,n), phi(w)
             do i=1,na
                fgrad(i,w) = fgrad(i,w) + tmp*dgrad(i,1,n)*deter(2,n)
             enddo
@@ -1373,7 +1373,7 @@ CONTAINS
             n = n+1
             tmp = cci(k)*ccsf(j,k)
             phi(w) = phi(w) + tmp*deter(1,n)*deter(2,n)
-            write(112,'(a,2i5,5g20.12)') "DBG:", k, j, tmp, deter(1,n), deter(2,n), tmp*deter(1,n)*deter(2,n), phi(w)
+            !!!write(112,'(a,2i5,5g20.12)') "DBG:", k, j, tmp, deter(1,n), deter(2,n), tmp*deter(1,n)*deter(2,n), phi(w)
             do i=1,na
                fgrad(i,w) = fgrad(i,w) + tmp*dgrad(i,1,n)*deter(2,n)
             enddo
