@@ -88,9 +88,8 @@ MODULE wfData_m
   logical :: doReorderDets = .true.       ! reorder determinants to max coincidence with 1st det
   logical :: repeatedDetsOpt = .true.     ! optimize calculation of repeated determinants 
 
-  real(r8) :: mDetInverseThreshold = 0.0_r8
-  integer :: mCheckMDetError = 0
-  real(r8) :: mCheckMDetThreshold = 0.0_r8
+  real(r8) :: mDetInverseThreshold = 1.0e-12_r8     ! det threshold for avoiding inverse for gradient/laplacian
+  real(r8) :: mSwitchDirectThreshold = 1.0e-12_r8   ! det threshold for avoiding inverse update
 
 !------------- Properties----------------------
 
@@ -128,23 +127,14 @@ CONTAINS
      mDetInverseThreshold = value 
   end subroutine setDetInverseThreshold
 
-  integer pure function getCheckMDetError()
-     getCheckMDetError = mCheckMDetError
-  end function getCheckMDetError
+  real(r8) pure function getSwitchDirectThreshold()
+     getSwitchDirectThreshold = mSwitchDirectThreshold
+  end function getSwitchDirectThreshold
   
-  subroutine setCheckMDetError(value)
-     integer, intent(in) :: value
-     mCheckMDetError = value 
-  end subroutine setCheckMDetError
-
-  real(r8) pure function getCheckMDetThreshold()
-     getCheckMDetThreshold = mCheckMDetThreshold
-  end function getCheckMDetThreshold
-  
-  subroutine setCheckMDetThreshold(value)
+  subroutine setSwitchDirectThreshold(value)
      real(r8), intent(in) :: value
-     mCheckMDetThreshold = value 
-  end subroutine setCheckMDetThreshold
+     mSwitchDirectThreshold = value 
+  end subroutine setSwitchDirectThreshold
 
 
   !------------------------------------!

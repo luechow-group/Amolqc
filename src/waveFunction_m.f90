@@ -143,17 +143,14 @@ CONTAINS
 #endif
     end if
 
-    call getdbla(lines,nl,'check_det_threshold=', value , iflag)
+    call getdbla(lines,nl,'switch_direct_threshold=', value , iflag)
     if (iflag == 0) then
 #ifndef CHKNANUP
       call error(" direct calculation of determinants requires -DCHKNANUP")
 #else
-      call setCheckMDetThreshold(value)
-      call setCheckMDetError(1)
+      call setSwitchDirectThreshold(value)
 #endif
     end if
-
-
 
     found = finda(lines,nl,'task')
     if(found) then
