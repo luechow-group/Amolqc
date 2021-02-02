@@ -1,0 +1,39 @@
+! Copyright (C) 2019 Leonard Reuter
+!
+! SPDX-License-Identifier: GPL-3.0-or-later
+
+module partition_tm
+   use PFUNIT_MOD
+   use kinds_m, only: r8
+   use partition_m, only:  partition_t, assignment(=)
+   use wfData_m, only: ncenter
+   implicit none
+
+   type(partition_t) :: partition
+
+contains
+   subroutine init()
+      ncenter = 2
+   end subroutine init
+
+@Test
+   subroutine TestConstruction()
+      integer :: electronsPerFragment(3) = [0,2,0]
+      call init()
+      partition = partition_t(electronsPerFragment, 17)
+      @assertEqual(17, partition%count)
+      @assertEqual(electronsPerFragment, partition%electronsPerFragment)
+   end subroutine TestConstruction
+
+@Test
+   subroutine TestCopy()
+      integer :: electronsPerFragment(3) = [0,2,0]
+      type(partition_t) :: partition2
+      call init()
+      partition = partition_t(electronsPerFragment, 17)
+      partition2 = partition
+      @assertEqual(17, partition2%count)
+      @assertEqual(electronsPerFragment, partition2%electronsPerFragment)
+   end subroutine TestCopy
+
+end module partition_tm

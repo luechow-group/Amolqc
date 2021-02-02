@@ -1,0 +1,83 @@
+#! /bin/bash
+echo " MR wf tests (AE) ..."
+
+i=csf
+cp ../../templates/mrwf.in $i.in
+$SED -i "s/XXX/C2CAS44/" $i.in
+rm -f $i.out $i.out-*
+$AMOLQCRUN $i
+sleep 1
+
+R=`grep "total energy" $i.$REF |awk {'print $4'}`
+C=`grep "total energy" $i.out |awk {'print $6'}`
+if [ $R == $C ] ; then
+   echo -e "    $i test \033[32mpassed.\033[39m"
+   csfpassed=1
+else
+   export FAILED=1
+   echo -e "    $i test \033[31mfailed.\033[39m"
+   echo "    Check $PWD/$i.out for more information."
+fi
+
+j=csfdet
+cp ../../templates/mrwf.in $j.in
+$SED -i "s/XXX/C2CAS44det/" $j.in
+rm -f $j.out $j.out-*
+$AMOLQCRUN $j
+
+R=`grep "total energy" $i.$REF |awk {'print $4'}`
+C=`grep "total energy" $j.out |awk {'print $6'}`
+if [ $R == $C ] ; then
+   echo -e "    $j test \033[32mpassed.\033[39m"
+   rm -f $j.in $.out
+   if [ $csfpassed -eq 1 ] ; then
+      rm -f $i.in $i.out
+   fi
+else
+   export FAILED=1
+   echo -e "    $j test \033[31mfailed.\033[39m"
+   echo "    Check $PWD/$j.out for more information."
+fi
+
+
+i=det
+cp ../../templates/mrwf.in $i.in
+$SED -i "s/XXX/CH4-mdet/" $i.in
+rm -f $i.out $i.out-*
+$AMOLQCRUN $i
+
+R=`grep "total energy" $i.$REF |awk {'print $4'}`
+C=`grep "total energy" $i.out |awk {'print $6'}`
+if [ $R == $C ] ; then
+   echo -e "    $i test \033[32mpassed.\033[39m"
+   detpassed=1
+else
+   export FAILED=1
+   echo -e "    $i test \033[31mfailed.\033[39m"
+   echo "    Check $PWD/$i.out for more information."
+fi
+
+for j in fastdet no_repeat_det_opt no_reorder_dets
+do
+   cp ../../templates/mrwf.in $j.in
+   $SED -i "s/XXX.wf'/CH4-mdet.wf',$j/" $j.in
+   rm -f $j.out $j.out-*
+   $AMOLQCRUN $j
+
+   R=`grep "total energy" $i.$REF |awk {'print $4'}`
+   C=`grep "total energy" $j.out |awk {'print $6'}`
+   if [ $R == $C ] ; then
+      echo -e "    $j test \033[32mpassed.\033[39m"
+      rm -f $j.in $.out
+   else
+      export FAILED=1
+      echo -e "    $j test \033[31mfailed.\033[39m"
+      echo "    Check $PWD/$j.out for more information."
+   fi
+done
+
+if [ $detpassed -eq 1 ] ; then
+  rm -f $i.in $i.out
+fi
+
+

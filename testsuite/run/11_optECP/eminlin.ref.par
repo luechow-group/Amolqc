@@ -1,0 +1,719 @@
+
+
+              __  __    ____    _         ____     _____   
+      /\     |  \/  |  / __ \  | |       / __ \   / ____|  
+     /  \    | \  / | | |  | | | |      | |  | | | |       
+    / /\ \   | |\/| | | |  | | | |      | |  | | | |       
+   / ____ \  | |  | | | |__| | | |____  | |__| | | |____   
+  /_/    \_\ |_|  |_|  \____/  |______|  \___\_\  \_____|  
+
+
+ Atoms and Molecules with Quantum Monte Carlo -- electron structure code
+
+ initial version:
+  Arne Luechow, Penn State University, 2/1996
+
+ main author:
+  Arne Luechow, RWTH Aachen University, 52056 Aachen, Germany
+
+ with contributions from:
+  Sebastian Manten, Christian Diedrich, Annika Bande, Tony Scott,
+  Rene Petz, Raphael Berner, Alexander Sturm, Kaveh Haghighi Mood
+
+
+ version 2018-04-15 7314a67  (HEAD, tag: version-6.7-dev)            
+
+
+ run started on tcrocks.pc.rwth-aachen.de at Thu Oct  4 18:20:04 2018 on    2 processor(s)
+ using path: /home/luechow/Projekte/Eqmc/amolqc_test/amolqc67dev
+
+ =======>      $gen - initializing RNG and setting general parameters       <=======
+
+ seed =    101     verbose level = 2
+
+ =======>      $wf - wave function      <=======
+
+ wave function settings:
+    with BLAS/LAPACK      
+    splines for contracted GTOs (no cusp correction!)
+
+ using sequential AO and MO mode 
+ 
+ wave function ../../wavefunction/C2-cas44-ECP.wf with: 
+           title =No
+           basis =     BFD-VTZ       MO format =         gms         jastrow =   sm3      
+          charge =     0                  spin =     1                 coord =  angstrom  
+  atomic_charges =      F      same_atoms =      F    no_H_jastrow =      F
+ 
+  geometry (in angstrom):
+C    0.00000   0.00000  -0.62128
+C    0.00000   0.00000   0.62128
+ 
+  splining GTOs with         4000  points
+ 
+
+ basis set:
+ basis name: BFD-VTZ.abs
+ different basis functions  =   18
+ individual basis functions =   68
+
+ spline_points =  4000
+ basis read ...
+
+  ECPs read from ECP library ...
+
+           effective core potentials:
+   atom   1: C 
+ # core electrons =  2  l_core+1 = 1
+   V_l = sum_k   a_lk * r^(n_lk - 2) * exp(-b_lk*r^2)
+   l      a_lk      n_lk       b_lk
+    1    4.000000    1    8.359738    
+    1    33.43895    3    4.483619    
+    1   -19.17537    2    3.938313    
+    0    22.55164    2    5.029916    
+   atom   2: C 
+ # core electrons =  2  l_core+1 = 1
+   V_l = sum_k   a_lk * r^(n_lk - 2) * exp(-b_lk*r^2)
+   l      a_lk      n_lk       b_lk
+    1    4.000000    1    8.359738    
+    1    33.43895    3    4.483619    
+    1   -19.17537    2    3.938313    
+    0    22.55164    2    5.029916    
+
+ calculation with    8 electrons
+   4 alpha and    4 beta
+
+ Jastrow factor of type sm3 read with:
+    9 generic Schmidt-Moskowitz terms of type sm3
+  Jastrow factor read ...
+ 
+ AO/MO evaluation carried out using aocalc and mocalc.
+ 
+  MOs read ...
+ 
+    NCSFs =     6 Ndets =    16
+    6 unique alpha and    6 unique beta determinants
+                          are going to be calculated.
+ 
+  CSFs read ...
+
+ =======>      $ecp - effective core potential settings      <=======
+
+ ecp parameters: full_localisation random_rotation full_cutoff
+
+ cutoff threshold =         0.10000E-06
+
+ pseudo atoms:
+ idx  atom  grid points  cutoff distances (A) 
+-------------------------------------------- 
+   1    C          6         1.15426
+   2    C          6         1.15426
+ 
+
+ =======>      $sample - creating or modifying the walker sample      <=======
+
+ creating new sample
+
+ created initial random sample using atom densities
+ sample size (all nodes):            2
+ <E>_allnodes =     -12.2905 +/-       2.2046 V_allnodes =       4.8603
+ 
+
+ wall clock time for   sample :               0.01 s
+ cpu time (master) for sample :               0.00 s
+
+
+
+ =======>      $qmc - running a qmc calculation      <=======
+
+
+   * * *  VMC calculation  * * *
+
+    QMC parameters:
+
+                 tau =     0.03466             adapt tau =           T
+        total walker =           2          local walker =           1
+               steps =         300               discard =         300
+           block_len =         100          walker_block =           1
+         step_stride =          10
+ target accept ratio =     0.50000
+               E_ref =     0.00000                  wfac =     1.00000
+        E_loc_cutoff =           F                factor =     1.00000
+        kill_persist =           F           max_persist =           0
+        load balance =           F                branch =           F
+      future walking =           F       pop ctrl = global
+              Reconf =           F             RcfMethod =           1
+          accumulate =           F
+ 
+    propagator parameters:
+
+              weight =        none                  move =     Umrigar
+            moveType =         all
+                 tau =     0.03466            drift_scal =     1.00000
+             AR step =           T             rej_cross =           F
+     expon. sampling =           T
+ 
+
+             step       size              <E>                   <V>     AR 
+ --------------------------------------------------------------------------
+            100         2       -10.92169 +/-   0.02273     0.103   0.950
+            200         2       -10.94731 +/-   0.02663     0.141   0.800
+            300         2       -10.96540 +/-   0.03599     0.258   0.660
+
+ qmc: Emean =       -10.96540 var =         0.25772
+
+ wall clock time for   qmc :               0.15 s
+ cpu time (master) for qmc :               0.05 s
+
+
+
+ =======>      $change_jastrow - changing Jastrow terms      <=======
+
+ changing Jastrow type from sm3 to sm3
+
+    9 generic Schmidt-Moskowitz terms of type sm3
+
+ =======>      $qmc - running a qmc calculation      <=======
+
+
+   * * *  VMC calculation  * * *
+
+    QMC parameters:
+
+                 tau =     0.21439             adapt tau =           T
+        total walker =           2          local walker =           1
+               steps =         300               discard =         300
+           block_len =         100          walker_block =           1
+         step_stride =          10
+ target accept ratio =     0.50000
+               E_ref =     0.00000                  wfac =     1.00000
+        E_loc_cutoff =           F                factor =     1.00000
+        kill_persist =           F           max_persist =           0
+        load balance =           F                branch =           F
+      future walking =           F       pop ctrl = global
+              Reconf =           F             RcfMethod =           1
+          accumulate =           F
+ 
+    propagator parameters:
+
+              weight =        none                  move =     Umrigar
+            moveType =         all
+                 tau =     0.21439            drift_scal =     1.00000
+             AR step =           T             rej_cross =           F
+     expon. sampling =           T
+ 
+
+             step       size              <E>                   <V>     AR 
+ --------------------------------------------------------------------------
+            100         2       -10.94911 +/-   0.02493     0.124   0.470
+            200         2       -10.98035 +/-   0.03654     0.266   0.540
+            300         2       -10.96522 +/-   0.02127     0.090   0.480
+
+ qmc: Emean =       -10.96522 var =         0.09005
+
+ wall clock time for   qmc :               0.13 s
+ cpu time (master) for qmc :               0.05 s
+
+
+
+ =======>      $qmc - running a qmc calculation      <=======
+
+
+   * * *  VMC calculation  * * *
+
+    QMC parameters:
+
+                 tau =     0.21942             adapt tau =           T
+        total walker =           2          local walker =           1
+               steps =        4991               discard =           1
+           block_len =         100          walker_block =           1
+         step_stride =          10
+ target accept ratio =     0.50000
+               E_ref =     0.00000                  wfac =     1.00000
+        E_loc_cutoff =           F                factor =     1.00000
+        kill_persist =           F           max_persist =           0
+        load balance =           F                branch =           F
+      future walking =           F       pop ctrl = global
+              Reconf =           F             RcfMethod =           1
+          accumulate =           T
+ 
+    propagator parameters:
+
+              weight =        none                  move =     Umrigar
+            moveType =         all
+                 tau =     0.21942            drift_scal =     1.00000
+             AR step =           T             rej_cross =           F
+     expon. sampling =           T
+ 
+
+             step       size              <E>                   <V>     AR 
+ --------------------------------------------------------------------------
+            100         2       -10.96403 +/-   0.03318     0.219   0.390
+            200         2       -10.94473 +/-   0.02831     0.160   0.520
+            300         2       -11.05933 +/-   0.02279     0.103   0.650
+            400         2       -11.07696 +/-   0.02677     0.143   0.620
+            500         2       -11.10287 +/-   0.02976     0.176   0.470
+            600         2       -11.04205 +/-   0.02319     0.107   0.380
+            700         2       -10.95427 +/-   0.02735     0.149   0.240
+            800         2       -11.08700 +/-   0.02726     0.148   0.500
+            900         2       -10.94648 +/-   0.02597     0.134   0.650
+           1000         2       -10.93443 +/-   0.03502     0.244   0.480
+           1100         2       -10.89329 +/-   0.04084     0.332   0.550
+           1200         2       -11.03162 +/-   0.04508     0.404   0.350
+           1300         2       -11.02275 +/-   0.02153     0.092   0.540
+           1400         2       -10.99219 +/-   0.02993     0.178   0.560
+           1500         2       -11.13872 +/-   0.05029     0.503   0.540
+           1600         2       -11.02645 +/-   0.03822     0.291   0.440
+           1700         2       -10.88409 +/-   0.02531     0.127   0.560
+           1800         2       -11.04797 +/-   0.02390     0.114   0.590
+           1900         2       -11.07324 +/-   0.03740     0.278   0.550
+           2000         2       -10.98984 +/-   0.02352     0.110   0.490
+           2100         2       -10.96468 +/-   0.02568     0.131   0.440
+           2200         2       -11.02924 +/-   0.03542     0.250   0.440
+           2300         2       -10.98903 +/-   0.02262     0.102   0.610
+           2400         2       -11.01511 +/-   0.02453     0.120   0.470
+           2500         2       -10.99140 +/-   0.02497     0.124   0.380
+           2600         2       -10.91950 +/-   0.02852     0.162   0.490
+           2700         2       -10.85534 +/-   0.03766     0.282   0.520
+           2800         2       -11.08755 +/-   0.02957     0.174   0.540
+           2900         2       -10.94742 +/-   0.02785     0.154   0.540
+           3000         2       -10.99416 +/-   0.03240     0.209   0.340
+           3100         2       -11.03006 +/-   0.04028     0.323   0.530
+           3200         2       -10.95162 +/-   0.02785     0.154   0.380
+           3300         2       -11.02347 +/-   0.02673     0.142   0.410
+           3400         2       -10.94047 +/-   0.02612     0.136   0.520
+           3500         2       -11.04909 +/-   0.03498     0.243   0.390
+           3600         2       -10.99031 +/-   0.02600     0.134   0.520
+           3700         2       -11.11925 +/-   0.04964     0.490   0.480
+           3800         2       -11.00415 +/-   0.03557     0.252   0.520
+           3900         2       -11.07086 +/-   0.02090     0.087   0.580
+           4000         2       -10.90066 +/-   0.02886     0.166   0.490
+           4100         2       -10.94542 +/-   0.02548     0.129   0.550
+           4200         2       -11.00378 +/-   0.02900     0.167   0.420
+           4300         2       -10.77012 +/-   0.04408     0.387   0.480
+           4400         2       -11.07811 +/-   0.02506     0.125   0.390
+           4500         2       -11.04327 +/-   0.03658     0.266   0.530
+           4600         2       -10.91061 +/-   0.04562     0.414   0.500
+           4700         2       -10.94074 +/-   0.03000     0.179   0.450
+           4800         2       -11.01095 +/-   0.03087     0.190   0.480
+           4900         2       -11.00448 +/-   0.03146     0.197   0.530
+
+
+  FINAL RESULT:
+ total energy                 =     -10.99578 +/- 0.01033 E_h
+ block average energy         =     -10.99578 E_h
+ variance (of wave function)  =       0.20724 E_h^2
+ tau (adapted)                =        0.2184 fixed at step         1750
+ N_corr (<5%)                 =      13.2
+ N_corr (global)              =       4.9
+
+ sample accumulation: new total sample size is         1000
+
+ wall clock time for   qmc :               2.14 s
+ cpu time (master) for qmc :               0.80 s
+
+
+
+ =======>      $sample - creating or modifying the walker sample      <=======
+
+ removing outliers
+
+  using trimmed mean (parallel version)
+  parallel merge required:   5.4001808E-05  sec.
+  trimmed mean =      -11.001  sigma =        0.200
+      6 walkers will be deleted and not replaced
+      0 processes attempted to exceed the limit of      75 deletions
+
+  after outlier removal:
+  final total walker size=     994 E_mean=      -11.00024 +/-    0.01266 var=           0.16
+
+ wall clock time for   sample :               0.00 s
+ cpu time (master) for sample :               0.00 s
+
+
+
+ =======>      $optimize_parameters - optimizing wave function parameters      <=======
+
+ initializing jastrow parameters with np=           8  ne=            8
+ initializing ci parameters with np=           5
+
+ orbital rotation settings:
+    mo_update_mode  2 mo_param_mode=  2
+
+ reading   6 classes of orbital rotations
+ initializing orbital rotation parameters with np=          36
+ params = jas+mo+ci    method = eminlin    param mode=  1
+
+   - -  energy minimization using linear method: initialization  - -
+
+  starting wf parameter optimization with optType=jas+mo+ci
+ with Emean=      -10.99984 +/-      0.01265 var=       0.159 size=       994
+ Difference to projection: Delta E=      -10.99984 Delta var =       0.159
+
+ sample Emean and var for lowest ev:
+    1      -11.01512        0.15286
+    2    64432.33608***************
+    3     -138.08774   235319.78010
+    4******************************
+    5******************************
+best ev   1 with E=      -11.01512 var=      0.15 d=        0.11665
+cffac=        0.00500
+ lambda=1.0 with cf=        0.48565
+    1: lambda=      0.02 Emean =      -11.00444 var =         0.14816 cf =         0.49630
+    2: lambda=      0.10 Emean =      -11.00451 var =         0.14630 cf =         0.49622
+    3: lambda=      0.30 Emean =      -11.00499 var =         0.14240 cf =         0.49572
+    4: lambda=      0.50 Emean =      -11.00659 var =         0.14095 cf =         0.49411
+    5: lambda=      0.70 Emean =      -11.00912 var =         0.14378 cf =         0.49160
+ choosing min cost function: lambda=      1.00
+
+ final parameter set ev  1 lambda=      1.00
+  new parameter vector:
+  0.4624      -1.568       1.017     -0.7873E-01  0.6602     -0.9068     -0.6795      0.4196      0.4833E-01  0.3279E-01
+  0.6780E-02  0.7055E-02 -0.5169E-02  0.2822E-02 -0.4902E-02 -0.9862E-02  0.9356E-02 -0.6893E-02  0.4623E-02  0.1716E-01
+  0.1323E-01 -0.3799E-02 -0.2711E-04  0.1995E-02  0.6650E-03  0.5432E-03  0.3802E-02 -0.1169E-01  0.2142E-03 -0.1032E-02
+  0.4261E-02 -0.8403E-02 -0.1460E-01  0.3355E-02 -0.9763E-02  0.8247E-01 -0.3869E-01 -0.1821E-01 -0.3296E-01  0.1312    
+ -0.3496E-01 -0.2929E-01  0.5344E-01 -0.9178E-02 -0.8394E-01  0.2028E-01  0.1080E-01  0.1951E-01 -0.3957E-01
+ with projected Emean=      -11.01567 +/-      0.01265 var=       0.153 size=       994
+ 
+ ci coefficients are normalized
+ 
+
+ ================>     calling subroutine aeq
+
+ =======>      $sample - creating or modifying the walker sample      <=======
+
+ changing size of sample
+ sample size has been reduced by     496 to       1 walkers per node
+ 
+
+ wall clock time for   sample :               0.00 s
+ cpu time (master) for sample :               0.00 s
+
+
+
+ =======>      $qmc - running a qmc calculation      <=======
+
+
+             step       size              <E>                   <V>     AR 
+ --------------------------------------------------------------------------
+            100         2       -11.03022 +/-   0.03926     0.307   0.520
+            200         2       -10.89621 +/-   0.04480     0.399   0.570
+            300         2       -10.92013 +/-   0.02821     0.158   0.460
+
+ qmc: Emean =       -10.92013 var =         0.15831
+
+ wall clock time for   qmc :               0.13 s
+ cpu time (master) for qmc :               0.05 s
+
+
+
+ =======>      $qmc - running a qmc calculation      <=======
+
+
+             step       size              <E>                   <V>     AR 
+ --------------------------------------------------------------------------
+            100         2       -10.87153 +/-   0.03267     0.212   0.530
+            200         2       -10.97606 +/-   0.02768     0.152   0.450
+            300         2       -11.00779 +/-   0.02735     0.149   0.570
+            400         2       -10.77753 +/-   0.02817     0.158   0.480
+            500         2       -10.97479 +/-   0.04598     0.421   0.530
+            600         2       -11.05651 +/-   0.02371     0.112   0.380
+            700         2       -10.88578 +/-   0.03240     0.209   0.530
+            800         2       -11.07682 +/-   0.02596     0.134   0.640
+            900         2       -10.97669 +/-   0.03337     0.222   0.600
+           1000         2       -10.99415 +/-   0.04585     0.418   0.420
+           1100         2       -11.06718 +/-   0.02502     0.125   0.540
+           1200         2       -10.93430 +/-   0.02149     0.092   0.530
+           1300         2       -10.97999 +/-   0.02115     0.089   0.400
+           1400         2       -11.02083 +/-   0.02827     0.159   0.410
+           1500         2       -11.08052 +/-   0.02866     0.163   0.540
+           1600         2       -11.02769 +/-   0.02358     0.111   0.480
+           1700         2       -11.08377 +/-   0.02476     0.122   0.410
+           1800         2       -10.97788 +/-   0.02421     0.117   0.520
+           1900         2       -11.14251 +/-   0.01914     0.073   0.450
+           2000         2       -11.06725 +/-   0.03540     0.249   0.520
+           2100         2       -11.02896 +/-   0.02790     0.155   0.390
+           2200         2       -11.05172 +/-   0.03190     0.202   0.530
+           2300         2       -10.94245 +/-   0.03160     0.199   0.560
+           2400         2       -10.96529 +/-   0.02737     0.149   0.520
+           2500         2       -11.04429 +/-   0.02413     0.116   0.550
+           2600         2       -11.03587 +/-   0.04129     0.339   0.550
+           2700         2       -11.09575 +/-   0.04948     0.487   0.480
+           2800         2       -10.83479 +/-   0.12227     2.975   0.570
+           2900         2       -10.92331 +/-   0.02804     0.156   0.540
+           3000         2       -10.96405 +/-   0.02852     0.162   0.550
+           3100         2       -11.07810 +/-   0.02616     0.136   0.550
+           3200         2       -11.04349 +/-   0.03042     0.184   0.480
+           3300         2       -11.06475 +/-   0.02110     0.089   0.390
+           3400         2       -11.12985 +/-   0.02411     0.116   0.530
+           3500         2       -10.94355 +/-   0.02546     0.129   0.560
+           3600         2       -10.96506 +/-   0.03069     0.187   0.450
+           3700         2       -11.13593 +/-   0.02396     0.114   0.430
+           3800         2       -10.96894 +/-   0.01998     0.079   0.520
+           3900         2       -11.00657 +/-   0.03287     0.215   0.540
+           4000         2       -10.97036 +/-   0.03670     0.268   0.440
+           4100         2       -11.06303 +/-   0.02541     0.128   0.650
+           4200         2       -11.03281 +/-   0.03872     0.298   0.550
+           4300         2       -10.90096 +/-   0.03096     0.191   0.480
+           4400         2       -10.91398 +/-   0.03527     0.248   0.400
+           4500         2       -11.05151 +/-   0.02360     0.111   0.460
+           4600         2       -11.01911 +/-   0.02547     0.129   0.470
+           4700         2       -10.99106 +/-   0.03390     0.229   0.550
+           4800         2       -10.91533 +/-   0.02519     0.126   0.550
+           4900         2       -11.00133 +/-   0.02064     0.085   0.510
+
+
+  FINAL RESULT:
+ total energy                 =     -11.00126 +/- 0.01092 E_h
+ block average energy         =     -11.00126 E_h
+ variance (of wave function)  =       0.24022 E_h^2
+ tau (adapted)                =        0.2051 fixed at step          250
+ N_corr (<5%)                 =       4.6
+ N_corr (global)              =       4.8
+
+ sample accumulation: new total sample size is         1000
+
+ wall clock time for   qmc :               2.10 s
+ cpu time (master) for qmc :               0.79 s
+
+
+
+ =======>      $save_results - storing current results      <=======
+
+
+ =======>      $sample - creating or modifying the walker sample      <=======
+
+ removing outliers
+
+  using trimmed mean (parallel version)
+  parallel merge required:   1.5020370E-05  sec.
+  trimmed mean =      -11.011  sigma =        0.201
+      3 walkers will be deleted and not replaced
+      0 processes attempted to exceed the limit of      75 deletions
+
+  after outlier removal:
+  final total walker size=     997 E_mean=      -11.00644 +/-    0.01184 var=           0.14
+
+ wall clock time for   sample :               0.00 s
+ cpu time (master) for sample :               0.00 s
+
+
+
+ =============>    end subroutine aeq
+
+ with Emean=      -11.00646 +/-      0.01184 var=       0.140 size=       997
+ Difference to projection: Delta E=        0.00921 Delta var =      -0.013
+
+ sample Emean and var for lowest ev:
+    1      -11.01773        0.12562
+    2******************************
+    3******************************
+    4    -1117.11255580885801.11404
+    5      -70.48802  2149985.85407
+best ev   1 with E=      -11.01773 var=      0.13 d=        0.09154
+cffac=        0.00500
+ lambda=1.0 with cf=        0.48289
+    1: lambda=      0.02 Emean =      -10.95352 var =         2.81493 cf =         0.56056
+    2: lambda=      0.10 Emean =      -11.03829 var =         1.19292 cf =         0.46768
+    3: lambda=      0.30 Emean =      -11.01081 var =         0.14064 cf =         0.48989
+    4: lambda=      0.50 Emean =      -11.00967 var =         0.12391 cf =         0.49095
+    5: lambda=      0.70 Emean =      -11.01209 var =         0.12149 cf =         0.48852
+ choosing min cost function: lambda=      0.10
+
+ final parameter set ev  1 lambda=      0.10
+  new parameter vector:
+  0.4155      -1.466      0.9466     -0.7453E-01  0.6650     -0.9104     -0.7042      0.4248      0.4889E-01  0.2970E-01
+  0.1023E-01  0.5780E-02 -0.5784E-02  0.1441E-02 -0.3532E-02 -0.8756E-02  0.1046E-01 -0.5588E-02  0.5880E-02  0.1792E-01
+  0.1129E-01 -0.4079E-02 -0.6912E-04  0.2054E-02  0.4193E-02  0.1632E-02  0.1155E-02 -0.1282E-01  0.3053E-03  0.3640E-02
+  0.3731E-02 -0.1016E-01 -0.1492E-01  0.3711E-02 -0.4114E-02  0.7682E-01 -0.2864E-01 -0.1705E-01 -0.2146E-01  0.9944E-01
+ -0.1404E-01 -0.4003E-01  0.4841E-01 -0.5577E-02 -0.1085      0.6769E-01 -0.9270E-02  0.1951E-01 -0.3909E-01
+ with projected Emean=      -11.03585 +/-      0.01184 var=       1.069 size=       997
+ 
+ ci coefficients are normalized
+ 
+
+ wall clock time for   optimize_parameters :              10.07 s
+ cpu time (master) for optimize_parameters :               3.76 s
+
+
+
+ =======>      $sample - creating or modifying the walker sample      <=======
+
+ changing size of sample
+ sample size has been reduced by     498 to       1 walkers per node
+ 
+
+ wall clock time for   sample :               0.00 s
+ cpu time (master) for sample :               0.00 s
+
+
+
+ =======>      $qmc - running a qmc calculation      <=======
+
+
+   * * *  VMC calculation  * * *
+
+    QMC parameters:
+
+                 tau =     0.20509             adapt tau =           T
+        total walker =           2          local walker =           1
+               steps =         300               discard =         300
+           block_len =         100          walker_block =           1
+         step_stride =          10
+ target accept ratio =     0.50000
+               E_ref =     0.00000                  wfac =     1.00000
+        E_loc_cutoff =           F                factor =     1.00000
+        kill_persist =           F           max_persist =           0
+        load balance =           F                branch =           F
+      future walking =           F       pop ctrl = global
+              Reconf =           F             RcfMethod =           1
+          accumulate =           F
+ 
+    propagator parameters:
+
+              weight =        none                  move =     Umrigar
+            moveType =         all
+                 tau =     0.20509            drift_scal =     1.00000
+             AR step =           T             rej_cross =           F
+     expon. sampling =           T
+ 
+
+             step       size              <E>                   <V>     AR 
+ --------------------------------------------------------------------------
+            100         2       -10.90843 +/-   0.03506     0.245   0.540
+            200         2       -10.99210 +/-   0.04070     0.330   0.530
+            300         2       -10.95704 +/-   0.03098     0.191   0.570
+
+ qmc: Emean =       -10.95704 var =         0.19102
+
+ wall clock time for   qmc :               0.13 s
+ cpu time (master) for qmc :               0.05 s
+
+
+
+ =======>      $qmc - running a qmc calculation      <=======
+
+
+   * * *  VMC calculation  * * *
+
+    QMC parameters:
+
+                 tau =     0.21868             adapt tau =           T
+        total walker =           2          local walker =           1
+               steps =        4991               discard =           1
+           block_len =         100          walker_block =           1
+         step_stride =          10
+ target accept ratio =     0.50000
+               E_ref =     0.00000                  wfac =     1.00000
+        E_loc_cutoff =           F                factor =     1.00000
+        kill_persist =           F           max_persist =           0
+        load balance =           F                branch =           F
+      future walking =           F       pop ctrl = global
+              Reconf =           F             RcfMethod =           1
+          accumulate =           T
+ 
+    propagator parameters:
+
+              weight =        none                  move =     Umrigar
+            moveType =         all
+                 tau =     0.21868            drift_scal =     1.00000
+             AR step =           T             rej_cross =           F
+     expon. sampling =           T
+ 
+
+             step       size              <E>                   <V>     AR 
+ --------------------------------------------------------------------------
+            100         2       -11.39560 +/-   0.07320     1.066   0.390
+            200         2       -11.17367 +/-   0.04507     0.404   0.540
+            300         2       -11.03745 +/-   0.02501     0.124   0.520
+            400         2       -11.20783 +/-   0.04041     0.325   0.650
+            500         2       -11.04164 +/-   0.03752     0.280   0.490
+            600         2       -11.22249 +/-   0.06650     0.880   0.460
+            700         2       -11.04956 +/-   0.03234     0.208   0.580
+            800         2       -11.04665 +/-   0.02335     0.108   0.410
+            900         2       -11.02611 +/-   0.02403     0.115   0.500
+           1000         2       -11.07674 +/-   0.02486     0.123   0.460
+           1100         2       -11.03189 +/-   0.02636     0.138   0.420
+           1200         2       -11.06094 +/-   0.02187     0.095   0.500
+           1300         2       -10.98914 +/-   0.03863     0.297   0.480
+           1400         2       -10.98623 +/-   0.02470     0.121   0.460
+           1500         2       -11.01440 +/-   0.03281     0.214   0.480
+           1600         2       -10.99241 +/-   0.02315     0.107   0.400
+           1700         2       -10.95867 +/-   0.03482     0.241   0.380
+           1800         2       -11.04437 +/-   0.02341     0.109   0.430
+           1900         2       -11.06426 +/-   0.03182     0.201   0.400
+           2000         2       -11.00155 +/-   0.02429     0.117   0.400
+           2100         2       -10.89594 +/-   0.02801     0.156   0.450
+           2200         2       -11.01704 +/-   0.02770     0.153   0.400
+           2300         2       -11.07973 +/-   0.03434     0.235   0.450
+           2400         2       -10.95490 +/-   0.03697     0.272   0.460
+           2500         2       -10.96020 +/-   0.03361     0.225   0.380
+           2600         2       -10.90950 +/-   0.03045     0.185   0.400
+           2700         2       -10.97001 +/-   0.03970     0.314   0.450
+           2800         2       -11.06711 +/-   0.03104     0.192   0.330
+           2900         2       -11.08784 +/-   0.03313     0.218   0.440
+           3000         2       -11.05021 +/-   0.02390     0.114   0.470
+           3100         2       -10.90933 +/-   0.02296     0.105   0.450
+           3200         2       -10.98868 +/-   0.03652     0.265   0.470
+           3300         2       -11.10633 +/-   0.02526     0.127   0.380
+           3400         2       -11.10781 +/-   0.03431     0.234   0.460
+           3500         2       -11.08031 +/-   0.03373     0.226   0.490
+           3600         2       -10.94667 +/-   0.03283     0.214   0.370
+           3700         2       -11.03524 +/-   0.02446     0.119   0.490
+           3800         2       -11.02948 +/-   0.03090     0.190   0.450
+           3900         2       -10.89562 +/-   0.03288     0.215   0.380
+           4000         2       -11.11985 +/-   0.04133     0.340   0.330
+           4100         2       -11.01712 +/-   0.02326     0.108   0.440
+           4200         2       -11.02076 +/-   0.03743     0.279   0.470
+           4300         2       -10.95576 +/-   0.03016     0.181   0.490
+           4400         2       -10.92836 +/-   0.02935     0.171   0.490
+           4500         2       -10.98073 +/-   0.03069     0.187   0.480
+           4600         2       -10.95461 +/-   0.04452     0.394   0.370
+           4700         2       -10.99936 +/-   0.02402     0.115   0.470
+           4800         2       -11.06280 +/-   0.03764     0.282   0.470
+           4900         2       -11.00230 +/-   0.02675     0.142   0.400
+
+
+  FINAL RESULT:
+ total energy                 =     -11.03174 +/- 0.01279 E_h
+ block average energy         =     -11.03174 E_h
+ variance (of wave function)  =       0.23713 E_h^2
+ tau (adapted)                =        0.2441 fixed at step          750
+ N_corr (<5%)                 =       7.9
+ N_corr (global)              =       6.6
+
+ WARNING: stddev and global N_corr may be unreliable
+  (block_len < 20*N_corr)
+
+ sample accumulation: new total sample size is         1000
+
+ wall clock time for   qmc :               2.14 s
+ cpu time (master) for qmc :               0.80 s
+
+
+
+ =======>      $save_results - storing current results      <=======
+
+
+ =======>      $print_results - printing stored results      <=======
+
+
+table of results:
+
+   i          E            stddev           var
+ -------------------------------------------------------
+    1      -11.00126        0.01092          0.172
+    2      -11.03174        0.01279          0.247
+-------------------------------------------------------
+
+
+
+ wall clock time for run         :   0d 00:00:14.781
+ total cpu time for run (core-h) :            0.0031
+ cpu time per mpi process (h)    :            0.0015
+
+Amolqc run finished on Thu Oct  4 18:20:10 2018  
+
+Bye!
+
+

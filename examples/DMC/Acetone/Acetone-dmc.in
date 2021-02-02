@@ -1,0 +1,4 @@
+$gen(seed=201)
+$wf(read,file='Acetone-vm.wf')
+$generate_sample(size=30, steps=1500, block_len=500)
+$qmc(dmc, tau=0.002, E_ref=-192.943, steps=1M, block_len=2500, discard=7500, std_dev=0.001)

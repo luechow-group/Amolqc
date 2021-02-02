@@ -1,0 +1,270 @@
+! Copyright (C) 2018 Arne Luechow
+!
+! SPDX-License-Identifier: GPL-3.0-or-later
+
+module minimizer_module
+
+   use kinds_m, only: r8
+   use globalUtils_m, only: getMyTaskId
+   use fctn_module, only: Function_t
+   use verbosity_m, only: Verbosity_t
+   implicit none
+
+   private
+   public :: minimizer
+
+   type, extends(Verbosity_t), abstract :: minimizer
+      !!!private
+      real(r8)                        :: convergence_max_distance_ = 0.d0
+      real(r8)                        :: convergence_max_gradient_ = 0.d0
+      real(r8)                        :: convergence_max_gradnorm_ = 0.d0
+      real(r8)                        :: value_ = 0.d0
+      real(r8), allocatable           :: gradient_(:)
+      real(r8)                        :: max_abs_gradient_ = 0.1d0
+      real(r8)                        :: max_mean_gradient_ = 0.1d0
+      logical                       :: converged_ = .false.
+      integer                       :: current_iterations_ = 0
+      integer                       :: max_iterations_ = 100
+      integer                       :: current_fctn_eval_ = 0
+      integer                       :: path_count_ = 0
+   contains
+      procedure(minimizer_interface), deferred :: minimize
+      procedure                                :: reset       ! resets current values only
+      procedure                                :: is_converged
+      procedure                                :: set_converged
+      procedure                                :: set_convergence_distance
+      procedure                                :: set_convergence_gradient
+      procedure                                :: set_convergence_gradnorm
+      procedure                                :: convergence_distance
+      procedure                                :: convergence_gradient
+      procedure                                :: convergence_gradnorm
+      procedure                                :: is_distance_converged
+      procedure                                :: is_gradient_converged
+      procedure                                :: is_gradnorm_converged
+      procedure                                :: value
+      procedure                                :: set_value
+      procedure                                :: gradient
+      procedure                                :: gradnorm
+      procedure                                :: set_gradient
+      procedure                                :: iterations
+      procedure                                :: set_iterations
+      procedure                                :: max_iterations
+      procedure                                :: set_max_iterations
+      procedure                                :: function_evaluations
+      procedure                                :: set_function_evaluations
+      procedure, non_overridable               :: write_params_minimizer
+      procedure                                :: write_params => write_params_minimizer
+      procedure                                :: write_opt_path
+      procedure                                :: do_write_opt_path
+      procedure                                :: write_opt_path_entry
+   end type minimizer 
+
+   abstract interface
+      subroutine minimizer_interface(this, fn, x)
+         import :: minimizer, Function_t, r8
+         class(minimizer), intent(inout)  :: this
+         class(Function_t), intent(in)     :: fn
+         real(r8), intent(inout)            :: x(:)
+      end subroutine minimizer_interface
+   end interface
+
+contains
+
+   subroutine reset(this)
+      class(minimizer)      :: this
+      this%converged_ = .false.
+      this%value_ = 0.d0
+      if (allocated(this%gradient_)) this%gradient_ = 0.d0
+      this%current_iterations_ = 0
+      this%current_fctn_eval_ = 0
+   end subroutine reset
+
+   function is_converged(this) result (res)
+      class(minimizer), intent(in) :: this
+      logical                      :: res
+      res = this%converged_
+   end function is_converged
+
+   subroutine set_converged(this, tf)
+      class(minimizer), intent(inout) :: this
+      logical, intent(in)             :: tf
+      this%converged_ = tf
+   end subroutine set_converged
+
+   subroutine set_convergence_distance(this, distance)
+      class(minimizer), intent(inout) :: this
+      real(r8), intent(in)              :: distance
+      this%convergence_max_distance_ = distance
+   end subroutine set_convergence_distance
+
+   subroutine set_convergence_gradient(this, gradient)
+      class(minimizer), intent(inout) :: this
+      real(r8), intent(in)              :: gradient
+      this%convergence_max_gradient_ = gradient
+   end subroutine set_convergence_gradient
+
+   subroutine set_convergence_gradnorm(this, gradnorm)
+      class(minimizer), intent(inout) :: this
+      real(r8), intent(in)              :: gradnorm
+      this%convergence_max_gradnorm_ = gradnorm
+   end subroutine set_convergence_gradnorm
+
+   function convergence_distance(this) result(distance)
+      class(minimizer), intent(inout) :: this
+      real(r8)                          :: distance
+      distance = this%convergence_max_distance_ 
+   end function convergence_distance
+
+   function convergence_gradient(this) result(gradient)
+      class(minimizer), intent(inout) :: this
+      real(r8)                          :: gradient
+      gradient = this%convergence_max_gradient_
+   end function convergence_gradient
+
+   function convergence_gradnorm(this) result(gradnorm)
+      class(minimizer), intent(inout) :: this
+      real(r8)                          :: gradnorm
+      gradnorm = this%convergence_max_gradnorm_ 
+   end function convergence_gradnorm
+
+   function is_distance_converged(this, distance) result (res)
+      class(minimizer), intent(in) :: this
+      real(r8), intent(in)           :: distance
+      logical                      :: res
+      res = distance < this%convergence_max_distance_
+   end function is_distance_converged
+
+   function is_gradient_converged(this, gradient) result (res)
+      class(minimizer), intent(in) :: this
+      real(r8), intent(in)           :: gradient
+      logical                      :: res
+      res = gradient < this%convergence_max_gradient_
+   end function is_gradient_converged
+
+   function is_gradnorm_converged(this, gradnorm) result (res)
+      class(minimizer), intent(in) :: this
+      real(r8), intent(in)           :: gradnorm
+      logical                      :: res
+      res = gradnorm < this%convergence_max_gradnorm_
+   end function is_gradnorm_converged
+
+   function value(this) result (res)
+      class(minimizer), intent(in) :: this
+      real(r8)                       :: res
+      res = this%value_
+   end function value
+
+   subroutine set_value(this, val)
+      class(minimizer), intent(inout) :: this
+      real(r8), intent(in)              :: val
+      this%value_ = val
+   end subroutine set_value
+
+   function gradient(this) result (res)
+      class(minimizer), intent(in) :: this
+      real(r8), allocatable          :: res(:)
+      if (allocated(this%gradient_)) then
+         res = this%gradient_
+      else
+         allocate(res(1))
+         res(1) = 0.d0
+      end if
+   end function gradient
+
+   function gradnorm(this) result (res)
+      class(minimizer), intent(in) :: this
+      real(r8)                       :: res
+      res = sqrt( dot_product( this%gradient_, this%gradient_ ) )
+   end function gradnorm
+
+   subroutine set_gradient(this, grad)
+      class(minimizer), intent(inout) :: this
+      real(r8), intent(in)              :: grad(:)
+      this%gradient_ = grad               ! automatic allocation 
+   end subroutine set_gradient
+
+   function iterations(this) result (res)
+      class(minimizer), intent(in) :: this
+      integer                      :: res
+      res = this%current_iterations_
+   end function iterations
+
+   subroutine set_iterations(this, val)
+      class(minimizer), intent(inout) :: this
+      integer, intent(in)             :: val
+      this%current_iterations_ = val 
+   end subroutine set_iterations
+
+   function max_iterations(this) result (res)
+      class(minimizer), intent(in) :: this
+      integer                      :: res
+      res = this%max_iterations_
+   end function max_iterations
+
+   subroutine set_max_iterations(this, val)
+      class(minimizer), intent(inout) :: this
+      integer, intent(in)             :: val
+      this%max_iterations_ = val
+   end subroutine set_max_iterations
+
+   function function_evaluations(this) result (res)
+      class(minimizer), intent(in) :: this
+      integer                      :: res
+      res = this%current_fctn_eval_
+   end function function_evaluations
+
+   subroutine set_function_evaluations(this, val)
+      class(minimizer), intent(inout) :: this
+      integer, intent(in)             :: val
+      this%current_fctn_eval_ = val 
+   end subroutine set_function_evaluations
+
+   subroutine write_params_minimizer(this, iu)
+      class(minimizer), intent(in) :: this
+      integer, intent(in) , optional :: iu
+      integer iull
+      if (present(iu)) then
+         iull = iu
+      else
+         iull = this%verbose_unit()
+      end if
+
+      write(iull,"(a)") " minimizer parameters:"
+      write(iull,"(a,i8)") " max_iterations      =", this%max_iterations_
+      write(iull,"(a,i3)") " verbose             =", this%verbose()
+      if (this%convergence_max_distance_ > 0.d0)  &
+         write(iull, "(a,g13.5)") " convergence_distance=", this%convergence_max_distance_
+      if (this%convergence_max_gradient_ > 0.d0)  &
+         write(iull, "(a,g13.5)") " convergence_gradient=", this%convergence_max_gradient_
+      if (this%convergence_max_gradnorm_ > 0.d0)  &
+         write(iull, "(a,g13.5)") " convergence_gradnorm=", this%convergence_max_gradnorm_
+   end subroutine write_params_minimizer
+
+   subroutine write_opt_path(this, counter)
+      class(minimizer), intent(inout) :: this
+      integer, intent(in)                    :: counter
+      this%path_count_ = counter
+   end subroutine write_opt_path
+
+   function do_write_opt_path(this) result(res)
+      class(minimizer), intent(inout) :: this
+      logical                                :: res
+      res = this%path_count_ > 0
+   end function do_write_opt_path
+
+   subroutine write_opt_path_entry(this, k, x, f)
+      class(minimizer), intent(inout) :: this
+      integer, intent(in)                    :: k
+      real(r8), intent(in)                     :: x(:)
+      real(r8), intent(in)                     :: f
+      integer iu, i
+
+      iu = 300 + getMyTaskId()
+      write(iu,'(a, 2i6, a, f14.5, a)') "OPTPATH:", this%path_count_, k, "   F(Max):",  f, "  found: 0 0 0 0 0"
+      write(iu,'(i5)') size(x) / 3
+      do i = 1, size(x) / 3
+         write(iu,'(3f14.7)') x(3*i-2), x(3*i-1), x(3*i)
+      enddo
+   end subroutine write_opt_path_entry
+
+end module minimizer_module

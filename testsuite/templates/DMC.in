@@ -1,0 +1,6 @@
+$gen(seed=101)
+$wf(read,file='../../wavefunction/H2O-SM3.wf')
+$sample(size=30)
+$sample(remove_outliers)
+$qmc(vmc,steps=400,block_len=100,discard_all)
+$qmc(dmc,steps=1k,block_len=100,tau=0.002,discard=300)

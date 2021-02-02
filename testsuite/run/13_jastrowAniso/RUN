@@ -1,0 +1,65 @@
+#! /bin/bash
+rm -f *in *out*
+rm -f symmAO.dat
+echo " Anisotropic Jastrow tests ..."
+for i in 'ao-all-p' 'ao-all-d' 'eenao-all-p' 'eennao-all-p'
+do
+  cp ../../templates/JASaniso.in $i.in
+  b="${i//-/ }"
+  $SED -i "s/XXX/$b/" $i.in
+  $AMOLQCRUN $i
+
+  R=`grep "total energy" $i.$REF|tail -n 1|awk {'print $4;'}`
+  C=`grep "total energy" $i.out|tail -n 1|awk {'print $6;'}`
+  if [ $R == $C ] ; then
+    echo -e "    $i Jastrow test \033[32mpassed.\033[39m"
+    rm -f $i.in $i.out
+  else
+    export FAILED=1
+    echo -e "    $i Jastrow test \033[31mfailed.\033[39m"
+    echo "    Check $PWD/$i.out for more information."
+  fi
+done
+
+cp ../../templates/symmAO.dat symmAO.dat
+for i in 'ao-all-p-symm' 'eenao-all-p-symm' 'eennao-all-p-symm'
+do
+  cp ../../templates/JASaniso.in $i.in
+  b="${i//-symm/}"
+  b="${b//-/ }"
+  $SED -i "s/XXX/$b/" $i.in
+  $AMOLQCRUN $i
+
+  R=`grep "total energy" $i.$REF|tail -n 1|awk {'print $4;'}`
+  C=`grep "total energy" $i.out|tail -n 1|awk {'print $6;'}`
+  if [ $R == $C ] ; then
+    echo -e "    $i Jastrow test \033[32mpassed.\033[39m"
+    rm -f $i.in $i.out
+  else
+    export FAILED=1
+    echo -e "    $i Jastrow test \033[31mfailed.\033[39m"
+    echo "    Check $PWD/$i.out for more information."
+  fi
+done
+rm -f symmAO.dat
+
+for i in 'ao-all-p-ECP' 'eenao-all-p-ECP' 'eennao-all-p-ECP'
+do
+  cp ../../templates/JASanisoECP.in $i.in
+  b="${i//-ECP/}"
+  b="${b//-/ }"
+  $SED -i "s/XXX/$b/" $i.in
+  $AMOLQCRUN $i
+
+  R=`grep "total energy" $i.$REF|tail -n 1|awk {'print $4;'}`
+  C=`grep "total energy" $i.out|tail -n 1|awk {'print $6;'}`
+  if [ $R == $C ] ; then
+    echo -e "    $i Jastrow test \033[32mpassed.\033[39m"
+    rm -f $i.in $i.out
+  else
+    export FAILED=1
+    echo -e "    $i Jastrow test \033[31mfailed.\033[39m"
+    echo "    Check $PWD/$i.out for more information."
+  fi
+done
+

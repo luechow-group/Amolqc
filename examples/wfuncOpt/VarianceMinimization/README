@@ -1,0 +1,6 @@
+This folder contains examples for wave function variance minimizations
+
+VMC-OPT-H2O: Variance minimization calculation for water. The input file of this example
+ 	can be used for most cases.
+VMC-OPT-C6H6: Variance minimization calculation for Benzene. The input file of this example
+ 	can be used for cases that optimization fail with jastrow_varmin_safe macro.

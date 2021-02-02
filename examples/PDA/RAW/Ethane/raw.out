@@ -1,0 +1,397 @@
+
+
+              __  __    ____    _         ____     _____   
+      /\     |  \/  |  / __ \  | |       / __ \   / ____|  
+     /  \    | \  / | | |  | | | |      | |  | | | |       
+    / /\ \   | |\/| | | |  | | | |      | |  | | | |       
+   / ____ \  | |  | | | |__| | | |____  | |__| | | |____   
+  /_/    \_\ |_|  |_|  \____/  |______|  \___\_\  \_____|  
+
+
+ Atoms and Molecules with Quantum Monte Carlo -- electron structure code
+
+ initial version:
+  Arne Luechow, Penn State University, 2/1996
+
+ main author:
+  Arne Luechow, RWTH Aachen University, 52056 Aachen, Germany
+
+ with contributions from:
+  Sebastian Manten, Christian Diedrich, Annika Bande, Tony Scott,
+  Annett Schwarz, Rene Petz, Raphael Berner, Alexander Sturm,
+  Christopher Pezley, Lennart Scharf, Marko Hermsen, Kaveh Haghighi Mood,
+  Christoph Schulte, Sebastian Klahm, Michael Andree Heuer, Leonard Reuter,
+  Jil Ludovicy
+
+
+ version:          version-6.7-dev-1079-g829bab
+ compiler version: Intel(R) Fortran Intel(R) 64 Compiler for applications running on Intel(R) 64, Version 18.0.3.222 Build 20180410
+ compiler options: -fpp -warn none -O3
+ mpi version:      Intel(R) MPI Library 2017 Update 4 for Linux* OS
+
+
+
+ run started on tcrocks.pc.rwth-aachen.de at 2020-04-23T14:33:07.400+02:00 on    4 processor(s)
+ using path: /home/reuter/Amolqc
+ 
+==============================> reading input <=================================
+ 
+$gen(seed=101)
+$wf(read, file='Ethane-em.wf')
+$generate_walker(steps=1000)
+$init_rawdata_generation(max_records=500k)
+$init_max_search(max_distance=0.05, latency=50)
+$qmc(vmc, steps=2000, block_len=100, step_stride=20) ! small vmc run with 2000/20=100 samples per core
+ 
+==========> $gen - initializing RNG and setting general parameters <============
+ 
+ seed =    101     verbose level = 2
+ 
+===========================> $wf - wave function <==============================
+ 
+ wave function settings:
+    with BLAS/LAPACK      
+    cusp-corrected splines for contracted GTOs
+
+ using sequential AO and MO mode 
+ 
+ using the standard determinant update algorithm
+ 
+ wave function Ethane-em.wf with: 
+           title =ethane
+           basis =       TZPAE       MO format =         gau         jastrow =   ic       
+          charge =     0                  spin =     1                 coord =  angstrom  
+  atomic_charges =      F      same_atoms =      F    no_H_jastrow =      F
+ 
+  geometry (in angstrom):
+C    0.00000   0.00000   0.76531
+C    0.00000   0.00000  -0.76531
+H   -0.50888   0.88233   1.16371
+H    1.01856  -0.00047   1.16371
+H   -0.50969  -0.88187   1.16371
+H    0.50969  -0.88187  -1.16371
+H   -1.01856  -0.00047  -1.16371
+H    0.50888   0.88233  -1.16371
+ 
+
+ basis set:
+ basis name: TZPAE.abs
+ different basis functions  =   42
+ individual basis functions =   76
+
+ basis read ...
+
+
+ calculation with   18 electrons
+   9 alpha and    9 beta
+
+ Jastrow factor of type ic read with:
+  Schmidt-Moskowitz radial function
+   7 ee terms,   14 en terms,   30 een terms
+  Jastrow factor read ...
+ 
+ AO/MO evaluation carried out using aocalc and mocalc.
+ 
+  MOs read ...
+ 
+    NCSFs =        1 Ndets =        1
+    1 unique alpha and    1 unique beta determinants
+                          are going to be calculated.
+ 
+  CSFs read ...
+
+
+  ---  Expanding macro cmd generate_walker to:
+X$sample(create, start=density, size=10)
+$qmc(vmc, steps=300, block_len=100, persist=9, accept_ratio=0.5, discard_all)
+$sample(remove_outliers)
+$sample(change_size, new_size=1)
+$qmc(vmc, steps=1000, block_len=100, accept_ratio=0.5, discard_all)
+
+ 
+============> $sample - creating or modifying the walker sample <===============
+ 
+ creating new sample
+
+ created initial random sample using atom densities
+ sample size (all nodes):           40
+ <E>_allnodes =     -80.2377 +/-       0.1248 V_allnodes =       0.6070
+ 
+
+ wall clock time for   sample :               0.01 s
+ cpu time (master) for sample :               0.01 s
+
+
+ 
+=====================> $qmc - running a qmc calculation <=======================
+ 
+
+   * * *  VMC calculation  * * *
+
+    QMC parameters:
+
+                 tau =     0.02310             adapt tau =           T
+        total walker =          40          local walker =          10
+               steps =         300               discard =         300
+           block_len =         100          walker_block =           1
+         step_stride =          10
+ target accept ratio =     0.50000
+               E_ref =     0.00000                  wfac =     1.00000
+        E_loc_cutoff =           F                factor =     1.00000
+        kill_persist =           T           max_persist =           9
+        load balance =           F                branch =           F
+      future walking =           F       pop ctrl = global
+              Reconf =           F             RcfMethod =           1
+          accumulate =           F
+ 
+    propagator parameters:
+
+              weight =        none                  move =     Umrigar
+            moveType =         all
+                 tau =     0.02310            drift_scal =     1.00000
+             AR step =           T             rej_cross =           F
+     expon. sampling =           T
+ 
+
+             step       size              <E>                   <V>     AR 
+ --------------------------------------------------------------------------
+            100        40       -79.79392 +/-   0.01610     1.036   0.560
+            200        40       -79.72117 +/-   0.01629     1.061   0.494
+            300        40       -79.74155 +/-   0.01720     1.183   0.518
+
+ qmc: Emean =       -79.74155 var =         1.18285
+
+ wall clock time for   qmc :               0.95 s
+ cpu time (master) for qmc :               0.95 s
+
+
+ 
+============> $sample - creating or modifying the walker sample <===============
+ 
+ removing outliers
+
+  using trimmed mean (parallel version)
+  parallel merge required:   2.5033951E-05  sec.
+  trimmed mean =      -79.821  sigma =        0.768
+      0 walkers will be deleted and replaced
+      0 processes attempted to exceed the limit of       1 deletions
+
+  after outlier removal:
+  final total walker size=      40 E_mean=      -79.83775 +/-    0.18542 var=           1.34
+
+ wall clock time for   sample :               0.00 s
+ cpu time (master) for sample :               0.00 s
+
+
+ 
+============> $sample - creating or modifying the walker sample <===============
+ 
+ changing size of sample
+ sample size has been reduced by       9 to       1 walkers per node
+ 
+
+ wall clock time for   sample :               0.00 s
+ cpu time (master) for sample :               0.00 s
+
+
+ 
+=====================> $qmc - running a qmc calculation <=======================
+ 
+
+   * * *  VMC calculation  * * *
+
+    QMC parameters:
+
+                 tau =     0.11249             adapt tau =           T
+        total walker =           4          local walker =           1
+               steps =        1000               discard =        1000
+           block_len =         100          walker_block =           1
+         step_stride =          10
+ target accept ratio =     0.50000
+               E_ref =     0.00000                  wfac =     1.00000
+        E_loc_cutoff =           F                factor =     1.00000
+        kill_persist =           F           max_persist =           0
+        load balance =           F                branch =           F
+      future walking =           F       pop ctrl = global
+              Reconf =           F             RcfMethod =           1
+          accumulate =           F
+ 
+    propagator parameters:
+
+              weight =        none                  move =     Umrigar
+            moveType =         all
+                 tau =     0.11249            drift_scal =     1.00000
+             AR step =           T             rej_cross =           F
+     expon. sampling =           T
+ 
+
+             step       size              <E>                   <V>     AR 
+ --------------------------------------------------------------------------
+            100         4       -79.69149 +/-   0.05166     1.065   0.590
+            200         4       -79.85975 +/-   0.05283     1.114   0.450
+            300         4       -79.89150 +/-   0.05318     1.128   0.600
+            400         4       -79.83965 +/-   0.04908     0.961   0.450
+            500         4       -79.88461 +/-   0.05117     1.045   0.340
+            600         4       -79.83744 +/-   0.05533     1.221   0.500
+            700         4       -79.81391 +/-   0.05870     1.375   0.380
+            800         4       -79.60701 +/-   0.05710     1.301   0.450
+            900         4       -79.65651 +/-   0.04543     0.823   0.510
+           1000         4       -79.68375 +/-   0.04817     0.926   0.620
+
+ qmc: Emean =       -79.68375 var =         0.92571
+
+ wall clock time for   qmc :               0.32 s
+ cpu time (master) for qmc :               0.32 s
+
+
+ 
+=======> $init_rawdata_generation - initializing raw data generation <==========
+ 
+ Raw data is written in binary format into "raw"
+ in the following order, dimensionality, and precision:
+ ---------------Header----------------
+               number of atoms ( 1*i4)
+         atomic numbers vector ( N*i4)
+         atom positions vector (3N*r8)
+           number of electrons ( 1*i4)
+     number of alpha electrons ( 1*i4)
+ ----------------Body-----------------
+   1.  sample positions vector (3N*r8)
+       kinetic energies vector ( N*r8)
+      maximum positions vector (3N*r8)
+              -ln|Psi|^2 value ( 1*r8)
+   2. ...                             
+ 
+==============> $init_max_search - initializing maxima search <=================
+ 
+ -- BFGS minimizer with singularity correction
+ minimizer parameters:
+ max_iterations      =    1000
+ verbose             =  0
+ convergence_gradient=  0.10000E-03
+
+ singularity correction parameters:
+ sing_thresh         =  0.50000E-02
+ corr_thresh         =  0.10000    
+ corr_mode           = 12
+ scaling             =  T
+
+ -- simple line search with step correction
+ with:
+ alpha               =    1.00    
+ c                   =   0.100    
+ rho                 =   0.330    
+ max_distance        =   0.500E-01
+
+ BFGS parameters:
+ scale_initial_H     =    F
+ step                = 0.10000    
+ latency             =          50
+ 
+=====================> $qmc - running a qmc calculation <=======================
+ 
+
+   * * *  VMC calculation  * * *
+
+    QMC parameters:
+
+                 tau =     0.13179             adapt tau =           T
+        total walker =           4          local walker =           1
+               steps =        2000               discard =           0
+           block_len =         100          walker_block =           1
+         step_stride =          20
+ target accept ratio =     0.50000
+               E_ref =     0.00000                  wfac =     1.00000
+        E_loc_cutoff =           F                factor =     1.00000
+        kill_persist =           F           max_persist =           0
+        load balance =           F                branch =           F
+      future walking =           F       pop ctrl = global
+              Reconf =           F             RcfMethod =           1
+          accumulate =           F
+ 
+    propagator parameters:
+
+              weight =        none                  move =     Umrigar
+            moveType =         all
+                 tau =     0.13179            drift_scal =     1.00000
+             AR step =           T             rej_cross =           F
+     expon. sampling =           T
+ 
+
+             step       size              <E>                   <V>     AR 
+ --------------------------------------------------------------------------
+            100         4       -79.76328 +/-   0.04850     0.939   0.540
+            200         4       -79.79277 +/-   0.04600     0.844   0.340
+            300         4       -79.74404 +/-   0.05035     1.011   0.520
+            400         4       -79.66763 +/-   0.06812     1.852   0.540
+            500         4       -79.69323 +/-   0.05204     1.081   0.470
+            600         4       -79.83760 +/-   0.06389     1.629   0.380
+            700         4       -79.65438 +/-   0.05482     1.199   0.420
+            800         4       -79.81256 +/-   0.05569     1.238   0.440
+            900         4       -79.65918 +/-   0.05699     1.296   0.300
+           1000         4       -79.64077 +/-   0.05585     1.245   0.370
+           1100         4       -79.74688 +/-   0.04556     0.828   0.400
+           1200         4       -79.60357 +/-   0.06029     1.450   0.420
+           1300         4       -79.78103 +/-   0.05642     1.270   0.470
+           1400         4       -79.83028 +/-   0.06293     1.580   0.530
+           1500         4       -79.79048 +/-   0.04938     0.973   0.550
+           1600         4       -79.63839 +/-   0.04828     0.930   0.440
+           1700         4       -79.70435 +/-   0.05410     1.168   0.370
+           1800         4       -79.67843 +/-   0.05189     1.074   0.500
+           1900         4       -79.63146 +/-   0.05168     1.065   0.620
+           2000         4       -79.67103 +/-   0.08143     2.645   0.490
+
+
+  FINAL RESULT:
+ total energy (mean E_loc)    =     -79.71707 +/- 0.01636 E_h
+ block average energy         =     -79.71707 E_h
+ variance (of E_loc)          =       1.27098 +/- 0.09428 E_h^2
+ block average variance       =       1.26590 E_h^2
+ tau (adapted)                =        0.1212 fixed at step         1625
+ N_corr (<5%)                 =      10.3
+ N_corr (global)              =       1.6
+
+  FLYVBJERG-PETERSEN: 
+ variance                     =       1.27114 E_h^2
+ error                        =       0.02451 E_h
+ block length                 =      16
+ n_corr                       =       3.78
+
+ log2(blen)   error estimate   errors error
+          0        0.0126053      0.0001993
+          1        0.0157994      0.0003533
+          2        0.0188721      0.0005969
+          3        0.0223020      0.0009979
+          4        0.0241271      0.0015275
+          5        0.0239535      0.0021468
+          6        0.0254499      0.0032321
+          7        0.0241392      0.0043709
+          8        0.0282885      0.0073041
+          9        0.0372996      0.0140979
+         10        0.0389363      0.0224799
+         11        0.0568829      0.0568829
+ 
+ Summary for maxima search:
+ 
+ # minimizer calls                      :     400
+ # maxima analyzed (converged)          :     400
+ average # iterations                   :     133
+ average # function/gradient evaluations:     136
+ 
+ Raw data was written in file raw.
+
+ wall clock time for   qmc :               5.67 s
+ cpu time (master) for qmc :               5.67 s
+
+
+
+
+ wall clock time for run         :   0d 00:00:06.954
+ total cpu time for run (core-h) :            0.0077
+ cpu time per mpi process (h)    :            0.0019
+
+Amolqc run finished on 2020-04-23T14:33:14.354+02
+
+Bye!
+
+

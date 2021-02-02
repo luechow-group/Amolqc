@@ -1,0 +1,43 @@
+$begin_subroutine(name=aeq)
+$sample(change_size,new_size=init_size,last)
+$qmc(vmc,steps=300,block_len=100,accept_ratio=0.5,discard_all)
+$qmc(vmc,accumulate,step_stride=10,acc_size=500,block_len=100,
+accept_ratio=0.5,discard=1,move=umr)
+$save_result()
+$sample(remove_outliers,no_replace)
+$end_subroutine()
+
+
+$gen(seed=101)
+$wf(read,file='../../wavefunction/C2CAS44.wf')
+$sample(create,start=density,generate=random,size=1)
+$qmc(vmc,steps=300,block_len=100,accept_ratio=0.5,discard_all)
+$qmc(vmc,accumulate,step_stride=10,acc_size=500,block_len=100,
+accept_ratio=0.5,discard=1,move=umr)
+$sample(remove_outliers,no_replace)
+$optimize_parameters(params=jas+mo+ci,method=lm_newton,E_ref=-76.0,eq_iter=2
+,energy_min,eq_call=aeq,
+nu=0.0001,delta_f_min=0.0001,max_var=10.0
+mo_update_mode=2, mo_param_mode=2,
+,orbital_rotation_list=
+6
+2 1 3 
+7 9  13 16 23 33 35 37
+2 2 4 
+7 10 17 18 30 34 36 38 
+1 5 
+3 11 22 26  
+1 6 
+3 12 21 27
+1 7
+3 15 29 32
+1 8
+3 14 28 31 
+
+)
+$sample(change_size,new_size=1,last)
+$qmc(vmc,steps=300,block_len=100,accept_ratio=0.5,discard_all)
+$qmc(vmc,accumulate,step_stride=10,acc_size=500,block_len=100,
+accept_ratio=0.5,discard=1,move=umr)
+$save_result()
+$print_results()

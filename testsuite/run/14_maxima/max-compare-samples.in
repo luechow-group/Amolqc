@@ -1,0 +1,10 @@
+! the wave function is actually not needed
+$wf(read, file='../../wavefunction/H2O-SM3.wf')
+!
+! comparing bfgs
+$sample(read, pos_file='bfgs.pos.ref', size=100)
+$compare_sample(file='bfgs.pos', max_sample_size=100, threshold=1e-5)
+! optimizing with steepest descent
+$sample(read, pos_file='steep-desc.pos.ref', size=100)
+$compare_sample(file='steep-desc.pos', max_sample_size=100)
+

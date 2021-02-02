@@ -1,0 +1,3 @@
+$gen(seed=101)
+$wf(read,file='../../wavefunction/H2O-SM3.wf')
+$sample(create,start=XXX,generate=random,size=10)

@@ -1,0 +1,31 @@
+module parsing_tm
+   use PFUNIT_MOD
+   use kinds_m, only: r8
+   use parsing_m, only: getintarra, getdblarra
+
+   implicit none
+
+   integer, parameter :: nl = 1
+   character(len = 120), parameter :: lines(nl) = ['$macros(intarr=42;-10;0,dblarr=-.1d-0;42e+1;142857;2.718;3.e0)']
+
+contains
+@Test
+   subroutine TestGetintarra()
+      integer, allocatable :: intarr(:)
+      integer :: iflag
+
+      call getintarra(lines, nl, 'intarr=', intarr, iflag)
+      @assertEqual([42, -10, 0], intarr)
+   end subroutine TestGetintarra
+
+@Test
+   subroutine TestGetdblarra()
+      real(r8), allocatable :: dblarr(:)
+      integer :: iflag
+
+      call getdblarra(lines, nl, 'dblarr=', dblarr, iflag)
+      @assertEqual([-.1_r8, 420._r8, 142857._r8, 2.718_r8, 3._r8], dblarr, tolerance = EPSILON(0._r8))
+   end subroutine TestGetdblarra
+
+   ! TODO: test other procedures
+end module parsing_tm

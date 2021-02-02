@@ -1,0 +1,63 @@
+! Copyright (C) 2019 Leonard Reuter
+!
+! SPDX-License-Identifier: GPL-3.0-or-later
+
+module plateau_tm
+    use PFUNIT_MOD
+    use kinds_m, only : r8
+    use plateau_m, only: Find_plateau
+    implicit none
+
+contains
+@Test
+    subroutine TestFind_plateau()
+        real(r8) :: ydata(13) = [0.0001979, 0.0003046, 0.0004154, 0.0005017, 0.0005403, 0.0005502, &
+                             0.0005513, 0.0005498, 0.0005511, 0.0005485, 0.000509, 0.0005737, 0.0009247]
+        logical :: ref(13) = [.false., .false., .false., .false., .true., .true., &
+                .true., .true., .true., .true., .true., .false., .false.]
+
+        @assertTrue(ref .eqv. Find_plateau(ydata))
+    end subroutine TestFind_plateau
+
+@Test
+subroutine TestTwoPlateaus()
+    real(r8) :: ydata(13) = [0.0001979, 0.0003046, 0.0004154, 0.0005017, 0.0005403, 0.0005502, &
+            0.0004, 0.0005498, 0.0005511, 0.0005485, 0.000509, 0.0005737, 0.0009247]
+    logical :: ref(13) = [.false., .false., .false., .false., .false., .false., &
+            .false., .false., .true., .true., .true., .false., .false.]
+
+    @assertTrue(ref .eqv. Find_plateau(ydata))
+end subroutine TestTwoPlateaus
+
+@Test
+subroutine TestSingleExample()
+    real(r8) :: ydata(21) = [0.0005171,&
+    0.0005164,&
+    0.0005167,&
+    0.0005167,&
+    0.0005171,&
+    0.000517,&
+    0.000515,&
+    0.000572,&
+    0.0006907,&
+    0.0008163,&
+    0.0009096,&
+    0.0009756,&
+    0.0010281,&
+    0.0010548,&
+    0.0010768,&
+    0.0010729,&
+    0.0010151,&
+    0.0008754,&
+    0.0010527,&
+    0.0008093,&
+    0.000851]
+    logical :: ref(21) = .false.
+
+    ref(14) = .true.
+    ref(15) = .true.
+
+    @assertTrue(ref .eqv. Find_plateau(ydata))
+end subroutine TestSingleExample
+
+end module plateau_tm

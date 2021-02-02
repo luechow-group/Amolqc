@@ -1,0 +1,27 @@
+
+$gen(seed=101)
+$wf(read,file='../../wavefunction/C2CAS44.wf')
+$sample(create,size=1)
+$qmc(vmc,move=umr,steps=300,block_len=100,acc_ratio=0.5,discard_all)
+$qmc(vmc,accumulate,step_stride=10,acc_size=500,block_len=100,
+accept_ratio=0.5,discard=1,move=umr)
+$sample(remove_outliers,no_replace)
+$wf_param_deriv_test(params=XXX,verbose=3,tol=1.d-7
+mo_update_mode=2, mo_param_mode=2,
+,orbital_rotation_list=
+6
+2 1 3 
+7 9  13 16 23 33 35 37
+2 2 4 
+7 10 17 18 30 34 36 38 
+1 5 
+3 11 22 26  
+1 6 
+3 12 21 27
+1 7
+3 15 29 32
+1 8
+3 14 28 31 
+
+)
+

@@ -1,0 +1,120 @@
+! Copyright (C) 2019 Leonard Reuter
+!
+! SPDX-License-Identifier: GPL-3.0-or-later
+
+module rhoData_tm
+   use PFUNIT_MOD
+   use kinds_m, only: r8
+   use rhoData_m, only:  rhoData_t, operator(+), assignment(=)
+   use wfData_m, only: getNNuc, ncenter, atoms
+   use atom_m, only: atom, atoms_configure, atom_init, atom_getPosition
+   implicit none
+
+   type(rhoData_t) :: rhoData
+   type(atom) :: waterMolecule(3)
+
+contains
+   subroutine init()
+      call atoms_configure(angstrom=.true.,withSA=.false.,withBasis=.false.,withCharge=.false.)
+      call atom_init(waterMolecule(1),0._r8, 0._r8    , 0.1173_r8,atomIdx=8)
+      call atom_init(waterMolecule(2),0._r8, 0.7572_r8,-0.4692_r8,atomIdx=1)
+      call atom_init(waterMolecule(2),0._r8,-0.7572_r8,-0.4692_r8,atomIdx=1)
+      atoms = waterMolecule
+   end subroutine init
+
+@Test
+   subroutine TestConstruction()
+      call init()
+      rhoData = rhoData_t(1._r8, 2._r8)
+
+      @assertEqual(0, rhoData%n)
+      @assertEqual(0, rhoData%nSamples)
+      @assertEqual(1._r8, rhoData%assignThresh)
+      @assertEqual(2._r8, rhoData%printThresh)
+      @assertEqual(0, SIZE(rhoData%partitions))
+   end subroutine TestConstruction
+
+@Test
+   subroutine TestAddData()
+      integer :: basins(1)
+      call init()
+      rhoData = rhoData_t(0.1_r8, 0.1_r8)
+
+      basins(1) = rhoData%getBasin(atom_getPosition(atoms(1)))
+      call rhoData%addData(basins)
+
+      @assertEqual(1, rhoData%n)
+      @assertEqual(1, rhoData%nSamples)
+      @assertEqual(1, SIZE(rhoData%partitions))
+   end subroutine TestAddData
+
+@Test
+   subroutine TestAddData2()
+      integer :: basins(1)
+      call init()
+      rhoData = rhoData_t(0.1_r8, 0.1_r8)
+
+      basins(1) = rhoData%getBasin(atom_getPosition(atoms(1)))
+      call rhoData%addData(basins)
+      basins(1) = rhoData%getBasin(atom_getPosition(atoms(2)))
+      call rhoData%addData(basins)
+      basins(1) = rhoData%getBasin(atom_getPosition(atoms(1)))
+      call rhoData%addData(basins)
+
+      @assertEqual(2, rhoData%n)
+      @assertEqual(3, rhoData%nSamples)
+      @assertEqual(2, SIZE(rhoData%partitions))
+   end subroutine TestAddData2
+
+@Test
+   subroutine TestAddData3()
+      integer :: basins(2)
+      call init()
+      rhoData = rhoData_t(0.1_r8, 0.1_r8)
+
+      basins(1) = rhoData%getBasin(atom_getPosition(atoms(1)))
+      basins(2) = rhoData%getBasin(atom_getPosition(atoms(1)))
+      call rhoData%addData(basins)
+
+      basins(1) = rhoData%getBasin(atom_getPosition(atoms(1)))
+      basins(2) = rhoData%getBasin(atom_getPosition(atoms(2)))
+      call rhoData%addData(basins)
+      call rhoData%addData(basins)
+
+      @assertEqual(2, rhoData%n)
+      @assertEqual(3, rhoData%nSamples)
+      @assertEqual(2, SIZE(rhoData%partitions))
+   end subroutine TestAddData3
+
+@Test
+   subroutine TestSum()
+      integer :: basins(2)
+      type(rhoData_t) :: rhoData2, rhoData3
+      call init()
+      rhoData = rhoData_t(0.1_r8, 0.1_r8)
+      rhoData2 = rhoData_t(0.1_r8, 0.1_r8)
+
+      basins(1) = rhoData%getBasin(atom_getPosition(atoms(1)))
+      basins(2) = rhoData%getBasin(atom_getPosition(atoms(1)))
+      call rhoData%addData(basins)
+      basins(1) = rhoData%getBasin(atom_getPosition(atoms(1)))
+      basins(2) = rhoData%getBasin(atom_getPosition(atoms(2)))
+      call rhoData%addData(basins)
+      call rhoData%addData(basins)
+
+      basins(1) = rhoData%getBasin(atom_getPosition(atoms(1)))
+      basins(2) = rhoData%getBasin(atom_getPosition(atoms(1)))
+      call rhoData2%addData(basins)
+      basins(1) = rhoData%getBasin(atom_getPosition(atoms(3)))
+      basins(2) = rhoData%getBasin(atom_getPosition(atoms(2)))
+      call rhoData2%addData(basins)
+      call rhoData2%addData(basins)
+
+      rhoData3 = rhoData + rhoData2
+
+      @assertEqual(3, rhoData3%n)
+      @assertEqual(6, rhoData3%nSamples)
+      @assertEqual(3, SIZE(rhoData3%partitions))
+   end subroutine TestSum
+
+end module rhoData_tm

@@ -1,0 +1,37 @@
+#! /bin/bash
+echo " Initial sample tests (AE) ..."
+for i in density gaussian
+do
+  cp ../../templates/sample.in $i.in
+  $SED -i "s/XXX/$i/" $i.in
+  rm -f $i.out $i.out-*
+  $AMOLQCRUN $i
+  sleep 1
+
+  R=`grep "<E>" $i.$REF |awk {'print $3'}`
+  C=`grep "<E>" $i.out |awk {'print $3'}`
+  if [ $R == $C ] ; then
+     echo -e "    $i sample test \033[32mpassed.\033[39m"
+     rm -f $i.in $i.out
+  else
+     export FAILED=1
+     echo -e "    $i sample test \033[31mfailed.\033[39m"
+     echo "    Check $PWD/$i.out for more information."
+  fi
+done
+
+##i=lmo
+##$AMOLQCRUN $i
+
+##R=`grep "<E>" $i.$REF |awk {'print $3'}`
+##C=`grep "<E>" $i.out |awk {'print $3'}`
+##if [ $R == $C ] ; then
+##  echo -e "    $i sample test \033[32mpassed.\033[39m"
+##  rm -f $i.out $i.out-*
+##else
+##  export FAILED=1
+##  echo -e "    $i sample test \033[31mfailed.\033[39m"
+##  echo "    Check $PWD/$i.out for more information."
+##fi
+
+

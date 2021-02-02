@@ -1,0 +1,7 @@
+$gen(seed=101)
+$wf(read, file='Acetone-em.wf')
+$generate_walker(steps=1000)
+$init_max_analysis(kmax=50, mmax=50, excl_file='excl_list', tol_sim=0.2, tol_same=0.01)
+$init_max_search(max_distance=0.05, latency=50)
+$qmc(vmc, steps=20000, block_len=1000, step_stride=20)
+

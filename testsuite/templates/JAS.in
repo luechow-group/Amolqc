@@ -1,0 +1,7 @@
+$gen(seed=101)
+$wf(read, file='../../wavefunction/XXX.wf')
+$sample(create, start=density, generate=random, size=1)
+$qmc(vmc, move=umr, steps=300, block_len=100, accept_ratio=0.5, discard_all)
+$qmc(vmc, mover=umr, steps=1k, block_len=100, accept_ratio=0.5, discard=0)
+$save_result()
+$print_results()

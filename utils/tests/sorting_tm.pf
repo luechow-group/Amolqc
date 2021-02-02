@@ -1,0 +1,31 @@
+! Copyright (C) 2019 Leonard Reuter
+!
+! SPDX-License-Identifier: GPL-3.0-or-later
+
+module sorting_tm
+    use PFUNIT_MOD
+    use kinds_m, only : i4, r8
+    use sorting_m, only: sort
+    implicit none
+
+contains
+
+@Test
+    subroutine TestDoubleSort()
+        real(r8) :: a(4) = [2._r8,-3._r8,0._r8,4._r8]
+
+        call sort(a)
+
+        @assertEqual(a, [-3._r8,0._r8,2._r8,4._r8])
+    end subroutine TestDoubleSort
+
+@Test
+    subroutine TestIntSort()
+        integer(i4) :: a(4) = [2_i4,-3_i4,0_i4,4_i4]
+
+        call sort(a)
+
+        @assertEqual(a, [-3_i4,0_i4,2_i4,4_i4])
+    end subroutine TestIntSort
+
+end module sorting_tm

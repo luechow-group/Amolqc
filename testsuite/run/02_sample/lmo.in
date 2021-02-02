@@ -1,0 +1,4 @@
+$gen(seed=101)
+$wf(read,file='../../wavefunction/ethan-lmo.wf')
+$sample(create,generate=random,start=lmo,size=10)
+

@@ -1,0 +1,175 @@
+
+
+              __  __    ____    _         ____     _____   
+      /\     |  \/  |  / __ \  | |       / __ \   / ____|  
+     /  \    | \  / | | |  | | | |      | |  | | | |       
+    / /\ \   | |\/| | | |  | | | |      | |  | | | |       
+   / ____ \  | |  | | | |__| | | |____  | |__| | | |____   
+  /_/    \_\ |_|  |_|  \____/  |______|  \___\_\  \_____|  
+
+
+ Atoms and Molecules with Quantum Monte Carlo -- electron structure code
+
+ initial version:
+  Arne Luechow, Penn State University, 2/1996
+
+ main author:
+  Arne Luechow, RWTH Aachen University, 52056 Aachen, Germany
+
+ with contributions from:
+  Sebastian Manten, Christian Diedrich, Annika Bande, Tony Scott,
+  Annett Schwarz, Rene Petz, Raphael Berner, Alexander Sturm,
+  Christopher Pezley, Lennart Scharf, Marko Hermsen, Kaveh Haghighi Mood,
+  Christoph Schulte, Sebastian Klahm, Michael Andree Heuer, Leonard Reuter,
+  Jil Ludovicy
+
+
+ version:          version-6.7-dev-1094-gadcb1a
+ compiler version: Intel(R) Fortran Intel(R) 64 Compiler for applications running on Intel(R) 64, Version 18.0.3.222 Build 20180410
+ compiler options: -fpp -warn none -O3
+ mpi version:      Intel(R) MPI Library 2017 Update 4 for Linux* OS
+
+
+
+ run started on tcrocks.pc.rwth-aachen.de at 2020-06-17T16:26:19.606+02:00 on    2 processor(s)
+ using path: /home/reuter/Amolqc
+ 
+==============================> reading input <=================================
+ 
+$gen(seed=101)
+$wf(read,file='c2h6_ks.wf')
+$sample(read,pos_file='sample.pos',size_total=199)
+$init_rho_analysis(
+method=steepest_descent,
+max_iter=200,
+convergence_gradient=0.0,
+correction_mode=cut,
+assign_thresh=.1,
+print_thresh=1e-12,
+fragments=1;2;1;2;1;1;2;2,
+step_size=1e12,
+max_distance_one=0.05
+)
+$maximize_sample_rho()
+ 
+==========> $gen - initializing RNG and setting general parameters <============
+ 
+ seed =    101     verbose level = 2
+ 
+===========================> $wf - wave function <==============================
+ 
+ wave function settings:
+    with BLAS/LAPACK      
+    cusp-corrected splines for contracted GTOs
+
+ using sequential AO and MO mode 
+ 
+ using the standard determinant update algorithm
+ 
+ wave function c2h6_ks.wf with: 
+           title =c2h6
+           basis =       TZPAE       MO format =         gau         jastrow =   none     
+          charge =     0                  spin =     1                 coord =  angstrom  
+  atomic_charges =      F      same_atoms =      F    no_H_jastrow =      F
+ 
+  geometry (in angstrom):
+C    0.00000   0.00000   0.76800
+C    0.00000   0.00000  -0.76800
+H   -1.01920   0.00000   1.15730
+H    1.01920   0.00000  -1.15730
+H    0.50960   0.88260   1.15730
+H    0.50960  -0.88260   1.15730
+H   -0.50960  -0.88260  -1.15730
+H   -0.50960   0.88260  -1.15730
+ 
+
+ basis set:
+ basis name: TZPAE.abs
+ different basis functions  =   42
+ individual basis functions =   76
+
+ basis read ...
+
+
+ calculation with   18 electrons
+   9 alpha and    9 beta
+
+ Jastrow factor of type none read with:
+  Jastrow factor read ...
+ 
+ AO/MO evaluation carried out using aocalc and mocalc.
+ 
+  MOs read ...
+ 
+    NCSFs =        1 Ndets =        1
+    1 unique alpha and    1 unique beta determinants
+                          are going to be calculated.
+ 
+  CSFs read ...
+ 
+============> $sample - creating or modifying the walker sample <===============
+ 
+ reading sample
+
+ created initial sample from file sample.pos
+
+ sample size (all nodes):          198
+ <E>_allnodes =     -79.6651 +/-       0.2393 V_allnodes =      11.2855
+ 
+
+ wall clock time for   sample :               0.15 s
+ cpu time (master) for sample :               0.02 s
+
+
+ 
+======> $init_rho_analysis - initializing electronic density analysis <=========
+ 
+  * * * Steepest Descent minimizer with singularity correction * * *
+ minimizer parameters:
+ max_iterations      =     200
+ verbose             =  0
+
+ singularity correction parameters:
+ sing_thresh         =  0.50000E-02
+ corr_thresh         =  0.10000    
+ corr_mode           =  2
+ scaling             =  F
+
+ -- simple line search with step correction
+ with:
+ alpha               =    1.00    
+ c                   =   0.100    
+ rho                 =   0.330    
+ max_step            =   0.500E-01
+ step=  0.10000E+13
+ 
+=============> $maximize_sample_rho - get rho maxima of sample <================
+ 
+ Converged minimizers:         198
+ 
+ Fragments
+  1  2  1  2  1  1  2  2
+ 
+ Weight     Partition
+ 0.51515152   9   9   0
+ 0.21717172   8  10   0
+ 0.25252525  10   8   0
+ 0.01010101  11   7   0
+ 0.00505051   7  11   0
+ 
+ Integrals of Basins
+   1:   9.0455
+   2:   8.9545
+   3:   0.0000
+ sum:  18.0000
+
+
+ wall clock time for run         :   0d 00:00:00.705
+ total cpu time for run (core-h) :            0.0003
+ cpu time per mpi process (h)    :            0.0002
+
+Amolqc run finished on 2020-06-17T16:26:20.312+02
+
+Bye!
+
+

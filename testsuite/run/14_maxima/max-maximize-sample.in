@@ -1,0 +1,23 @@
+$wf(read, file='../../wavefunction/H2O-SM3.wf')
+!
+! optimizing with bfgs
+$sample(read, pos_file='sample.pos', size=100)
+$init_max_search(method=bfgs, max_distance_all=0.1, step_size=0.1, switch_step=50, max_iter=1000,
+  convergence_gradient=0.0001, singularity_threshold=0.005, correction_threshold=0.1, correction_mode=cut)
+$maximize_sample()
+$write_sample(file='bfgs.pos')
+! optimizing with fire
+$sample(read, pos_file='sample.pos', size=100)
+$init_max_search(method=fire, overshoot=backtrack, tau_init=0.01, tau_max=0.1, 
+ delta_max=0.001, max_iter=10000, 
+ convergence_gradient=0.0001, singularity_threshold=0.005, correction_threshold=0.1, correction_mode=cut)
+$maximize_sample()
+$write_sample(file='fire.pos')
+! optimizing with steepest descent
+$sample(read, pos_file='sample.pos', size=100)
+$init_max_search(method=steepest_descent, overshoot=mod_step, 
+ step_size=0.1, alpha=0.2, delta_max=0.01, max_iter=20000,
+ convergence_gradient=0.0001, singularity_threshold=0.005, correction_threshold=0.1, correction_mode=cut)
+$maximize_sample()
+$write_sample(file='steep-desc.pos')
+

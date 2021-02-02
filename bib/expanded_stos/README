@@ -1,0 +1,4 @@
+The STOs are expanded into 14 GTOs for use in QM programs:
+*.gbs for Gaussian
+*.gms for Gamess
+*.ini for Molpro

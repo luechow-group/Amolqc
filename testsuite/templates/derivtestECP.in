@@ -1,0 +1,21 @@
+
+$gen(seed=101)
+$wf(read,file='../../wavefunction/C2-cas44-ECP.wf',no_cuspcor)
+$ecp(grid_points=6,full_cutoff,cutoff=1.d-7,no_random_rotation,loc_method=SD*J)
+$sample(create,size=1)
+$qmc(vmc,move=umr,steps=300,block_len=100,acc_ratio=0.5,discard_all)
+$qmc(vmc,accumulate,step_stride=10,acc_size=500,block_len=100,
+accept_ratio=0.5,discard=1,move=umr)
+$sample(remove_outliers,no_replace)
+$wf_param_deriv_test(params=XXX,verbose=3,tol=1.d-7
+mo_update_mode=2, mo_param_mode=2,
+orbital_rotation_list=
+3
+2 1 2    
+15  7 8 9 14 15 18 25 26 29 39 48 53 54 57 58     
+2 4 6 
+10  11 12 20 24 28 32 38 45 50 56   
+2 3 5  
+10 10 13 19 23 27 31 37 44 49 55  
+)
+

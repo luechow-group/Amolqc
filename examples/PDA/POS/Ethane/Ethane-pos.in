@@ -1,0 +1,12 @@
+$gen(seed=101)
+$wf(read,file='Ethane-em.wf')
+$sample(create,start=density,generate=random,size=10)
+$sample(remove_outliers)
+$qmc(vmc,accept_ratio=0.5,steps=30,block_len=10,persist=9,discard_all)
+$sample(change_size,new_size=1)
+$qmc(vmc,accept_ratio=0.5,steps=700,block_len=100,discard_all)
+$init_max_analysis(max_mode=pos,kmax=1,tol_sim=0.2,tol_same=0.01,
+    excl_file=excl_list,ref_file=Ethane-max.ref)
+$init_max_search(max_distance=0.05, latency=50)
+$qmc(vmc,steps=15k,block_len=300,discard=300,step_stride=10)
+

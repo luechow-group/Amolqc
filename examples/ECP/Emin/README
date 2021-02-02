@@ -1,0 +1,3 @@
+WF optimization for FeO
+The initial guess is taken from another geometry.
+Optimization is done in 2 steps because we do not want inaccurate \Delta e for popt due to the inaccurate initial orbitals

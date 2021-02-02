@@ -1,0 +1,30 @@
+! Copyright (C) 2020 Leonard Reuter
+!
+! SPDX-License-Identifier: GPL-3.0-or-later
+
+module normal_tm
+    use PFUNIT_MOD
+    use kinds_m, only : r8
+    use normal_m, only: normal, box_muller
+    implicit none
+
+    real(r8), parameter :: PI = 2 * ATAN(1._r8)
+
+contains
+@Test
+    subroutine TestNormal()
+        @assertEqual(1._r8/SQRT(2*PI), normal(0._r8))
+        @assertEqual(1._r8/SQRT(2*PI)*EXP(-1.5**2/2._r8), normal(1.5_r8))
+    end subroutine TestNormal
+
+@Test
+    subroutine TestBoxMuller()
+        real(r8) :: u1 = 0.2, u2 = 0.5
+        real(r8) :: R, theta
+        R = SQRT(-2*LOG(u1))
+        theta = 2*PI*u2
+        @assertEqual(R*SIN(theta), box_muller(u1,u2,.True.))
+        @assertEqual(R*COS(theta), box_muller(u1,u2,.False.))
+    end subroutine TestBoxMuller
+
+end module normal_tm

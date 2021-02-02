@@ -1,0 +1,7 @@
+$gen(seed=101)
+$wf(read,file='../../wavefunction/C2-sm3-ECP.wf',no_cuspcor)
+$ecp(grid_points=12,cutoff=1.d-7,full_cutoff,loc_method=SD*J)
+$sample(size=30)
+$sample(remove_outliers)
+$qmc(vmc,steps=400,block_len=100,discard_all)
+$qmc(dmc,steps=1k,block_len=100,tau=0.002,discard=300)

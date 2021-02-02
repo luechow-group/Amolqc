@@ -1,0 +1,4 @@
+$gen(seed=101)
+$wf(read, file='H2O-with-jas.wf')
+$generate_walker(steps=1500, block_len=500)
+$qmc(vmc, steps=1M, block_len=10k, discard=10k, std_dev=0.001)

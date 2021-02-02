@@ -1,0 +1,16 @@
+$gen(seed=101)
+$wf(read,file='C6H6.wf')
+$generate_walker(steps=1500, block_len=500)
+$change_jastrow(new_jastrow=ic444)
+$qmc(vmc, steps=1500, block_len=500, discard_all)
+$jastrow_varmin_safe(E_ref=-232.00, acc_size=500, block_len=200, eq_iter=5)
+
+
+!You can run VMC after optimization with last parameter set.
+!but it is better to take a look on energy and variance of parameter set then
+!choose the best set manually.
+!If you want to do this uncomment rest
+!$sample(change_size,new_size=100)
+!$qmc(vmc,steps=1500,block_len=500,persist=9,discard_all)
+!$qmc(vmc,steps=1k,block_len=50,discard_all)
+!$qmc(vmc,steps=20k,block_len=100,discard=1k,accept_ratio=0.5,stddev=0.003)

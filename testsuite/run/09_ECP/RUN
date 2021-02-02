@@ -1,0 +1,41 @@
+#! /bin/bash
+rm -f *in *out*
+echo " ECP sample and propagator tests ..."
+for i in density gaussian
+do
+  cp ../../templates/sampleECP.in $i.in
+  $SED -i "s/XXX/$i/" $i.in
+  $AMOLQCRUN $i
+
+  R=`grep "<E>" $i.$REF |awk {'print $3'}`
+  C=`grep "<E>" $i.out |awk {'print $3'}`
+  if [ $R == $C ] ; then
+     echo -e "    $i ECP sample and propagator test \033[32mpassed.\033[39m"
+     rm -f $i.in $i.out
+  else
+     export FAILED=1
+     echo -e "    $i ECP sample and propagator test \033[31mfailed.\033[39m"
+     echo "    Check $PWD/$i.out for more information."
+  fi
+done
+
+for i in umr rey two gss
+do
+  cp ../../templates/sampleECP.in $i.in
+  $SED -i "s/XXX/density/" $i.in
+  echo "\$qmc(vmc,move=$i,steps=100,block_len=10,discard=5,accept_ratio=0.5)" >> $i.in
+  $AMOLQCRUN $i
+
+  R=`grep "total energy" $i.$REF |awk {'print $4'}`
+  C=`grep "total energy" $i.out |awk {'print $6'}`
+  if [ $R == $C ] ; then
+     echo -e "    $i ECP sample and propagator test \033[32mpassed.\033[39m"
+     rm -f $i.in $i.out
+  else
+     export FAILED=1
+     echo -e "    $i ECP sample and propagator test \033[31mfailed.\033[39m"
+     echo "    Check $PWD/$i.out for more information."
+  fi
+done
+
+

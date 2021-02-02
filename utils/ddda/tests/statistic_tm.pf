@@ -1,0 +1,203 @@
+! Copyright (C) 2018 Leonard Reuter
+!
+! SPDX-License-Identifier: GPL-3.0-or-later
+
+module statistic_tm
+    use PFUNIT_MOD
+    use kinds_m, only: r8
+    use statistic_m, only: Statistic_t, StatisticData_t, &
+            operator (+), operator (==), assignment (=)
+
+    implicit none
+
+    real(r8) :: testSample = -8.431_r8
+    type(Statistic_t)             :: sO, sO1, sO2, sO3, sO4
+    type(StatisticData_t), target :: sOD, sOD1, sOD2, sOD3, sOD4
+contains
+@Test
+    subroutine TestStatisticConstruction()
+        call sO%Create(sOD)
+        @assertEqual(0, sO%nSamp)
+        @assertEqual(0._r8, sO%sum)
+        @assertEqual(0._r8, sO%sqSum)
+        call sO%Destroy
+    end subroutine TestStatisticConstruction
+
+@Test
+    subroutine TestStatisticAddData()
+        call sO%Create(sOD)
+        call sO%Add_data(testSample)
+        @assertEqual(1, sO%nSamp)
+        @assertEqual(testSample, sO%sum)
+        @assertEqual(testSample**2, sO%sqSum)
+        call sO%Destroy
+    end subroutine TestStatisticAddData
+
+@Test
+    subroutine TestStatisticAssign()
+        call sO%Create(sOD)
+        call sO2%Create(sOD2)
+
+        call sO%Add_data(testSample)
+
+        sO2  = sO
+        @assertEqual(testSample, sO2%sum)
+        @assertEqual(testSample**2, sO2%sqSum)
+
+        call sO%Add_data(testSample + 2._r8)
+
+        @assertEqual(testSample, sO2%sum)
+        @assertEqual(testSample**2, sO2%sqSum)
+
+        call sO%Destroy
+        call sO2%Destroy
+
+    end subroutine TestStatisticAssign
+
+@Test
+    subroutine TestStatisticAddition()
+        call sO1%Create(sOD1)
+        call sO2%Create(sOD2)
+        call sO3%Create(sOD3)
+
+        call sO1%Add_data(1._r8)
+        call sO2%Add_data(-2._r8)
+        call sO2%Add_data(1.7_r8)
+        sOD3 = sOD1 + sOD2
+
+        @assertEqual(1._r8 - 2._r8 + 1.7_r8, sO3%sum)
+        @assertEqual(1._r8**2 + 2._r8**2 + 1.7_r8**2, sO3%sqSum)
+
+        call sO1%Destroy
+        call sO2%Destroy
+        call sO3%Destroy
+    end subroutine TestStatisticAddition
+
+@Test
+    subroutine TestStatisticAddition2()
+        call sO1%Create(sOD1)
+        call sO2%Create(sOD2)
+        call sO3%Create(sOD3)
+        call sO4%Create(sOD4)
+
+        call sO1%Add_data(1._r8)
+        call sO2%Add_data(-2._r8)
+        call sO2%Add_data(1.7_r8)
+        call sO4%Add_data(-1._r8)
+        sOD4 = sOD1 + sOD2 + sOD4
+
+        @assertEqual(1._r8 - 2._r8 + 1.7_r8 - 1._r8, sO4%sum)
+        @assertEqual(1._r8**2 + 2._r8**2 + 1.7_r8**2 + 1._r8**2, sO4%sqSum)
+
+        call sO1%Destroy
+        call sO2%Destroy
+        call sO3%Destroy
+        call sO4%Destroy
+    end subroutine TestStatisticAddition2
+
+@Test
+    subroutine TestStatisticCompare()
+        call sO1%Create(sOD1)
+        call sO2%Create(sOD2)
+        call sO3%Create(sOD3)
+        call sO1%Add_data(1._r8)
+        call sO2%Add_data(-2._r8)
+        call sO3%Add_data(1._r8)
+
+        @assertEqualUserDefined(sO1, sO3)
+        @assertFalse(sO1 == sO2)
+
+        call sO1%Destroy
+        call sO2%Destroy
+        call sO3%Destroy
+    end subroutine TestStatisticCompare
+
+@Test
+    subroutine TestStatisticArray()
+        type(Statistic_t)                   :: sArray(3)
+        type(StatisticData_t), target       :: sDArray(3)
+        integer :: i
+
+        call sO1%Create(sOD1)
+        call sO2%Create(sOD2)
+        call sO3%Create(sOD3)
+        call sO1%Add_data(1._r8)
+        call sO2%Add_data(-2._r8)
+        call sO2%Add_data(1.7_r8)
+
+        sOD3 = sOD1 + sOD2
+
+        do i = 1,3
+            call sArray(i)%Create(sDArray(i))
+        end do
+
+        sArray(1) = sO2
+        sArray(2) = sO3
+        sArray(3) = sO1
+
+        @assertEqual(- 2._r8 + 1.7_r8, sArray(1)%sum)
+        @assertEqual(1._r8 - 2._r8 + 1.7_r8, sArray(2)%sum)
+        @assertEqual(1._r8, sArray(3)%sum)
+        @assertEqual(2._r8**2 + 1.7_r8**2, sArray(1)%sqSum)
+        @assertEqual(1._r8**2 + 2._r8**2 + 1.7_r8**2, sArray(2)%sqSum)
+        @assertEqual(1._r8**2, sArray(3)%sqSum)
+
+        do i = 1,3
+            call sArray(i)%Destroy
+        end do
+        call sO1%Destroy
+        call sO2%Destroy
+        call sO3%Destroy
+    end subroutine TestStatisticArray
+
+@Test
+    subroutine TestStatisticGetAverage()
+        real(r8)        :: localTestSample = 0._r8
+        integer         :: i
+
+        call sO%Create(sOD)
+
+        do i=1,8
+            call sO%Add_data(localTestSample)
+            localTestSample = localTestSample + 1._r8
+        end do
+
+        @assertEqual(3.5_r8, sO%get_average())
+
+        call sO%Destroy
+    end subroutine TestStatisticGetAverage
+
+@Test
+    subroutine TestStatisticGetErrorEstimate()
+        real(r8)        :: localTestSample = 0._r8
+        integer         :: i
+
+        call sO%Create(sOD)
+
+        do i=1,8
+            call sO%Add_data(localTestSample)
+            localTestSample = localTestSample + 1._r8
+        end do
+
+        @assertEqual(sqrt(7.5E-1_r8), sO%get_error_estimate())
+
+        call sO%Destroy
+    end subroutine TestStatisticGetErrorEstimate
+
+@Test
+    subroutine TestStatisticGetErrorsError()
+        real(r8)        :: localTestSample = 0._r8
+        integer         :: i
+
+        call sO%Create(sOD)
+
+        do i=1,8
+            call sO%Add_data(localTestSample)
+            localTestSample = localTestSample + 1._r8
+        end do
+
+        @assertEqual(sO%get_error_estimate() * sqrt(2._r8 / ( sO%nSamp - 1 ) ), sO%get_errors_error())
+
+        call sO%Destroy
+    end subroutine TestStatisticGetErrorsError
+end module statistic_tm

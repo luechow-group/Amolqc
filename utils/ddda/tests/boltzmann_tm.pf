@@ -1,0 +1,23 @@
+! Copyright (C) 2018 Leonard Reuter
+!
+! SPDX-License-Identifier: GPL-3.0-or-later
+
+module boltzmann_tm
+    use PFUNIT_MOD
+    use kinds_m, only: r8
+    use boltzmann_m, only: Boltzmann_fit
+
+contains
+@Test
+    subroutine TestBoltzmann_fit()
+        real(r8)   :: x(4), y(4), p(4), ref(4)
+
+        x = [0._r8, 1._r8, 2._r8, 3._r8]
+        y = [1.448E-3_r8, 1.775E-3_r8, 2.113E-3_r8, 2.404E-3_r8]
+        ref = [7.250217333400478E-4_r8, 2.947502602595493E-3_r8, 1.17826537726583E0_r8, 1.61514724738478E0_r8]
+
+        p = Boltzmann_fit(x,y,4)
+
+        @assertEqual(ref, p, 1E-9_r8)
+    end subroutine TestBoltzmann_fit
+end module boltzmann_tm

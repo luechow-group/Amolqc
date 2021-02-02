@@ -1,0 +1,51 @@
+### to add ignored to the repository files:
+### git add -f file
+
+### OS X folders
+.DS_Store
+.settings
+
+### Editors
+# Sublime
+.*project
+*.sublime-workspace
+amolqc.sublime-project
+sftp-config.json
+
+# Eclipse
+/.externalToolBuilders
+
+# Clion/Pycharm
+*.idea
+
+# gedit
+*~
+
+# vim
+*.swp
+
+### Build Files
+# Binaries
+*.a
+*.mod
+*.o
+*.pyc
+
+# make
+mod
+bin
+*depends.mk
+make/config.mk
+configs/*.mk
+
+# cmake
+build*
+cmake-build*
+cmake/config.cmake
+configs/cmake/*.cmake
+
+### Others
+# Testsuite
+testsuite/**/*.out
+testsuite/run/test.log
+

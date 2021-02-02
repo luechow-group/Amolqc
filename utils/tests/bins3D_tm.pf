@@ -1,0 +1,110 @@
+module bins3D_tm
+   use PFUNIT_MOD
+   use kinds_m, only: r8
+   use bins3D_m, only: Bins3D_t, GetBins3D
+
+   implicit none
+
+   logical :: inited = .false.
+   integer :: num, totNum, dataShape(3), cell(3), iflag
+   real(r8) :: bounds(3, 2), binSize, offset(3), coords(3)
+   integer, allocatable :: data(:, :, :)
+   type(Bins3D_t) :: bins
+
+contains
+   subroutine TestInit()
+      if (.not. inited) then
+         bounds = RESHAPE([0._r8, -.9_r8, 1._r8, .9_r8, .9_r8, 4._r8], SHAPE(bounds))
+         binSize = 1._r8
+         dataShape = [1, 2, 3]
+         offset = [-.05_r8, -1._r8, 1._r8]
+         allocate(data(dataShape(1), dataShape(2), dataShape(3)))
+         inited = .true.
+      end if
+      num = 0
+      totNum = 0
+      data = 0
+
+      bins = GetBins3D(bounds, binSize)  ! TODO: error handling with bad arguments
+   end subroutine TestInit
+
+@Test
+   subroutine TestConstructor()
+      call TestInit()
+
+      @assertTrue(bins%IsInitialized())
+      @assertEqual(data, bins%GetData())
+      @assertEqual(binSize, bins%GetBinSize())
+      @assertEqual(offset, bins%GetOffset(), tolerance = EPSILON(0._r8))
+      @assertEqual(num, bins%GetNum())
+      @assertEqual(totNum, bins%GetTotNum())
+      @assertEqual(dataShape, bins%GetShape())
+   end subroutine TestConstructor
+
+@Test
+   subroutine TestInBounds()
+      call TestInit()
+
+      cell = dataShape
+      coords = [.45_r8, 0.5_r8, 3.5_r8]
+      @assertTrue(bins%InBounds(cell(1), cell(2), cell(3)))
+      @assertTrue(bins%InBounds(coords(1), coords(2), coords(3)))
+      cell(1) = cell(1) - 1
+      coords(1) = coords(1) - binSize
+      @assertFalse(bins%InBounds(cell(1), cell(2), cell(3)))
+      @assertFalse(bins%InBounds(coords(1), coords(2), coords(3)))
+      cell(1) = cell(1) + 1
+      cell(3) = cell(3) + 1
+      coords(1) = coords(1) + binSize
+      coords(3) = coords(3) + binSize
+      @assertFalse(bins%InBounds(cell(1), cell(2), cell(3)))
+      @assertFalse(bins%InBounds(coords(1), coords(2), coords(3)))
+      @assertTrue(bins%InBounds(1, 1, 1))
+      @assertTrue(bins%InBounds(0._r8, -.9_r8, 1._r8))
+   end subroutine TestInBounds
+
+@Test
+   subroutine TestConversion()
+      call TestInit()
+
+      call bins%CoordsToCell(0._r8, 0._r8, 2._r8, cell(1), cell(2), cell(3))
+      @assertEqual([1, 2, 2], cell)
+      call bins%CellToCoords(1, 2, 2, coords(1), coords(2), coords(3))
+      @assertEqual([.45_r8, .5_r8, 2.5_r8], coords)
+   end subroutine TestConversion
+
+@Test
+   subroutine TestIncValue()
+      call TestInit()
+
+      call bins%IncValue(0._r8, 0._r8, 2._r8, iflag)
+      num = num + 1
+      totNum = totNum + 1
+      @assertEqual(0, iflag)
+      call bins%IncValue(.45_r8, .5_r8, 2.5_r8, iflag)
+      num = num + 1
+      totNum = totNum + 1
+      @assertEqual(0, iflag)
+      call bins%IncValue(0._r8, 0._r8, 0._r8, iflag)
+      totNum = totNum + 1
+      @assertEqual(1, iflag)
+
+      @assertEqual(num, bins%GetNum())
+      @assertEqual(totNum, bins%GetTotNum())
+      @assertEqual(RESHAPE([0, 0, 0, 2, 0, 0], dataShape), bins%GetData())
+   end subroutine TestIncValue
+
+@Test
+   subroutine TestGetValue()
+      call TestInit()
+
+      call bins%IncValue(0._r8, 0._r8, 2._r8, iflag)
+      call bins%IncValue(.45_r8, .5_r8, 2.5_r8, iflag)
+
+      @assertEqual(2, bins%GetValue(1, 2, 2))
+      @assertEqual(2, bins%GetValue(0._r8, 0._r8, 2._r8))
+   end subroutine TestGetValue
+
+   ! TODO: test Bins3D_AllNodes
+   ! TODO: test Bins3D_FindMax
+end module bins3D_tm

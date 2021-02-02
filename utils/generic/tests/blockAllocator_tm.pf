@@ -1,0 +1,71 @@
+! Copyright (C) 2018 Leonard Reuter
+!
+! SPDX-License-Identifier: GPL-3.0-or-later
+
+module blockAllocator_tm
+    use PFUNIT_MOD
+    use kinds_m, only : r8
+    use blockAllocator_m, only: BlockAllocator_t
+    implicit none
+
+    type(BlockAllocator_t) :: vec
+    integer :: i
+    real(r8) :: r(7) = [ (i * 1._r8, i = 1,7)]
+    real(r8), allocatable :: r2(:)
+contains
+@Test
+    subroutine TestBlockAllocatorConstruction()
+        call vec%Create(10)
+
+        @assertEqual(0, vec%size)
+        @assertEqual(10, size(vec%vector))
+
+        call vec%Destroy()
+    end subroutine TestBlockAllocatorConstruction
+
+@Test
+    subroutine TestBlockAllocatorAdd()
+        call vec%Create(10)
+        call vec%Add(r)
+
+        @assertEqual(7, vec%size)
+
+        call vec%Destroy()
+    end subroutine TestBlockAllocatorAdd
+
+@Test
+    subroutine TestBlockAllocatorGet()
+        real(r8), allocatable :: r2(:)
+
+        call vec%Create(10)
+        call vec%Add(r)
+
+        ! next lign uses automatic allocation on assign (Fortran 2008)
+        r2 = vec%Get()
+
+        @assertEqual(r, r2)
+
+        deallocate(r2)
+        call vec%Destroy()
+    end subroutine TestBlockAllocatorGet
+
+@Test
+    subroutine TestBlockAllocatorReallocate()
+        call vec%Create(10)
+
+        call vec%Add(r)
+        call vec%Add(r)
+
+        ! next lign uses automatic allocation on assign (Fortran 2008)
+        r2 = vec%Get()
+
+        @assertEqual(r, r2(1:7))
+        @assertEqual(r, r2(8:14))
+        @assertEqual(14 , vec%size)
+        @assertEqual(20 , SIZE(vec%vector))
+
+        deallocate(r2)
+        call vec%Destroy()
+    end subroutine TestBlockAllocatorReallocate
+
+end module blockAllocator_tm

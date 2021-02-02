@@ -1,0 +1,188 @@
+! Copyright (C) 2018 Leonard Reuter
+!
+! SPDX-License-Identifier: GPL-3.0-or-later
+
+module decorrelation_tm
+    use PFUNIT_MOD
+    use kinds_m, only: r8, i8
+    use, intrinsic :: iso_c_binding,   only: c_ptr, c_f_pointer, c_loc, c_null_ptr
+    use decorrelation_m, only: DecorrelationData_t, Decorrelation_t, &
+            operator (+), operator (==), operator (.similar.)
+
+    implicit none
+    type(Decorrelation_t)     :: dec, test1, test2, test3, test4, test5
+    type(DecorrelationData_t), target :: decD, test1D, test2D, test3D, test4D, test5D
+
+contains
+@Test
+    subroutine TestDecorrelationConstruction()
+        call dec%Create(decD)
+        @assertEqual(0, dec%size)
+        @assertEqual(0, dec%nSamp)
+        call dec%Destroy()
+    end subroutine TestDecorrelationConstruction
+
+@Test
+    subroutine TestDecorrelationAddData()
+        real(r8)             :: newSample = 1._r8
+        integer(i8)          :: i
+
+        call dec%Create(decD)
+        do i = 1, 20
+            call dec%Add_data(newSample)
+            newSample = newSample + 1._r8
+        end do
+
+        @assertEqual(5, dec%size)
+        @assertEqual(20, dec%nSamp)
+        @assertEqual(8.5_r8, dec%wSamps(5))
+        @assertEqual(1, dec%stats(5)%nSamp)
+        @assertEqual(8.5_r8, dec%stats(5)%sum)
+        @assertEqual(72.25_r8, dec%stats(5)%sqSum)
+
+        call dec%Destroy()
+    end subroutine TestDecorrelationAddData
+
+@Test
+    subroutine TestDecorrelationAddition()
+        real(r8)            :: newSample = 0._r8
+        integer             :: i
+
+        call test1%Create(test1D)
+        call test2%Create(test2D)
+        call test3%Create(test3D)
+        call test4%Create(test4D)
+        call test5%Create(test5D)
+
+        do i = 1, 3
+            call test1%Add_data(newSample)
+            newSample = newSample + 1._r8
+        end do
+
+        do i = 1, 4
+            call test2%Add_data(newSample)
+            newSample = newSample + 1._r8
+        end do
+
+        newSample = 0._r8
+        do i = 1, 7
+            call test4%Add_data(newSample)
+            newSample = newSample + 1._r8
+        end do
+
+        test3D = test1D + test2D
+
+        call test5%Add_data(0._r8)
+
+        test3D = test3D + test5D
+        test4D = test4D + test5D
+
+        @assertTrue(test3 .similar. test4)
+
+        call test1%Destroy()
+        call test2%Destroy()
+        call test3%Destroy()
+        call test4%Destroy()
+        call test5%Destroy()
+    end subroutine TestDecorrelationAddition
+
+@Test
+    subroutine TestDecorrelationAdditionPointers()
+        type(DecorrelationData_t), pointer :: test1DP, test2DP, test3DP, test4DP, test5DP
+        real(r8)                           :: newSample = 0._r8
+        integer                            :: i
+
+        test1DP => test1D
+        test2DP => test2D
+        test3DP => test3D
+        test4DP => test4D
+        test5DP => test5D
+
+        call test1%Create(test1DP)
+        call test2%Create(test2DP)
+        call test3%Create(test3DP)
+        call test4%Create(test4DP)
+        call test5%Create(test5DP)
+
+        do i = 1, 3
+            call test1%Add_data(newSample)
+            newSample = newSample + 1._r8
+        end do
+
+        do i = 1, 4
+            call test2%Add_data(newSample)
+            newSample = newSample + 1._r8
+        end do
+
+        newSample = 0._r8
+        do i = 1, 7
+            call test4%Add_data(newSample)
+            newSample = newSample + 1._r8
+        end do
+
+        test3DP = test1DP + test2DP
+
+        call test5%Add_data(0._r8)
+
+        test3DP = test3DP + test5DP
+        test4DP = test4DP + test5DP
+
+        @assertTrue(test3 .similar. test4)
+
+        call test1%Destroy()
+        call test2%Destroy()
+        call test3%Destroy()
+        call test4%Destroy()
+        call test5%Destroy()
+        nullify(test1DP)
+        nullify(test2DP)
+        nullify(test3DP)
+        nullify(test4DP)
+        nullify(test5DP)
+    end subroutine TestDecorrelationAdditionPointers
+
+@Test
+    subroutine TestDecorrelationCptr()
+        type(c_ptr)                                      :: cptr
+        type(DecorrelationData_t), dimension(:), pointer :: decorrD
+        type(DecorrelationData_t), dimension(2), target  :: decorrDT
+        type(DecorrelationData_t), target                :: sum, reference
+        type(Decorrelation_t)                            :: decorr(2), decorrSum, decorrReference
+        real(r8)                                         :: sample = 0._r8
+        integer                                          :: i, j
+
+        cptr = c_loc(decorrDT)
+        call c_f_pointer(cptr, decorrD, [2])
+
+        @assertAssociated(decorrD, decorrDT)
+
+        do i = 1,2
+            call decorr(i)%Create(decorrD(i))
+            do j = 1, 8
+                call decorr(i)%Add_data(sample)
+                sample = sample + 1._r8
+            end do
+        end do
+
+        sum = decorrD(1) + decorrD(2)
+
+        call decorrReference%Create(reference)
+        sample = 0._r8
+        do j = 1, 16
+            call decorrReference%Add_data(sample)
+            sample = sample + 1._r8
+        end do
+
+        call decorrSum%Create(sum)
+
+        @assertEqualUserDefined(decorrSum, decorrReference)
+
+        call decorrSum%Destroy()
+        call decorrReference%Destroy()
+        do i = 1,2
+            call decorr(i)%Destroy()
+        end do
+        cptr = c_null_ptr
+    end subroutine TestDecorrelationCptr
+
+end module decorrelation_tm

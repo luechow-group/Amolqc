@@ -1,0 +1,50 @@
+#! /bin/bash
+rm -f  *.out *.out-*
+echo " Maxima tests ..."
+for IN in max-bfgs max-steep-desc
+do
+   local_failed=0
+   $AMOLQCRUN $IN
+
+   R=`grep "maxima analyzed" $IN.out | awk {'print $6'}`
+   C=`grep "maxima analyzed" $IN.out.$REF | awk {'print $6'}`
+   if [ "$R" != "$C" ] ; then
+      local_failed=1
+   fi
+   R=`grep "average # function/gradient" $IN.out | awk {'print $5'}`
+   C=`grep "average # function/gradient" $IN.out.$REF | awk {'print $5'}`
+   if [ "$R" != "$C" ] ; then
+      local_failed=1
+   fi
+   R=`grep "best value" $IN.out | awk {'print $6, $9'}`
+   C=`grep "best value" $IN.out.$REF | awk {'print $6, $9'}`
+   if [ "$R" != "$C" ] ; then
+      local_failed=1
+   fi
+
+   if [ $local_failed -eq 0 ] ; then
+      echo -e "    $IN test \033[32mpassed.\033[39m"
+      rm -f $IN.out
+   else
+      export FAILED=1
+      echo -e "    $IN sample test \033[31mfailed.\033[39m"
+      echo "    Check $PWD/$IN.out for more information."
+   fi
+done
+
+if [ $PAR != 1 ] ; then
+    $AMOLQCRUN max-maximize-sample.in
+    IN=max-compare-samples
+    $AMOLQCRUN $IN
+    if [ `grep -c "agrees in all of" $IN.out` == 2 ] ; then
+       echo -e "    $IN test \033[32mpassed.\033[39m"
+       rm -f max-maximize-sample.out
+       rm -f $IN.out
+       rm -f bfgs.pos
+       rm -f steep-desc.pos
+    else
+    export FAILED=1
+       echo -e "    $IN sample test \033[31mfailed.\033[39m"
+       echo "    Check $PWD/$IN.out for more information."
+    fi
+fi

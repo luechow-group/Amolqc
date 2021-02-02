@@ -1,0 +1,263 @@
+
+
+              __  __    ____    _         ____     _____   
+      /\     |  \/  |  / __ \  | |       / __ \   / ____|  
+     /  \    | \  / | | |  | | | |      | |  | | | |       
+    / /\ \   | |\/| | | |  | | | |      | |  | | | |       
+   / ____ \  | |  | | | |__| | | |____  | |__| | | |____   
+  /_/    \_\ |_|  |_|  \____/  |______|  \___\_\  \_____|  
+
+
+ Atoms and Molecules with Quantum Monte Carlo -- electron structure code
+
+ initial version:
+  Arne Luechow, Penn State University, 2/1996
+
+ main author:
+  Arne Luechow, RWTH Aachen University, 52056 Aachen, Germany
+
+ with contributions from:
+  Sebastian Manten, Christian Diedrich, Annika Bande, Tony Scott,
+  Rene Petz, Raphael Berner, Alexander Sturm, Kaveh Haghighi Mood
+
+
+ version 2017-11-15 859baae  (HEAD, tag: version-6.6-dev)            
+
+
+ run started on tcrocks.pc.rwth-aachen.de at Thu Oct  4 18:26:10 2018 on    2 processor(s)
+ using path: /home/luechow/Projekte/Eqmc/amolqc_test/amolqc66dev
+
+ =======>      $gen - initializing RNG and setting general parameters       <=======
+
+ seed =    101     verbose level = 2
+
+ =======>      $wf - wave function      <=======
+
+ wave function settings:
+    with BLAS/LAPACK      
+    splines for contracted GTOs (no cusp correction!)
+
+ using sequential AO and MO mode 
+ 
+ wave function ../../wavefunction/C2-sm3-ECP.wf with: 
+           title =No
+           basis =     BFD-VTZ       MO format =         gms         jastrow =   sm3      
+          charge =     0                  spin =     1                 coord =  angstrom  
+  atomic_charges =      F      same_atoms =      F    no_H_jastrow =      F
+ 
+  geometry (in angstrom):
+C    0.00000   0.00000  -0.62128
+C    0.00000   0.00000   0.62128
+ 
+  splining GTOs with         4000  points
+ 
+
+ basis set:
+ basis name: BFD-VTZ.abs
+ different basis functions  =   18
+ individual basis functions =   68
+
+ spline_points =  4000
+ basis read ...
+
+  ECPs read from ECP library ...
+
+           effective core potentials:
+   atom   1: C 
+ # core electrons =  2  l_core+1 = 1
+   V_l = sum_k   a_lk * r^(n_lk - 2) * exp(-b_lk*r^2)
+   l      a_lk      n_lk       b_lk
+    1    4.000000    1    8.359738    
+    1    33.43895    3    4.483619    
+    1   -19.17537    2    3.938313    
+    0    22.55164    2    5.029916    
+   atom   2: C 
+ # core electrons =  2  l_core+1 = 1
+   V_l = sum_k   a_lk * r^(n_lk - 2) * exp(-b_lk*r^2)
+   l      a_lk      n_lk       b_lk
+    1    4.000000    1    8.359738    
+    1    33.43895    3    4.483619    
+    1   -19.17537    2    3.938313    
+    0    22.55164    2    5.029916    
+
+ calculation with    8 electrons
+   4 alpha and    4 beta
+
+ Jastrow factor of type sm3 read with:
+    9 generic Schmidt-Moskowitz terms of type sm3
+  Jastrow factor read ...
+ 
+ AO/MO evaluation carried out using aocalc and mocalc.
+ 
+  MOs read ...
+ 
+    NCSFs =     1 Ndets =     1
+    1 unique alpha and    1 unique beta determinants
+                          are going to be calculated.
+ 
+  CSFs read ...
+
+ =======>      $ecp - effective core potential settings      <=======
+
+ ecp parameters: full_localisation random_rotation full_cutoff
+
+ cutoff threshold =         0.10000E-06
+
+ pseudo atoms:
+ idx  atom  grid points  cutoff distances (A) 
+-------------------------------------------- 
+   1    C         12         1.15426
+   2    C         12         1.15426
+ 
+
+ =======>      $sample - creating or modifying the walker sample      <=======
+
+ creating new sample
+
+ created initial random sample using atom densities
+ sample size (all nodes):           60
+ <E>_allnodes =     -11.4450 +/-       0.1515 V_allnodes =       1.3536
+ 
+
+ wall clock time for   sample :               0.00 s
+ cpu time (master) for sample :               0.01 s
+
+
+
+ =======>      $sample - creating or modifying the walker sample      <=======
+
+ removing outliers
+
+  using trimmed mean (parallel version)
+  parallel merge required:   1.7000362E-05  sec.
+  trimmed mean =      -11.312  sigma =        0.302
+      3 walkers will be deleted and replaced
+      0 processes attempted to exceed the limit of       4 deletions
+
+  after outlier removal:
+  final total walker size=      60 E_mean=      -11.24845 +/-    0.07621 var=           0.34
+
+ wall clock time for   sample :               0.00 s
+ cpu time (master) for sample :               0.00 s
+
+
+
+ =======>      $qmc - running a qmc calculation      <=======
+
+
+   * * *  VMC calculation  * * *
+
+    QMC parameters:
+
+                 tau =     0.03466             adapt tau =           T
+        total walker =          60          local walker =          30
+               steps =         400               discard =         400
+           block_len =         100          walker_block =           1
+         step_stride =          10
+ target accept ratio =     0.50000
+               E_ref =     0.00000                  wfac =     1.00000
+        E_loc_cutoff =           F                factor =     1.00000
+        kill_persist =           F           max_persist =           0
+        load balance =           F                branch =           F
+      future walking =           F       pop ctrl = global
+              Reconf =           F             RcfMethod =           1
+          accumulate =           F
+ 
+    propagator parameters:
+
+              weight =        none                  move =     Umrigar
+            moveType =         all
+                 tau =     0.03466            drift_scal =     1.00000
+             AR step =           T             rej_cross =           F
+     expon. sampling =           T
+ 
+
+             step       size              <E>                   <V>     AR 
+ --------------------------------------------------------------------------
+            100        60       -11.01036 +/-   0.00550     0.181   0.530
+            200        60       -10.96114 +/-   0.00612     0.225   0.491
+            300        60       -10.98675 +/-   0.00562     0.190   0.490
+            400        60       -11.00006 +/-   0.00560     0.188   0.481
+
+ qmc: Emean =       -11.00006 var =         0.18822
+
+ wall clock time for   qmc :               1.07 s
+ cpu time (master) for qmc :               1.18 s
+
+
+
+ =======>      $qmc - running a qmc calculation      <=======
+
+
+   * * *  DMC calculation  * * *
+
+    QMC parameters:
+
+                 tau =     0.00200             adapt tau =           F
+        total walker =          60          local walker =          30
+               steps =        1000               discard =         300
+           block_len =         100          walker_block =           1
+         step_stride =          10
+               E_ref =   -11.00006                  wfac =     1.00000
+        E_loc_cutoff =           T                factor =     1.00000
+        kill_persist =           T           max_persist =          10
+        load balance =           T                branch =           T
+      future walking =           F       pop ctrl = global
+              Reconf =           F             RcfMethod =           1
+          accumulate =           F
+ 
+    propagator parameters:
+
+              weight =    Reynolds                  move =    Reynolds
+            moveType =         all               T_moves =        none
+                 tau =     0.00200            drift_scal =     1.00000
+             AR step =           T             rej_cross =           T
+       T_move_reject =           0            T_move_wgt =           0
+        T_move_cross =           0  
+ 
+
+             step       size              <E>                   <V>     AR 
+ --------------------------------------------------------------------------
+            100        60       -11.04204 +/-   0.00579     0.201   0.999
+            200        60       -11.03306 +/-   0.00533     0.170   0.999
+            300        60       -11.10872 +/-   0.00573     0.197   1.000
+            400        60       -11.11196 +/-   0.00514     0.158   0.998
+            500        60       -11.09605 +/-   0.00569     0.194   0.999
+            600        60       -11.07532 +/-   0.00509     0.155   0.998
+            700        60       -11.06318 +/-   0.00488     0.143   0.998
+            800        61       -11.09341 +/-   0.00499     0.149   0.999
+            900        63       -11.06977 +/-   0.00480     0.142   0.999
+           1000        62       -11.04824 +/-   0.00497     0.155   0.998
+
+
+  FINAL RESULT:
+ total energy                 =     -11.07983 +/- 0.00828 E_h
+ block average energy         =     -11.07970 E_h
+ variance (of wave function)  =       0.15720 E_h^2
+ mean E_ref (sigma_i)         =     -11.09983 +/- 0.01820 E_h
+ mean weight (sigma_i)        =         60.18 +/-    0.49
+ minimum weight               =         59.36 maximum weight =         61.04
+ tau_acc                      =        0.0020
+ N_corr (global)              =      15.8
+
+ WARNING: stddev and global N_corr may be unreliable
+  (number of blocks not discarded < 20)
+
+ WARNING: stddev and global N_corr may be unreliable
+  (block_len < 20*N_corr)
+
+ wall clock time for   qmc :               2.58 s
+ cpu time (master) for qmc :               2.87 s
+
+
+
+
+ wall clock time for run         :   0d 00:00:03.660
+ total cpu time for run (core-h) :            0.0023
+ cpu time per mpi process (h)    :            0.0011
+
+Amolqc run finished on Thu Oct  4 18:26:15 2018  
+
+Bye!
+
+

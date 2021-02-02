@@ -1,0 +1,875 @@
+
+
+              __  __    ____    _         ____     _____   
+      /\     |  \/  |  / __ \  | |       / __ \   / ____|  
+     /  \    | \  / | | |  | | | |      | |  | | | |       
+    / /\ \   | |\/| | | |  | | | |      | |  | | | |       
+   / ____ \  | |  | | | |__| | | |____  | |__| | | |____   
+  /_/    \_\ |_|  |_|  \____/  |______|  \___\_\  \_____|  
+
+
+ Atoms and Molecules with Quantum Monte Carlo -- electron structure code
+
+ initial version:
+  Arne Luechow, Penn State University, 2/1996
+
+ main author:
+  Arne Luechow, RWTH Aachen University, 52056 Aachen, Germany
+
+ with contributions from:
+  Sebastian Manten, Christian Diedrich, Annika Bande, Tony Scott,
+  Annett Schwarz, Rene Petz, Raphael Berner, Alexander Sturm,
+  Christopher Pezley, Lennart Scharf, Marko Hermsen, Kaveh Haghighi Mood,
+  Christoph Schulte, Sebastian Klahm, Michael Andree Heuer, Leonard Reuter,
+  Jil Ludovicy
+
+
+ version:          version-6.7-dev-1079-g829bab
+ compiler version: Intel(R) Fortran Intel(R) 64 Compiler for applications running on Intel(R) 64, Version 18.0.3.222 Build 20180410
+ compiler options: -fpp -warn none -O3
+ mpi version:      Intel(R) MPI Library 2017 Update 4 for Linux* OS
+
+
+
+ run started on compute-0-6.local at 2020-04-24T15:19:10.542+02:00 on   80 processor(s)
+ using path: /home/reuter/Amolqc
+ 
+==============================> reading input <=================================
+ 
+$gen(seed=101)
+$wf(read, file='Ethane-em.wf')
+$generate_walker(steps=1000)
+$init_max_analysis(kmax=50, mmax=50, tol_sim=0.2, tol_same=0.01)
+$init_max_search(max_distance_all=0.05, latency=50)
+$qmc(vmc, steps=20000, block_len=1000, step_stride=20)
+ 
+==========> $gen - initializing RNG and setting general parameters <============
+ 
+ seed =    101     verbose level = 2
+ 
+===========================> $wf - wave function <==============================
+ 
+ wave function settings:
+    with BLAS/LAPACK      
+    cusp-corrected splines for contracted GTOs
+
+ using sequential AO and MO mode 
+ 
+ using the standard determinant update algorithm
+ 
+ wave function Ethane-em.wf with: 
+           title =ethane
+           basis =       TZPAE       MO format =         gau         jastrow =   ic       
+          charge =     0                  spin =     1                 coord =  angstrom  
+  atomic_charges =      F      same_atoms =      F    no_H_jastrow =      F
+ 
+  geometry (in angstrom):
+C    0.00000   0.00000   0.76531
+C    0.00000   0.00000  -0.76531
+H   -0.50888   0.88233   1.16371
+H    1.01856  -0.00047   1.16371
+H   -0.50969  -0.88187   1.16371
+H    0.50969  -0.88187  -1.16371
+H   -1.01856  -0.00047  -1.16371
+H    0.50888   0.88233  -1.16371
+ 
+
+ basis set:
+ basis name: TZPAE.abs
+ different basis functions  =   42
+ individual basis functions =   76
+
+ basis read ...
+
+
+ calculation with   18 electrons
+   9 alpha and    9 beta
+
+ Jastrow factor of type ic read with:
+  Schmidt-Moskowitz radial function
+   7 ee terms,   14 en terms,   30 een terms
+  Jastrow factor read ...
+ 
+ AO/MO evaluation carried out using aocalc and mocalc.
+ 
+  MOs read ...
+ 
+    NCSFs =        1 Ndets =        1
+    1 unique alpha and    1 unique beta determinants
+                          are going to be calculated.
+ 
+  CSFs read ...
+
+
+  ---  Expanding macro cmd generate_walker to:
+X$sample(create, start=density, size=10)
+$qmc(vmc, steps=300, block_len=100, persist=9, accept_ratio=0.5, discard_all)
+$sample(remove_outliers)
+$sample(change_size, new_size=1)
+$qmc(vmc, steps=1000, block_len=100, accept_ratio=0.5, discard_all)
+
+ 
+============> $sample - creating or modifying the walker sample <===============
+ 
+ creating new sample
+
+ created initial random sample using atom densities
+ sample size (all nodes):          800
+ <E>_allnodes =     -79.4062 +/-       1.5357 V_allnodes =    1884.3723
+ 
+
+ wall clock time for   sample :               1.43 s
+ cpu time (master) for sample :               0.13 s
+
+
+ 
+=====================> $qmc - running a qmc calculation <=======================
+ 
+
+   * * *  VMC calculation  * * *
+
+    QMC parameters:
+
+                 tau =     0.02310             adapt tau =           T
+        total walker =         800          local walker =          10
+               steps =         300               discard =         300
+           block_len =         100          walker_block =           1
+         step_stride =          10
+ target accept ratio =     0.50000
+               E_ref =     0.00000                  wfac =     1.00000
+        E_loc_cutoff =           F                factor =     1.00000
+        kill_persist =           T           max_persist =           9
+        load balance =           F                branch =           F
+      future walking =           F       pop ctrl = global
+              Reconf =           F             RcfMethod =           1
+          accumulate =           F
+ 
+    propagator parameters:
+
+              weight =        none                  move =     Umrigar
+            moveType =         all
+                 tau =     0.02310            drift_scal =     1.00000
+             AR step =           T             rej_cross =           F
+     expon. sampling =           T
+ 
+
+             step       size              <E>                   <V>     AR 
+ --------------------------------------------------------------------------
+            100       800       -79.79122 +/-   0.00503     2.026   0.500
+            200       800       -79.76995 +/-   0.00371     1.103   0.547
+            300       800       -79.76130 +/-   0.00368     1.081   0.547
+
+ qmc: Emean =       -79.76130 var =         1.08134
+
+ wall clock time for   qmc :               1.22 s
+ cpu time (master) for qmc :               1.22 s
+
+
+ 
+============> $sample - creating or modifying the walker sample <===============
+ 
+ removing outliers
+
+  using trimmed mean (parallel version)
+  parallel merge required:   6.5100193E-04  sec.
+  trimmed mean =      -79.768  sigma =        0.633
+      1 walkers will be deleted and replaced
+      0 processes attempted to exceed the limit of       1 deletions
+
+  after outlier removal:
+  final total walker size=     800 E_mean=      -79.75117 +/-    0.03611 var=           1.04
+
+ wall clock time for   sample :               0.00 s
+ cpu time (master) for sample :               0.00 s
+
+
+ 
+============> $sample - creating or modifying the walker sample <===============
+ 
+ changing size of sample
+ sample size has been reduced by       9 to       1 walkers per node
+ 
+
+ wall clock time for   sample :               0.00 s
+ cpu time (master) for sample :               0.00 s
+
+
+ 
+=====================> $qmc - running a qmc calculation <=======================
+ 
+
+   * * *  VMC calculation  * * *
+
+    QMC parameters:
+
+                 tau =     0.10046             adapt tau =           T
+        total walker =          80          local walker =           1
+               steps =        1000               discard =        1000
+           block_len =         100          walker_block =           1
+         step_stride =          10
+ target accept ratio =     0.50000
+               E_ref =     0.00000                  wfac =     1.00000
+        E_loc_cutoff =           F                factor =     1.00000
+        kill_persist =           F           max_persist =           0
+        load balance =           F                branch =           F
+      future walking =           F       pop ctrl = global
+              Reconf =           F             RcfMethod =           1
+          accumulate =           F
+ 
+    propagator parameters:
+
+              weight =        none                  move =     Umrigar
+            moveType =         all
+                 tau =     0.10046            drift_scal =     1.00000
+             AR step =           T             rej_cross =           F
+     expon. sampling =           T
+ 
+
+             step       size              <E>                   <V>     AR 
+ --------------------------------------------------------------------------
+            100        80       -79.76069 +/-   0.01125     1.012   0.520
+            200        80       -79.76712 +/-   0.01336     1.428   0.440
+            300        80       -79.76025 +/-   0.01168     1.091   0.500
+            400        80       -79.73801 +/-   0.01186     1.126   0.630
+            500        80       -79.76903 +/-   0.01138     1.036   0.530
+            600        80       -79.75790 +/-   0.01249     1.249   0.600
+            700        80       -79.75929 +/-   0.01141     1.041   0.490
+            800        80       -79.70202 +/-   0.01145     1.049   0.620
+            900        80       -79.76032 +/-   0.01195     1.143   0.440
+           1000        80       -79.78895 +/-   0.01171     1.096   0.550
+
+ qmc: Emean =       -79.78895 var =         1.09602
+
+ wall clock time for   qmc :               0.41 s
+ cpu time (master) for qmc :               0.41 s
+
+
+ 
+============> $init_max_analysis - initializing maximum analysis <==============
+ 
+    maximum analysis parameters:
+
+   maximum list mode =   str
+   same max func tol =    0.10E-02
+                nmax =    50                         mmax=    50
+         tol_sim (A) =      0.2000          tol_same (A) =      0.0100
+            tol_fctn =      0.0010        tol_simmax (A) =      0.2000
+ 
+  no initial references provided
+
+ 
+==============> $init_max_search - initializing maxima search <=================
+ 
+ -- BFGS minimizer with singularity correction
+ minimizer parameters:
+ max_iterations      =    1000
+ verbose             =  0
+ convergence_gradient=  0.10000E-03
+
+ singularity correction parameters:
+ sing_thresh         =  0.50000E-02
+ corr_thresh         =  0.10000    
+ corr_mode           = 12
+ scaling             =  T
+
+ -- simple line search with step correction
+ with:
+ alpha               =    1.00    
+ c                   =   0.100    
+ rho                 =   0.330    
+
+ BFGS parameters:
+ scale_initial_H     =    F
+ step                = 0.10000    
+ latency             =          50
+ 
+=====================> $qmc - running a qmc calculation <=======================
+ 
+
+   * * *  VMC calculation  * * *
+
+    QMC parameters:
+
+                 tau =     0.11699             adapt tau =           T
+        total walker =          80          local walker =           1
+               steps =       20000               discard =           0
+           block_len =        1000          walker_block =           1
+         step_stride =          20
+ target accept ratio =     0.50000
+               E_ref =     0.00000                  wfac =     1.00000
+        E_loc_cutoff =           F                factor =     1.00000
+        kill_persist =           F           max_persist =           0
+        load balance =           F                branch =           F
+      future walking =           F       pop ctrl = global
+              Reconf =           F             RcfMethod =           1
+          accumulate =           F
+ 
+    propagator parameters:
+
+              weight =        none                  move =     Umrigar
+            moveType =         all
+                 tau =     0.11699            drift_scal =     1.00000
+             AR step =           T             rej_cross =           F
+     expon. sampling =           T
+ 
+
+             step       size              <E>                   <V>     AR   #max  fmin
+ --------------------------------------------------------------------------------------
+           1000        80       -79.76468 +/-   0.00367     1.078   0.485  23    435.09887
+           2000        80       -79.75780 +/-   0.00374     1.117   0.513  28    435.09887
+           3000        80       -79.75383 +/-   0.00376     1.129   0.531  33    435.09887
+           4000        80       -79.74363 +/-   0.00367     1.077   0.494  38    435.09887
+           5000        80       -79.75604 +/-   0.00369     1.090   0.527  39    435.09887
+           6000        80       -79.77254 +/-   0.00373     1.115   0.539  45    435.09887
+           7000        80       -79.75747 +/-   0.00370     1.092   0.540  46    435.09887
+           8000        80       -79.75100 +/-   0.00371     1.103   0.504  47    435.09887
+           9000        80       -79.74732 +/-   0.00370     1.096   0.484  47    435.09887
+          10000        80       -79.77289 +/-   0.00369     1.092   0.492  48    435.09887
+          11000        80       -79.76264 +/-   0.00370     1.095   0.533  50    435.09887
+          12000        80       -79.75406 +/-   0.00371     1.099   0.523  50    435.09887
+          13000        80       -79.76240 +/-   0.00370     1.092   0.525  50    435.09887
+          14000        80       -79.75596 +/-   0.00373     1.114   0.501  50    435.09887
+          15000        80       -79.75966 +/-   0.00371     1.103   0.505  50    435.09887
+          16000        80       -79.75098 +/-   0.00366     1.074   0.525  50    435.09887
+          17000        80       -79.76155 +/-   0.00366     1.074   0.492  50    435.09887
+          18000        80       -79.74986 +/-   0.00369     1.088   0.495  50    435.09887
+          19000        80       -79.75395 +/-   0.00368     1.084   0.521  50    435.09887
+          20000        80       -79.76194 +/-   0.00370     1.094   0.532  50    435.09887
+
+
+  FINAL RESULT:
+ total energy (mean E_loc)    =     -79.75751 +/- 0.00169 E_h
+ block average energy         =     -79.75751 E_h
+ variance (of E_loc)          =       1.09553 +/- 0.00335 E_h^2
+ block average variance       =       1.09547 E_h^2
+ tau (adapted)                =        0.1142 fixed at step           35
+ N_corr (<5%)                 =       6.9
+ N_corr (global)              =       4.0
+
+  FLYVBJERG-PETERSEN: 
+ variance                     =       1.09553 E_h^2
+ error                        =       0.00167 E_h
+ block length                 =      64
+ n_corr                       =       4.08
+
+ log2(blen)   error estimate   errors error
+          0        0.0008275      0.0000009
+          1        0.0010141      0.0000016
+          2        0.0012064      0.0000027
+          3        0.0013719      0.0000043
+          4        0.0014971      0.0000067
+          5        0.0015820      0.0000100
+          6        0.0016296      0.0000146
+          7        0.0016527      0.0000209
+          8        0.0016725      0.0000299
+          9        0.0016808      0.0000425
+         10        0.0016698      0.0000598
+         11        0.0016692      0.0000845
+         12        0.0016383      0.0001175
+         13        0.0017091      0.0001735
+         14        0.0017158      0.0002476
+         15        0.0017628      0.0003636
+         16        0.0015342      0.0004524
+         17        0.0013155      0.0005610
+         18        0.0016793      0.0010621
+         19        0.0017631      0.0017631
+ 
+ Summary for maxima search:
+ 
+ # minimizer calls                      :   80000
+ # maxima analyzed (converged)          :   79988
+ average # iterations                   :      86
+ average # function/gradient evaluations:     125
+ 
+ maximum list mode: str
+ List contains different structures (ignoring spin) sorted w.r.t function value -ln(psi**2):
+ each structure contains a list of similar structures (with spin) sorted w.r.t function value -ln(psi**2):
+ total number of maxima collected with these structure:       79969
+
+    1 structure with best value=   435.098871    # found:  70714
+        1     435.098871      473
+        2     435.098871      484
+        3     435.098871      524
+        4     435.098871      466
+        5     435.098872      446
+        6     435.098872      499
+        7     435.108709      459
+        8     435.108709      475
+        9     435.108709      400
+       10     435.108709      486
+       11     435.108709      461
+       12     435.108709      464
+       13     435.108711      469
+       14     435.108711      428
+       15     435.108712      465
+    2 structure with best value=   435.313066    # found:   1394   min dist to     1  max/mean dist:     0.639     0.049
+        1     435.313066       22
+        2     435.313066       24
+        3     435.313067       24
+        4     435.313067       25
+        5     435.315635       23
+        6     435.315635       16
+        7     435.319194       20
+        8     435.319194       15
+        9     435.319197       16
+       10     435.319197       12
+       11     435.319591       23
+       12     435.319591       17
+       13     435.319593       22
+       14     435.319593       18
+       15     435.322658       17
+    3 structure with best value=   435.313066    # found:   1484   min dist to     1  max/mean dist:     0.639     0.048
+        1     435.313066       23
+        2     435.313066       17
+        3     435.313067       23
+        4     435.313067       26
+        5     435.315635       23
+        6     435.315635       34
+        7     435.319194        9
+        8     435.319194       16
+        9     435.319197       15
+       10     435.319197       14
+       11     435.319591       18
+       12     435.319591       21
+       13     435.319593       23
+       14     435.319593       21
+       15     435.322658       20
+    4 structure with best value=   435.313087    # found:   1357   min dist to     1  max/mean dist:     0.639     0.048
+        1     435.313087       17
+        2     435.313087       17
+        3     435.313091       14
+        4     435.313091       27
+        5     435.315659       14
+        6     435.315659       25
+        7     435.319218       15
+        8     435.319218       16
+        9     435.319219       17
+       10     435.319219       22
+       11     435.319614       18
+       12     435.319614       21
+       13     435.319617       13
+       14     435.319617       23
+       15     435.322680       19
+    5 structure with best value=   435.313087    # found:   1349   min dist to     1  max/mean dist:     0.639     0.048
+        1     435.313087       13
+        2     435.313087       15
+        3     435.313091       19
+        4     435.313091       24
+        5     435.315659       17
+        6     435.315659       24
+        7     435.319218       16
+        8     435.319218       17
+        9     435.319219       25
+       10     435.319219       21
+       11     435.319614       20
+       12     435.319614       24
+       13     435.319617       14
+       14     435.319617       14
+       15     435.322680       17
+    6 structure with best value=   435.313098    # found:   1552   min dist to     1  max/mean dist:     0.639     0.049
+        1     435.313098       25
+        2     435.313098       16
+        3     435.313099       27
+        4     435.313099       13
+        5     435.315668       17
+        6     435.315668       24
+        7     435.319226       27
+        8     435.319226       23
+        9     435.319229       26
+       10     435.319229       16
+       11     435.319623       11
+       12     435.319623       15
+       13     435.319627       18
+       14     435.319627       15
+       15     435.322690       24
+    7 structure with best value=   435.313098    # found:   1415   min dist to     1  max/mean dist:     0.639     0.048
+        1     435.313098       18
+        2     435.313098       24
+        3     435.313099       21
+        4     435.313099       13
+        5     435.315668       19
+        6     435.315668       22
+        7     435.319226       19
+        8     435.319226       22
+        9     435.319229       26
+       10     435.319229       23
+       11     435.319623       20
+       12     435.319623       14
+       13     435.319627       12
+       14     435.319627       21
+       15     435.322690       13
+    8 structure with best value=   435.554758    # found:     17   min dist to     1  max/mean dist:     0.639     0.086
+        1     435.554758        2
+        2     435.555498        1
+        3     435.555498        1
+        4     435.559907        1
+        5     435.559907        1
+        6     435.559908        1
+        7     435.559908        1
+        8     435.564792        3
+        9     435.564792        1
+       10     435.584208        1
+       11     435.584208        2
+       12     435.584210        1
+       13     435.603324        1
+    9 structure with best value=   435.555485    # found:     15   min dist to     1  max/mean dist:     0.639     0.087
+        1     435.555485        1
+        2     435.555485        1
+        3     435.559892        1
+        4     435.559893        1
+        5     435.559896        1
+        6     435.559897        1
+        7     435.564777        2
+        8     435.564781        1
+        9     435.584195        2
+       10     435.584197        2
+       11     435.589022        1
+       12     435.603310        1
+   10 structure with best value=   435.555485    # found:     17   min dist to     1  max/mean dist:     0.639     0.086
+        1     435.555485        2
+        2     435.555485        1
+        3     435.559892        1
+        4     435.559893        1
+        5     435.559893        2
+        6     435.559897        1
+        7     435.564781        1
+        8     435.584195        1
+        9     435.584197        2
+       10     435.584197        1
+       11     435.589021        1
+       12     435.589022        1
+       13     435.589022        1
+       14     435.603310        1
+   11 structure with best value=   435.565118    # found:     14   min dist to     1  max/mean dist:     0.639     0.085
+        1     435.565118        1
+        2     435.567935        1
+        3     435.569961        1
+        4     435.569961        1
+        5     435.571167        1
+        6     435.571169        3
+        7     435.590590        1
+        8     435.595203        1
+        9     435.616644        3
+       10     435.616644        1
+   12 structure with best value=   435.565126    # found:     23   min dist to     1  max/mean dist:     0.639     0.086
+        1     435.565126        2
+        2     435.566244        2
+        3     435.566244        1
+        4     435.566246        1
+        5     435.566246        1
+        6     435.569972        1
+        7     435.569972        1
+        8     435.571183        1
+        9     435.571183        1
+       10     435.590600        1
+       11     435.590601        1
+       12     435.595215        1
+       13     435.597098        2
+       14     435.597099        1
+       15     435.597099        2
+   13 structure with best value=   435.565126    # found:     12   min dist to     1  max/mean dist:     0.639     0.085
+        1     435.565126        1
+        2     435.566244        1
+        3     435.566244        2
+        4     435.566246        1
+        5     435.566246        1
+        6     435.571180        1
+        7     435.571183        1
+        8     435.597098        2
+        9     435.597099        1
+       10     435.616657        1
+   14 structure with best value=   435.565158    # found:     16   min dist to     1  max/mean dist:     0.639     0.086
+        1     435.565158        1
+        2     435.565315        1
+        3     435.566273        1
+        4     435.566273        1
+        5     435.567978        1
+        6     435.567978        1
+        7     435.570003        1
+        8     435.570003        1
+        9     435.571209        2
+       10     435.571209        2
+       11     435.590632        1
+       12     435.595247        1
+       13     435.597130        1
+       14     435.616688        1
+   15 structure with best value=   435.565231    # found:     10   min dist to     1  max/mean dist:     0.639     0.085
+        1     435.565231        1
+        2     435.569917        1
+        3     435.571127        2
+        4     435.571127        1
+        5     435.590545        1
+        6     435.595157        2
+        7     435.595157        1
+        8     435.597041        1
+   16 structure with best value=   435.566229    # found:     19   min dist to     1  max/mean dist:     0.639     0.086
+        1     435.566229        1
+        2     435.566231        1
+        3     435.566231        1
+        4     435.567935        2
+        5     435.569961        3
+        6     435.571169        1
+        7     435.571169        1
+        8     435.590589        1
+        9     435.590590        1
+       10     435.595203        1
+       11     435.595204        2
+       12     435.595204        2
+       13     435.597088        1
+       14     435.616644        1
+   17 structure with best value=   435.709514    # found:      9   min dist to     1  max/mean dist:     0.639     0.086
+        1     435.709514        1
+        2     435.712923        1
+        3     435.720855        1
+        4     435.729964        1
+        5     435.732436        1
+        6     435.732436        1
+        7     435.732687        2
+        8     435.774480        1
+   18 structure with best value=   435.709514    # found:     11   min dist to     1  max/mean dist:     0.639     0.086
+        1     435.709514        1
+        2     435.709516        1
+        3     435.712923        1
+        4     435.715271        1
+        5     435.720855        1
+        6     435.721517        1
+        7     435.732436        1
+        8     435.739086        1
+        9     435.739086        1
+       10     435.774480        1
+       11     435.776995        1
+   19 structure with best value=   435.709526    # found:     11   min dist to     1  max/mean dist:     0.639     0.086
+        1     435.709526        1
+        2     435.712934        4
+        3     435.727013        1
+        4     435.732443        1
+        5     435.732447        1
+        6     435.732697        1
+        7     435.774490        2
+   20 structure with best value=   435.709545    # found:      7   min dist to     1  max/mean dist:     0.639     0.087
+        1     435.709545        1
+        2     435.709548        1
+        3     435.729995        1
+        4     435.729995        1
+        5     435.729997        1
+        6     435.732719        1
+        7     435.732719        1
+   21 structure with best value=   435.709545    # found:      7   min dist to     1  max/mean dist:     0.639     0.088
+        1     435.709545        1
+        2     435.715303        1
+        3     435.721549        1
+        4     435.721549        1
+        5     435.721549        1
+        6     435.732467        1
+        7     435.732719        1
+   22 structure with best value=   435.712934    # found:     12   min dist to     1  max/mean dist:     0.639     0.086
+        1     435.712934        1
+        2     435.712934        1
+        3     435.715281        1
+        4     435.720865        1
+        5     435.721527        1
+        6     435.727013        1
+        7     435.729978        1
+        8     435.732443        1
+        9     435.732447        1
+       10     435.732697        2
+       11     435.774490        1
+   23 structure with best value=   435.991675    # found:      1   min dist to     1  max/mean dist:     0.639     0.121
+        1     435.991675        1
+   24 structure with best value=   437.360770    # found:     66   min dist to     2  max/mean dist:     0.604     0.082
+        1     437.360770        6
+        2     437.360770        2
+        3     437.364733       11
+        4     437.364769        1
+        5     437.364769        4
+        6     437.376813        7
+        7     437.376813        9
+        8     437.380730        3
+        9     437.380730        3
+       10     437.380768        1
+       11     437.380768        3
+       12     437.382562        5
+       13     437.382562        3
+       14     437.429530        3
+       15     437.429530        5
+   25 structure with best value=   437.360770    # found:     63   min dist to     3  max/mean dist:     0.604     0.082
+        1     437.360770        5
+        2     437.360770        4
+        3     437.364733        4
+        4     437.364733        5
+        5     437.364769        1
+        6     437.364769        5
+        7     437.376813        7
+        8     437.376813        3
+        9     437.380730        3
+       10     437.380730        3
+       11     437.380768        4
+       12     437.380768        4
+       13     437.382562        3
+       14     437.382562        3
+       15     437.429530        7
+   26 structure with best value=   437.360782    # found:     65   min dist to     3  max/mean dist:     0.604     0.082
+        1     437.360782        3
+        2     437.360782        5
+        3     437.364744        5
+        4     437.364744        4
+        5     437.364780        1
+        6     437.364780        4
+        7     437.376824        3
+        8     437.376824        3
+        9     437.380739        3
+       10     437.380739        4
+       11     437.380780        6
+       12     437.380780        8
+       13     437.382576        2
+       14     437.382576        5
+       15     437.429542        7
+   27 structure with best value=   437.360782    # found:     44   min dist to     2  max/mean dist:     0.604     0.082
+        1     437.360782        3
+        2     437.360782        5
+        3     437.364744        3
+        4     437.364744        4
+        5     437.364780        2
+        6     437.364780        1
+        7     437.376824        5
+        8     437.376824        3
+        9     437.380739        3
+       10     437.380780        6
+       11     437.380780        2
+       12     437.382576        2
+       13     437.382576        3
+       14     437.429542        2
+   28 structure with best value=   437.360799    # found:     66   min dist to     5  max/mean dist:     0.604     0.082
+        1     437.360799        1
+        2     437.360799        5
+        3     437.364761        3
+        4     437.364761        4
+        5     437.364797        7
+        6     437.364797        6
+        7     437.376841        4
+        8     437.376841        3
+        9     437.380758        5
+       10     437.380758        3
+       11     437.380794        5
+       12     437.380794        3
+       13     437.382593        3
+       14     437.382593        2
+       15     437.429560        6
+   29 structure with best value=   437.360799    # found:     59   min dist to     4  max/mean dist:     0.604     0.082
+        1     437.360799        3
+        2     437.360799        4
+        3     437.364761        5
+        4     437.364761        2
+        5     437.364797        3
+        6     437.364797        4
+        7     437.376841        1
+        8     437.376841        3
+        9     437.380758        1
+       10     437.380794        4
+       11     437.380794        8
+       12     437.382593        4
+       13     437.382593        7
+       14     437.429560        5
+       15     437.429560        5
+   30 structure with best value=   437.440227    # found:     57   min dist to     1  max/mean dist:     0.591     0.046
+        1     437.440227        2
+        2     437.440227        2
+        3     437.440227        4
+        4     437.440227        5
+        5     437.440227        2
+        6     437.445599        8
+        7     437.445599        7
+        8     437.465954        4
+        9     437.465954        4
+       10     437.465956        6
+       11     437.465956        1
+       12     437.465957        2
+       13     437.465957        4
+       14     437.521027        1
+       15     437.521027        5
+   31 structure with best value=   437.440227    # found:     43   min dist to     1  max/mean dist:     0.591     0.046
+        1     437.440227        4
+        2     437.440227        2
+        3     437.440227        1
+        4     437.440227        1
+        5     437.440227        3
+        6     437.440227        4
+        7     437.445599        3
+        8     437.445599        4
+        9     437.465954        4
+       10     437.465954        1
+       11     437.465956        3
+       12     437.465956        4
+       13     437.465957        2
+       14     437.465957        1
+       15     437.521027        5
+   32 structure with best value=   437.493663    # found:      2   min dist to     5  max/mean dist:     0.601     0.046
+        1     437.493663        1
+        2     437.521530        1
+   33 structure with best value=   437.493700    # found:      3   min dist to     6  max/mean dist:     0.600     0.046
+        1     437.493700        1
+        2     437.520047        1
+        3     437.567911        1
+   34 structure with best value=   437.493700    # found:      2   min dist to     7  max/mean dist:     0.601     0.046
+        1     437.493700        1
+        2     437.521570        1
+   35 structure with best value=   437.497697    # found:      2   min dist to    27  max/mean dist:     0.602     0.045
+        1     437.497697        1
+        2     437.503195        1
+   36 structure with best value=   437.497702    # found:      4   min dist to     3  max/mean dist:     0.601     0.046
+        1     437.497702        2
+        2     437.513974        1
+        3     437.521522        1
+   37 structure with best value=   437.503195    # found:      1   min dist to    26  max/mean dist:     0.602     0.045
+        1     437.503195        1
+   38 structure with best value=   437.507969    # found:      1   min dist to    24  max/mean dist:     0.602     0.044
+        1     437.507969        1
+   39 structure with best value=   437.507969    # found:      2   min dist to     3  max/mean dist:     0.602     0.045
+        1     437.507969        1
+        2     437.520027        1
+   40 structure with best value=   437.521561    # found:      1   min dist to     4  max/mean dist:     0.602     0.045
+        1     437.521561        1
+   41 structure with best value=   437.558323    # found:      1   min dist to    10  max/mean dist:     0.614     0.080
+        1     437.558323        1
+   42 structure with best value=   437.558361    # found:      6   min dist to     9  max/mean dist:     0.614     0.080
+        1     437.558361        1
+        2     437.558546        1
+        3     437.558546        2
+        4     437.587786        2
+   43 structure with best value=   437.558362    # found:      1   min dist to     8  max/mean dist:     0.614     0.081
+        1     437.558362        1
+   44 structure with best value=   437.558376    # found:      2   min dist to    10  max/mean dist:     0.613     0.080
+        1     437.558376        1
+        2     437.558563        1
+   45 structure with best value=   437.558510    # found:      2   min dist to     9  max/mean dist:     0.613     0.080
+        1     437.558510        2
+   46 structure with best value=   437.558532    # found:      4   min dist to     9  max/mean dist:     0.614     0.080
+        1     437.558532        1
+        2     437.561422        1
+        3     437.587731        2
+   47 structure with best value=   437.558542    # found:      2   min dist to     8  max/mean dist:     0.614     0.081
+        1     437.558542        1
+        2     437.561469        1
+   48 structure with best value=   437.567873    # found:      1   min dist to     4  max/mean dist:     0.600     0.046
+        1     437.567873        1
+   49 structure with best value=   437.582659    # found:      1   min dist to    16  max/mean dist:     0.615     0.081
+        1     437.582659        1
+   50 structure with best value=   437.585218    # found:      2   min dist to    15  max/mean dist:     0.617     0.081
+        1     437.585218        1
+        2     437.612330        1
+
+ wall clock time for   qmc :             159.11 s
+ cpu time (master) for qmc :             159.04 s
+
+
+
+
+ wall clock time for run         :   0d 00:02:42.207
+ total cpu time for run (core-h) :            3.5744
+ cpu time per mpi process (h)    :            0.0447
+
+Amolqc run finished on 2020-04-24T15:21:52.753+02
+
+Bye!
+
+

@@ -1,0 +1,2 @@
+$gen(seed=101)
+$wf(read,file='C-atom-5Z.wf',aosopt)

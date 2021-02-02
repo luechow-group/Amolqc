@@ -1,0 +1,13 @@
+! This is the basis of hydrogen-like orbitals.
+! Only the 1s, 2p, 3d... hydrogen-like orbitals
+! can be written as one STO.
+! All other orbitals (2s,3s,3p...) are linear
+! combinations of Slater orbitals.
+! Thus, the basis is only for H and He. 
+****
+H
+1S STO  1.00
+****
+He
+1S STO  2.00
+****

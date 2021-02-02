@@ -1,0 +1,131 @@
+image: registry.git.rwth-aachen.de/luechow-group/amolqc:combined
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+stages:
+  - build
+  - test
+
+before_script:
+  - export AMOLQC=/builds/luechow-group/Amolqc
+
+GNU parallel build:
+  stage: build
+  script:
+  - ./configure.sh openmpi_lapack.cmake
+  - mkdir -p cmake-build-gnu-parallel
+  - cd cmake-build-gnu-parallel
+  - cmake ..
+  - make -j4
+  - chown -R user ../cmake-build-gnu-parallel
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-gnu-parallel"
+    paths:
+    - cmake-build-gnu-parallel/
+    policy: pull-push
+
+GNU parallel test:
+  stage: test
+  dependencies:
+  - GNU parallel build
+  script:
+  - cd cmake-build-gnu-parallel
+  - su user -c "ctest -E StatisticsTests --output-on-failure -j2"
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-gnu-parallel"
+    paths:
+    - cmake-build-gnu-parallel/
+    policy: pull
+
+
+GNU serial build:
+  stage: build
+  script:
+  - ./configure.sh serial_gnu.cmake
+  - mkdir -p cmake-build-gnu-serial
+  - cd cmake-build-gnu-serial
+  - cmake ..
+  - make -j4
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-gnu-serial"
+    paths:
+    - cmake-build-gnu-serial/
+    policy: pull-push
+
+GNU serial test:
+  stage: test
+  dependencies:
+  - GNU serial build
+  script:
+  - cd cmake-build-gnu-serial
+  - ctest -E StatisticsTests --output-on-failure -j4
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-gnu-serial"
+    paths:
+    - cmake-build-gnu-serial/
+    policy: pull
+
+Intel serial build:
+  stage: build
+  script:
+  - source /opt/intel/parallel_studio_xe_2019/psxevars.sh intel64
+  - ./configure.sh serial_intel.cmake
+  - mkdir -p cmake-build-intel-serial
+  - cd cmake-build-intel-serial
+  - cmake ..
+  - make -j4
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-intel-serial"
+    paths:
+    - cmake-build-intel-serial/
+    policy: pull-push
+
+Intel serial test:
+  stage: test
+  dependencies:
+  - Intel serial build
+  script:
+  - source /opt/intel/parallel_studio_xe_2019/psxevars.sh intel64
+  - cd cmake-build-intel-serial
+  - ctest -E StatisticsTests --output-on-failure -j4
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-intel-serial"
+    paths:
+    - cmake-build-intel-serial/
+    policy: pull
+
+GNU make serial build:
+  stage: build
+  script:
+  - export MATHLIBS=/usr/lib/x86_64-linux-gnu
+  - mkdir -p make-build-gnu-serial
+  - cp -r src make-build-gnu-serial
+  - cp -r utils make-build-gnu-serial
+  - cp -r bib make-build-gnu-serial
+  - cp -r make make-build-gnu-serial
+  - cp -r testsuite make-build-gnu-serial
+  - cp Makefile make-build-gnu-serial
+  - cp configure.sh make-build-gnu-serial
+  - cd make-build-gnu-serial
+  - ./configure.sh serial_gnu.mk
+  - make -j4
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-gnu-serial-make"
+    paths:
+    - make-build-gnu-serial/
+    policy: pull-push
+
+GNU make serial test:
+  stage: test
+  dependencies:
+  - GNU make serial build
+  script:
+  - export MATHLIBS=/usr/lib/x86_64-linux-gnu
+  - cd make-build-gnu-serial
+  - make tests
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-gnu-serial-make"
+    paths:
+    - make-build-gnu-serial/
+    policy: pull

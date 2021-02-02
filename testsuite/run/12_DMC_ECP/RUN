@@ -1,0 +1,21 @@
+#! /bin/bash
+rm -f *in *out*
+echo " DMC test with ECPs ..."
+for i in DMC
+do
+  cp ../../templates/DMCECP.in ./DMC.in
+
+  $AMOLQCRUN $i
+
+  R=`grep "total energy" $i.$REF |awk {'print $4'}`
+  C=`grep "total energy" $i.out |awk {'print $6'}`
+  if [ $R == $C ] ; then
+    echo -e "     DMC ECP test \033[32mpassed.\033[39m"
+    rm -f $i.in $i.out
+  else
+    export FAILED=1
+    echo -e "     DMC ECP test \033[31mfailed.\033[39m"
+    echo "    Check $PWD/$i.out for more information."
+   fi
+done
+

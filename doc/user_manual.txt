@@ -1,0 +1,1640 @@
+
+  * * * User Manual for Amolqc * * *
+
+This manual describes tersely most of the options
+of the Amolqc program and its utilities. For the
+appropriate usage check the examples and tests.
+
+Contents:
+
+1.  Usage
+2.  Description of the infile (.in)
+3.  Description of the wave function file (.wf)
+4.  Utility programs
+4.1 runConvertBasisFile.py (converts basis sets from emsl or gaussian format to Amolqc format)
+5.  Amolqc basis set library
+
+Note: throughout this manual, [xxx] denotes an optional parameter xxx where
+a default value is supplied if xxx is not given
+Alternative values are indicated by '|', thus [a|b] means 'a' or 'b' can be given.
+
+
+
+1. Usage
+=========
+
+Running Amolqc requires one environment variable pointing to the (installation) directory "Amolqc"
+(containing the bib and cmds directories)
+
+export AMOLQC=/path/to/Amolqc
+
+usage:
+
+/path/to/amolqc infile
+or
+/path/to/amolqc infile.in
+
+where "infile.in" exists in the current directory and contains commands including a
+line '$wf(read, file=name.wf)' requiring a wave function file
+'name.wf' in the same directory. No output is generated. Instead, the output
+is written into the file 'infile.out'. If this file exists output is written to 'infile.out-1'.
+If this exists to 'infile.out-2' and so on (up to 99).
+Many commands use the "basename", i.e. "infile", with different suffixes for structured data output.
+
+Some commands require access to files of the Amolqc installation (the basis data in 'bib' and the macro
+commands in 'cmds'). These files are
+found relative to the contents of the environment variable $AMOLQC that has to
+be set to the root of the installation (usually named 'Amolqc' as well).
+The environment variable is set with
+export AMOLQC=/path/to/Amolqc-directory
+in bash shells. Put this line into your .profile or .bashrc and in your queue job script
+prior to the amolqc command.
+
+
+
+2. Description of infile (.in file)
+===================================
+
+Infile contains commands of the structure
+$name(options)
+or comment lines starting with "!"
+
+The commands are executed in order (but see loop commands below).
+$gen and $wf have to precede any qmc command.
+
+In this manual optional values are given with "[optional]" and
+alternative values with "|", e.g.
+[[no]splineaos]   means: either "nosplineaos" or "splineaos" may be given here,
+  but neither is necessary (because there is a default value)
+[splineaos|nosplineaos]    means: the same alternative, but one of the two has to
+  be given.
+[[splineaos|nosplineaos]]   means: the same as the first example.
+
+
+Besides the commands listed below, a loop structure and a macro expansion
+exists:
+
+2.1 Loop structure:
+
+$begin_loop(count=n)
+...
+[$exit_if(condition[,stop])]
+[$stop_if(condition)]
+...
+$end_loop
+
+The commands between $begin_loop and $end_loop are carried out n times.
+Optionally, the $exit_if command allows exiting the loop and continuing after
+$end_loop is 'condition' is fulfilled. If the keyword 'stop' is given, the
+job is terminated. The same is achieved with $stop_if(condition).
+conditions: [energy<ddd|energy>ddd|variance<ddd|variance>ddd]
+ddd is a real number. More than one condition can be given. They are combined
+with "or". Energy and variance values used in the comparison are the final result of
+the last "$qmc" or "$optimize_parameters" command.
+The $exit_if/$stop_if command is useful to terminate divergent parameter optimizations.
+
+
+2.2 Macro expansion:
+
+If a command "$command" is not implemented, it is checked if a macro command
+file with the name "command.cmd" exists in directory cmds. If it does the
+content of command.cmd replaces $command. IF arguments are given, the
+corresponding arguments in command.cmd are replaced with the new values
+(but: command replacement happens only in command lines beginning with "x")
+The macro expansion (with replacements) is printed in the output file.
+If no file command.cmd exists the program aborts with an error message.
+
+Macro commands are intended to be written by the user. A few are provided:
+
+$generate_sample(size=100) :   generates an independent sample of size 100
+$generate_walker()         :   generates an independent sample of size=1
+$jastrow_varmin_fast()     :   jastrow variance minimization, see examples
+$jastrow_varmin_safe()     :   if 'fast' fails
+$jastrow_emin_lin()        :   linear energy minimization, see examples
+$jastrow_emin_lm()         :   Levenber-Marquardt energy minimization
+$jastrow_emin_nw()         :   Newton-Raphson energy minimization
+
+
+
+2.3 infile commands in alphabetical order:
+
+Note the required order:
+
+$gen()
+$wf()
+[$ecp()]
+[further commands]
+
+Options for commands are of the type "keyword" or "keyword=value". If a value is given
+this denotes the default value (hopefully).
+keyword=dd means: value is a double precision number
+keyword=nn means: value is an integer
+
+
+====================================================================================
+
+$analyze_refs
+-------------
+
+analyzes the electron configurations from a ref file.
+Prints out function value (-ln(psi**)), E_loc and V_pot
+(both are NaN at singularities, E_loc is finite only if
+singularity is removed exactly.)
+Prints coordinates, gradients and electrons at nuclei
+Prints eigenvalues
+TODO: run optionally Nelder/Mead with all coordinates to check is true minimum
+
+ref_file=name.ref : ref file name must be given
+ref_n=0           : 0: analyze all i,1 refs with i=1,...; n: analyze all n,i refs
+maxrefs=100       : do not analyze more than maxrefs refs.
+verbose=2         : control output
+nuc_thresh=0.002  : identify all electrons closer to a nucleus as being at the nuc
+bond_thresh=0.4   : identify all electrons closer than bond_thresh as bond electron
+core_thresh=2.0   : identify all electrons ... as core electron
+h=0.001           : denominator for three-point numerical deriv (from grad) in Hessian
+eigenvec          : calculate eigenvectors in addition to eigenvalues of Hessian (store at basename.ev)
+calc_diff         : calculate differences to all previous references
+excl_file=file    : for calc_diff: exclusion file see $init_max_search
+
+(This uses only the MASTER node)
+
+
+====================================================================================
+
+$begin_subroutine(name=sub_name)
+[command lines]
+$end_subroutine
+---------------
+
+defines a subroutine. Most commands are allowed in subroutines. Subroutines must be
+defined prior to their usage. They are called by their name with the $call_subroutine()
+command or from within another command (see $optimize_parameters).
+Note that the subroutine mechanism is very simple. No subroutines are allowed in subroutines.
+
+====================================================================================
+
+$calculate_density
+-------------------------------
+
+calculates the single determinant Slater density at a given position.
+
+x=dd (default 0.0) : x position
+y=dd (default 0.0) : y position
+z=dd (default 0.0) : z position
+
+
+====================================================================================
+
+$call_subroutine(name=sub_name)
+-------------------------------
+
+calls a subroutine with the name 'sub_name',
+defined before the use with $begin_subroutine and $end_subroutine
+
+
+====================================================================================
+
+$change_jastrow
+---------------
+
+new_jastrow=jt where jt is the jastrow type (sm0,sm1,sm2,sm3,sm31,sm4,sm41,
+                                             icXYZ where X,Y,Z >= 0 <=9,
+                                             deXYZ where X,Y,Z >= 0 <=9)
+
+      [params=paramFile]  reading Jastrow parameters from file containing a
+                        $jastrow .. $end block
+
+      [keep_aniso_terms]  anisotropic terms are kept when changing from generic to generic jastrow
+
+diff_ee_cusp: keyword to enable usage of different ee cusp condition for spin
+        like and spin unlike electron electron terms in Jastrow factor
+            see Chapter 3 - "Input of Jastrow Parameters" for details
+
+same_ee_cusp: default
+        keyword to disable usage of different ee cusp condition for spin
+        like and spin unlike electron electron terms in Jastrow factor
+          currently not implemented
+
+add_aniso_terms : Adds anisotropic terms to Jastrow factor
+        Implementation require to define Jastrow first and then add anisotropic
+        terms in second "change_jastrow" call
+        format:
+          $change_jastrow(add_aniso_terms,
+          <keyword> [additional parameters; depend on keyword used]
+          )
+        line breaks are essential
+        <keyword>: <type> all , <type> nuc, <type> idx
+          where <type>:
+              ao :
+                adds two-body (en) anisotropic terms
+              eenao :
+                adds three-body (een) anisotropic terms
+              eennao :
+                adds four-body (eenn) anisotropic terms
+
+          and
+
+                <type> all:
+                    adds and uses all basis functions of given l
+                      format (e.g): ao all <functions>
+                    choice of l = s, p, d, f
+                    must be seperated by white space in case more than one function
+                    shall be used (e.g. "p d" or "p d f")
+                <type> nuc:
+                    adds and uses all basis functions for given l and nucleus
+                      format: <number of lines>
+                              <function> <center> [<center1_2> ... ]
+                              <function2> <center2> [<center2_2> ... ]
+                              ...
+                          seperated by line breaks, only one l added in each line
+                          (i.e. two lines needed for adding p and d functions)
+                <type> idx:
+                    adds and uses given basis function (given by indicies)
+                      format: <number of basis functions>
+                              <index of basis function1> <index of basis function2>
+                          seperated by white space or line break
+
+
+====================================================================================
+
+$change_parameters
+------------------
+
+type=jastrow
+mode=1
+
+2nd line: contains idx parameter value pairs.
+idx1 val1 idx2 val2 ...
+with the new values for the parameter vector
+
+This command must consist of three lines (last line is ')').
+
+
+=====================================================================================
+
+$compare_sample
+---------------
+
+compares with current sample with the sample in given by a position file (.pos). Comparison
+by position only, within a given threshold. Comparison is done in order!
+
+file='name.pos'     : position file
+max_sample_size=nn  : compare the first nn positions from pos-file (required)
+threshold=1.d-6     : sample points are considered identical when d = sqrt(delta*delta) / n < threshold
+verbose=0           : with 2 all d are printed
+
+
+=====================================================================================
+
+$coulomb_density
+----------------
+
+Initializes the Monte Carlo integration of the coulomb term with the
+separated_electrons/2 lowest orbitals. (eg. for pure pi wave functions)
+
+mc_steps=nn        : steps for Monte Carlo integration. If 0, the separated density does not appear
+                     in the Hamiltonian
+
+
+====================================================================================
+
+
+$displace_walker
+----------------
+
+Displaces the initial walker that has to be previously initialized with init_walker.
+
+displacement=dd     : displaces all electron positions by dd
+dimension=dd        : displaces in dimension (x,y,z)
+
+
+====================================================================================
+
+$ecp
+----
+
+initializes and turns on use of ECPs. $ecp must follow directly the $wf block.
+options:
+det_only: ECP localization without Jastrow factor
+full_localisation: ECP localization with Jastrow factor(default)
+[no_]random_rotation: use [fixed] random axis system for grid integration
+cutoff=x: if given, ECP cutoff is turned on. This calculates for each atom
+  a cutoff radius for the non-local part. The calculated radii are shown with
+  verbose>=2.
+[full|no|nonlocal]_cutoff: Cutoff for all channels (local and non-local)
+                           no cutoff Cutoff only for non-local channels(default)
+grid_points=n: Set same integration grid points for all atoms.
+grid_point_list=m: Set integration grid points for different atoms.
+  a n
+               which sets the integration grid points for atom a to n.
+
+
+====================================================================================
+
+$eloctest
+---------
+
+tests the local energy code by calculating contributions like Jastrow, Phi to Eloc
+and additionally testing the derivatives with numerical derivatives.
+
+options: h,rule,points,derivatives,updatetest
+
+h=x  where x is a small real number (default: 1.d-5) for difference quotients
+rule=n  3-point, 5-point or 7-point rule for numerical differentiation
+points=n use the first n points in sample for test
+derivatives: calculate derivatives numerically
+updatetest: check updating electrons
+
+
+====================================================================================
+
+$gen
+----
+
+options: seed (required), verbose
+
+verbose=[0,1,2,3,4,5,6]: standard output is 2, walker based output with 5
+
+seed=n: initialization of random number generator (uses the seeds n,n+1,...n+nproc-1, where
+        nproc is the # of MPI processes)
+
+
+====================================================================================
+
+$init_basin_analysis
+--------------------
+
+activates an analysis based on a previous maximum calculation that generated a .ref file.
+In this analysis, a sample that is generated on-the-fly with the next $qmc command is analyzed
+(on-the-fly) after assignment of each sample point to its maximum as identified from the ref file. This
+command (and a subsequent $init_max_search command) triggers the next $qmc command to do the
+actual analysis "step_stride" step.
+For each k of the ref data structure a mean reference structure is constructed by (weighted)
+averaging over all m ("centroid"). Make sure that mmax of the preceding maxima calculation is
+sufficiently large. The mean structures or centroids for each k are stored as the ref file "basename.ref".
+During the on-the-fly analysis, for each sample point generated from $qmc each "step_stride" step,
+at first the maximum is determined and compared using tol_sim with the centroid averaged maxima.
+If the maximum corresponds to one of the first "kmax" maxima, the permutation that brings the
+new maximum in (very close) coincidence to the centroid maximum, is determined. In all analyses
+of this command the permuted walker is used while the original walker is untouched for the
+continuation of the qmc walk. Note that electron permutations do not change psi**2, but only if
+the spin coordinate is permuted as well. Here, the spin is encoded in the electron index of the
+original sample walker: the order in the qmc code is first alpha, then beta, i.e. all indices <= n_alpha
+(n/2 in closed shell molecules) refer to alpha electrons, all others to beta electrons.
+
+The assignment of each sample point to a maximum allows many different types of analyses:
+(1) single electron densities (sed): collect all electrons from psi**2 assigned to a certain
+    maximum position.
+(2) electron pair analysis: analyse pairs of electrons and their spin after assignment
+(3) identify permutations necessary to match reference electron arrangement after maximization
+
+options:
+
+cubes     : write cube files (Gaussian format) for each electron (and each reference maximum)
+xyz       : write sample after permutation according to reference maximum
+energies  : do energy partitioning (possibly not working)
+psi2ratio : evaluates the psi**2 ratio of sample position to maximum position
+elec_pair_analysis=n  : electron pair analysis
+lra       : left-right analysis
+
+ref_file='file.ref'  : note: for each k a mean reference structure is constructed by averaging over all m
+kmax=n    : use only the first n reference maxima are used (sample points with different further
+            maxima are discarded)
+tol_sim=0.1       : see $init_max_analysis
+excl_file='file'  : see $init_max_analysis
+
+cubes:
+  nbin=80   : nbin x nbin x nbin 3d histogram
+  grid=4.d0 : defines a cube [-grid,-grid] in x,y,z direction, i.e. around the origin (no default)
+  ax=,bx=,ay=,by=,az=,bz= : give explicit coordinates of the cube (more precisely: cuboid)
+  sbin=0    : creates a subcube around the center of mass of the cube data of each maximum position
+               with the size of 2*sbin+1 in each direction. sbin>0 enables the creation of the
+               subcube
+
+(elec_pair_analysis and lra usage is to be completed)
+
+====================================================================================
+
+$init_max_analysis
+------------------
+
+activates an analysis for (all important) local maxima of psi**2 (with the 3n dimensional
+many-electron wave function psi).
+For all but the smallest molecules, the number of local maxima of psi**2 is large.
+Therefore, the global maximum is only of limited interest, and the goal is to analyze
+all local maxima of importance. This requires collecting (and counting) maxima according
+to certain criteria (see below).
+Maxima are identified as minima of f = - ln(psi**2)
+
+The collected maxima will be written to basename.ref
+The .ref file contains reference structures (usually local maxima) identified by two
+indices: k and m. This is to be understood as a main list (index k) where each entry
+is a sublist (index m).
+
+$init_max_analysis only sets the parameters for collecting and analyzing the maxima. The
+minimization algorithm is selected with a subsequent $init_max_search command. The
+actual collection of the maxima is done in a subsequent $qmc run, where the maximization is
+called after the discarded steps every "step_stride" step. (Note: the qmc walk is not changed by
+the maximization steps)
+
+The very many local maxima are collected in various ways controlled by 'max_mode'.
+
+     max_mode=[val|vst|str|pos] default: "str"
+
+        parameters: (not all used in all modes)
+             kmax=30              restricts length of the main list to nmax. Further data are ignored
+             mmax=5               restricts length of sub lists to mmax.
+             tol_fctn=0.001       two function values (-ln(psi**2)) are identified as the same if the differ
+                                  by less than tol_fctn
+             tol_same=0.01        two electron arrangements are identified as the same if the maximal distance
+                                  between two corresponding positions is less than tol_same (new: in A)
+             tol_sim=0.1          two electron arrangements are identified as the similar if the maximal distance
+                                  between two corresponding positions is less than tol_sim (new: in A)
+             sort_freq            if given, sort references w.r.t. frequency (instead of value) at output (out and ref)
+
+        val: "value" mode.
+             main list contains local maxima sorted w.r.t the function value, i.e. -ln(psi**2).
+             maxima with "same" function value are collected and only counted (not stored).
+             tolerance "tol_fctn" defines "same". ref file contains sorted list of maxima where
+             the last entry has the summed count of all remaining (discarded) maxima!
+             sub lists are not used, i.e. m=1 for all entries.
+
+        vst: "value/structure" mode. parameters:
+             same as val, but now for each function value a sublist (maximal length mmax) is created.
+             Entries are structures that differ by more than tol_same. More precisely: a new local
+             maximum with the same function value is compared with all structures in the sublist by finding
+             the best assignment (treating alpha and beta electrons as different) and then determining the
+             maximal distance for all assigned electrons. If max distance is smaller than tol_same, the
+             count for that structure is increased. If no structure matches the new local maximum, a new
+             entry is added to the sublist (more than mmax are ignored)
+
+        str: "structure" mode. addtnl parameters:
+             excl_file=filename
+
+             main list (max size nmax) contains different "structures". Two maxima are understood as
+             having the same structure if they are "similar" when the spin is ignored. "Similarity" is
+             determined by tol_sim (max distance of two corresponding positions in bohr)
+             The list of structures is sorted w.r.t the function value (1st index k in ref file). For
+             each structure in the list a (sub)list is maintained the collects identical (same)
+             maxima including identical spin. Maxima are identified as the same if the maximum distance
+             between to corresponding positions is less than tol_same.
+             The sublist for each structure contains thus the spin permutations of the structure.
+             The sublists are also sorted w.r.t the function value.
+
+             excl_file is an optional argument. If given a file containing "electrons to be excluded"
+             from the determination of maximum distance (for comparison with tol_sim and tol_same).
+             The file is a text file with the structure
+               n
+               code1
+               ...
+               coden
+             where n is the number of excluded positions, and "code" is a simple integer code of the form:
+             abbcc with
+               a=1: at nucleus  a=2: within core a=3: along a bond a=4: between two atoms (but not along bond)
+               a=5: all others (i.e. lone pair)
+               bb and cc are two digit form of the element number (01=H, 06=C, 18=Ar, ...). for a=1,2,5 bb=00
+               Ex.: 10001: position at any H nucleus
+                    30601 and 30106: position along any CH bond.
+             Note: The codes must be numerically sorted in ascending order!
+
+        pos: "position" mode. Parameters:
+             tol_simmax=tol_sim
+             ref_file=file_name.ref
+             excl_file=filename
+             ignore_ref_elecs=n
+
+             like in "str" mode, identical structures irrespective of spin are identified (with tol_sim). In pos
+             mode, however, the entries in the main structure list are read from the ref_file. More precisely,
+             The structure list is initialized with the entries (n=1,m=1), (2,1), ... (nmax,1) from file_name.ref.
+             It is useful to use file_name.ref from an "str" run, use the same tol_sim as in that run, and
+             restrict nmax to the interesting structures of the previous run.
+             In the "pos" mode all electron positions are collected
+             and averaged. For this a list of electron positions is constructed for each "structure". For each
+             new maximum all electrons are compared with the positions of the list. If an electron is closer than
+             tol_simmax (defaults to tol_sim) to a position in the list,
+             this electron is added to this position (meaning doing statistics over electron positions).
+             If not, a new entry in the position list is added.
+             All positions for each structure are printed at the end of the $find_maxima run, with std dev and
+             std error. They are also saved as basename.max in a format similar to the .ref format.
+             The ref_file is used to create the initial electron position lists, and it is used to assign electrons
+             of a maximum (of one structure) to the ref_file electrons, now with spin preserved. This way the two
+             possible position of an electron due to spin permutations are found, and thus electron pairs are
+             identified (because of they occupy the same two positions in closed shell molecules) if they exist.
+             We average over the position of each electron in the reference structure after assignment, i.e. we average
+             over the two possible positions of each pair. The mean is calculated with a weight proportional to
+             the probability (psi**2) of the local maximum relative to the global maximum (from the reference file).
+             The averaged positions are saved as .ref file.
+
+             This is done by comparing each electron arrangement with that of the reference
+             (ref_file), after renumbering
+
+             excl_file for list of excluded positions, see "str"
+             ignore_ref_elecs=n
+             $find_maxima(blocks=20,steps=200,max_iter=150,max_mode=pos,nmax=3,max_full=20,
+               ref_file=ethene-max1p.ref,ignore_ref_elecs=8,tol_maxdist=0.1,tol_pos=0.1,H_dist=0.1
+                  3
+                 3 4 6 8  11 12 15 16
+                 3 4 6 7  11 12 13 15
+                 3 4 5 7  11 12 14 15
+               )
+             this means: 8 electrons are ignored when determining maxdist and meandist for 3 ref structures
+             (see nmax=3). Each line contains the number of the electron in the reference file (here: ethene-max1.ref).
+             After identifying the positions using e.g. matlab, the above list of electrons assigned to the given
+             electrons of the reference can be constructed.
+
+
+====================================================================================
+
+$init_max_search
+----------------
+
+sets the parameters for a maximum search, either with a subsequent $maximize_sample() or
+on-the-fly with a $qmc() command where 'step_stride' is set.
+Use steepest_descent as reference, in particular with small 'step' and 'max_distance_all', and
+bfgs with switch_step as efficient approximative maximizer. Test convergence with $maximize_sample
+(and $write_sample) and $compare_sample. $maximize_walker(index) maximizes only one walker.
+
+method=[bfgs|fire|steepest_descent|bfgst|newton] default: bfgs
+max_iter=1000        : maximal number of iterations (not function evaluations!)
+max_distance=dd      : if given total 3n-dim step is scaled to a max of dd for the largest step of one electron
+max_distance_one=dd  : if given each one-electron step is cut at dd (!just for testing atm)
+convergence_gradient=0.0001 : convergence if max(abs(gradient)) < 0.0001
+save_opt_paths       : triggers saving the maximization path in the .ref format. Data are stored at unit 300+taskid,
+                       i.e. fort.300, fort.301, ... Entry (k, m) means: m-th iteration step of the k-th maximization
+
+singularity correction parameters:
+correction_mode=[cut|umr|cut_all|umr_all|none]:
+     cut: overshoot correction (3-dim step is restricted to the projection of the elec-nearest nuc vector
+          to the search vector, 3n-dim step is scaled accordingly) (default)
+     umr: additionally, the 3-dim step is bent towards the nearest nucleus.
+          (see Umrigar et al, JCP, 1993)
+     *_one: same as above, but only the electron step in concern is altered (!just for testing atm)
+     none: no correction
+correction_threshold=0.1 : do a singularity correction only within this distance/Z (bohr) to nearest nucleus
+                           (Z being the atomic number)
+singularity_threshold=0.005 : if an electron is this/Z close (bohr) to the nearest nucleus, it is assumed to
+                              have its maximum position at the nucleus and is put at the nucleus.
+no_scaling: correction_threshold and singularity_threshold are not! scaled with Z^{-1} (Z being the atomic number)
+
+bfgs parameters:
+step_size=dd         : to enforce local maximation initial steps are steepest_descent with step=dd
+switch_step=50       : after nn steps switch to bfgs (smoothly within 5 steps)
+latency=nn           : after nn steps switch to bfgs, each identified nucleus switches back to steepest_descent
+
+steepest_descent:
+step_size=dd         : actual step is:  -dd * gradient (with distance restriction)
+
+fire: FIRE algorithm, see paper, and minimizer_ws_factory_m.f90 for the options. Not generally competitive with
+  the BFGS/steepest_descent combination.
+
+bfgst: Lennard Dahl's BFGS variant mit singularity correction see BSc thesis and minimizer_ws_factory_m.f90
+  for the options. Not competitive with the BFGS/steepest_descent combination.
+
+newton (use newton only for saddle point searches):
+step_size=1.0         : factor for the newton step
+
+
+====================================================================================
+
+$init_rawdata_generation
+------------------
+
+Raw data from the VMC run and maxima search is written in binary format
+in the following order, dimensionality, and precision:
+---------------Header----------------
+           number of atoms ( 1*i4)
+     atomic numbers vector ( N*i4)
+     atom positions vector (3N*r8)
+       number of electrons ( 1*i4)
+ number of alpha electrons ( 1*i4)
+----------------Body-----------------
+ 1.  sample positions vector (3N*r8)
+   kinetic energies vector ( N*r8)
+  maximum positions vector (3N*r8)
+          -ln|Psi|^2 value ( 1*r8)
+ 2. ...
+
+parameters:
+basename='string'    (default basename of the input file) : sets the basename of the output binary files
+max_records=nn       (default 1000000)                    : sets the max number of body records per file
+verbose=nn           (default 0)                          : sets verbosity
+
+
+====================================================================================
+
+$init_rho_analysis
+------------------
+
+initializes parameters for the maximization of the single Slater determinant density
+and the analysis of the results.
+
+all parameters of '$init_max_search' are valid.
+
+other parameters:
+verbose=nn          (default 0)         : sets verbosity (high values can generate lots
+                                          of output)
+assign_thresh=dd    (default 0.1)       : threshold to assign electrons to atoms after max-
+                                          imization of rho
+print_thresh=dd     (default 0.05)      : threshold to print occupations (weight)
+fragments=nn;nn;... (default 1;2;...;N) : assignment of atoms to fragments for partition output,
+                                          must be of length N (number of atoms)
+use_log                                 : use -ln(rho) instead of -rho as function to minimize
+
+
+====================================================================================
+
+$init_rho_grid
+--------------
+
+creates an electronic density grid and initializes parameters for the maximization.
+
+bin_size=dd      (default 0.1)       : edge length of a cell
+atoms=nn;nn;...  (default all atoms) : array of indices of the atoms that must be inside the grid bounds
+offset=dd        (default 5.0)       : additional offset for the grid bounds
+search_radius=nn (default 3)         : number of adjacent cell layers checked in a step during maximization
+assign_thresh=dd (default bin_size)  : threshold to assign electrons to atoms after maximization
+compare                              : enable comparision of the created density grid with the density calculated using
+                                       the given wave function
+
+====================================================================================
+
+$init_walker
+
+allows to set an initial walker. This command must precede $sample(create, size=1, single_point).
+There are three formats. All coordinates are in bohr.
+
+The free format is:
+$init_walker(
+free
+between 1 2 3   ! electron is between the given atom positions (any number of atoms can be given)
+scaled 1 2 0.2  ! electron is between the given two atom positions at 0.2 of the way
+at 4            ! electron is at a given atom position
+x y z           ! simply x y and z coordinates of an electron
+...)
+
+The column format is:
+$init_walker(
+col
+x1 y1 z1
+x2 y2 z2
+...
+xn yn zn)
+
+The old format is:
+$init_walker(
+x1 x2 ... xn
+y1 y2 ... yn
+z1 z2 ... zn)
+
+=====================================================================================
+
+$maximize_mos
+-------------
+
+finds maxima/minima of all MOs simultaneously, but without importance sampling. For MO maxima/minima 
+with frequencies as weights use $qmc with $init_max_search and one MO (and one electron) only.
+Here all MO maxima/minima are identified either using a 3d grid or ellipsoid sampling for initial
+points for maximization. In both cases -abs(mo) is minimized.
+
+mode=[lmo_min|grid] default: lmo_min    # use LMO sampling or a simple 3d grid
+value_threshold=0.0001                  # ignore maxima/minima with values below threshold
+
+lmo_grid: (see LMO sampling in $init_sample)
+grid_size=100             # in x,y,z direction for determining ellipsoid (i.e. 3d gaussian) for (L)MO
+scale=1.0                 # Gaussian scale factor
+attempts_per_mo=5         # sample size
+distance_threshold=0.001  # identify two maxima as identical
+further options see: $init_max_search
+
+grid: this variant calculates MO on a grid and identifies local maxima/minima by comparison with neighbors. 
+x_grid_size=100           # number of grid points in x direction (half each in negative / positive direction)
+y_grid_size=100           # number of grid points in y direction
+z_grid_size=100           # number of grid points in z direction
+grid_step=0.02            # distance between grid points
+
+
+=====================================================================================
+
+$maximize_sample
+----------------
+
+no options. This command maximizes psi^2 for all sample elements and gives information about convergence
+and function evaluations. Maximization is done according to a preceding $init_max_search command.
+
+
+=====================================================================================
+
+$maximize_sample_rho
+----------------
+
+no options. This command maximizes rho for all sample elements and gives information about convergence
+and function evaluations. Maximization is done according to a preceding $init_rho_analysis command.
+
+
+=====================================================================================
+
+$maximize_walker
+----------------
+
+This command maximizes psi^2 for one sample element and gives information about convergence
+and function evaluations. Maximization is done according to a preceding $init_max_search command.
+
+index=nn : index of the walker to be maximized
+
+
+=====================================================================================
+
+$maximize_walker_rho
+----------------
+
+This command maximizes rho for one sample element and gives information about convergence
+and function evaluations. Maximization is done according to a preceding $init_rho_analysis command.
+
+index=nn : index of the walker to be maximized
+
+
+=====================================================================================
+
+$optimize_parameters
+--------------------
+options: energy_min|variance_min,params,method,optmode,eq_iter
+
+params=[jastrow|ci|mo|jas+ci|jas+mo|mo+ci,jas+mo+ci]
+        The order is important.
+energy_min: (minimization w.r.t. the sample energy)
+  method=[newton|scaled_newton|lm_newton|tr_newton|eminlin|popt] default is lm_newton
+   newton: simple several Newton-Raphson energy minimization
+   scaled_newton: Newton step is scaled w.r.t a cost function
+   lm_newton: Levenberg-Marquardt Newton step. Hessian is modified to ensure it is positive definite
+   tr_newton: trust-region Newton-Raphson energy using the DNMTR code (newton or eminlin is preferable)
+   eminlin: linear energy minimization as suggested by C. Umrigar with scaling step
+   popt: perturbative energy minimization Toulouse, Umrigar 2007
+variance_min: (minimization w.r.t. the sample variance)
+  method=[varmin|lm] default is varmin
+   varmin: variance minimization using the NL2SOL code
+   lm: variance minimization using Levenberg-Marquardt algorithm (varmin is preferable)
+
+optmode=[1|2|3|4|5]: which parameters to optimize (default: 1)
+  the meaning of the optmode depends on the parameter set being used:
+  jastrow:
+    ic|de:  1: linear parameters (analytical derivatives)
+            2: linear parameters (numerical derivatives)
+            3: nonlinear parameters (numerical derivatives)
+            4: all parameters (lin. analytical, nonlin. numerical)
+            5: all parameters (numerical)
+    sm:     1: linear parameters
+            2: linear + nonlinear parameters
+    dtn:    1: linear + nonlinear parameters
+            2: linear parameters
+  ci: ???
+
+options for params=mo:
+  mo_param_mode=[1|2] default: 2
+            1: successive 2x2 rotations
+            2: rotation matrix = exp(kappa)
+  mo_update_mode=[1|2] default: 2
+            1: excited determinants directly
+            2: excited determinants with Sherman-Morrison
+
+options for all methods:
+
+eq_iter=n: equilibrate sample and iterate n times.
+
+eq_call=subname: expects a $begin_subroutine(name=subname) ... $end_subroutine block
+  at the beginning of the in-script, containing the commands to equilibrate the sample
+  default: subname=equilibrate (allowing named subroutines in "cmds" is not yet implemented)
+
+wf_write: write the wf file for the parameters of each iteration step
+
+varmin options:
+  E_ref=dd:  reference energy(Optional but recommended).In case of absence,
+    emean+emean*0.02 for first optimization cycle and emean for rest cycles will
+    be used as E_ref. Note that "emean" is Sample's mean, local energy.
+  E_ref_adp (optional):  adapts reference energy using samples mean energy after
+    each opt cycle.
+  E_ref_fix (optional,default):  use fixed reference energy
+  max_iter=3: iterations with fixed sample (default: 3)
+  max_iter=n: iterations with fixed sample (e.g. in varmin1 and varmin2)
+    it's not usualy needed for varmin2, you only need to specify max_iter=2 if you had difficulties(diverged parameters) in optimizing paramiters.
+  NL2SOL_D_mode=[0,1]: NL2SOL scale vector mode (varmin2).default is "0".  Only needed when no changes in parameters.
+ mo_noise_coeff=0.0  : Add gaussian white noise fo starting orbital rotation params aroung
+                        zero (startin params will be mo_noise_coef* g_rand ).
+lm options:
+  E_ref=dd:  reference energy(Optional but recommended). In case of absence,
+    emean+emean*0.02 for first optimization cycle and emean for rest cycles will
+    be used as E_ref. Note that "emean" is Sample's mean, local energy.
+  E_ref_adp (optional):  adapts reference energy using samples mean energy after
+    each opt cycle.
+  E_ref_fix (optional,default):  use fixed reference energy.
+  max_iter=3: iterations with fixed sample (default: 3)
+  lambda=0.001: value of lambda in varmin1. The diagonal elements are scaled with 1+lambda, lambda is
+                increased by a factor of 10 with each itaration that didn't succeed in decreasing the variance.
+
+newton options:
+  max_var=1.d9: terminate optimization iterations if this variance is reached
+  nrmethod=1: Standard Newton-Raphson, no further options
+  nrmethod=2: Use scaled Newton-Raphson step, step length obtained from fixed sample
+    target_E, target_var: required to determine step length
+    dmax=1.d9: fixed trust radius (mean abs component of parameter vector delta_p). delta_p is forced below this
+               threshold
+    cffac=1.d0: scaling factor variance in cost function (abs(delta_E) + cffac*abs(delta_var))
+  nrmethod=3: Levenberg-Marquardt Newton stop with distance control
+    nu=0.001: Actual Hessian in Newton step is H' = H + nu*Imat (Imat=unit matrix). nu is initial value for nu.
+      nu is adapted to achieve a ratio of predicted/true energy change
+      of better than 0.25, and to achieve positive definite H'.
+    delta_f_min=0.d0: if set do not change nu if the change in the fixed sample energy is smaller than delta_f_min
+      (because of the unavoidable random noise in the fixed sample energy)
+
+eminlin options   :
+  E_lb=dd         : lower bound for eigenvalue selection : currently disabled
+  max_Im=1.d-3    : max allowed value for imaginary part for eigenvalue selection : currently disabled
+  max_ev=5        : eigenvalue selection by choosing lowest fixed sample variance of the lowest max_ev eigenvalues
+  ev_sample_size= : use a subset of samples to evaluate correct eigenvalue and parameters vector length
+  target_E, target_var: required to determine step length
+  cffac=0.001d0      : scaling factor variance in cost function (abs(delta_E) + cffac*abs(delta_var))
+  root=N          : specifies the chosen eigen vector manually
+  max_prj         : use projection to current ci vector to choose the eigen vector (only available for ci optimization)
+  prt_prj         : prints the projections to current ci vector (only available for ci optimization)
+  lambda=dd       : specifies the step length manually
+  lambdamax=1.0d0 : changes the max step length
+  quad            : use a quadratic model to determine the step length with minimum energy
+
+
+popt options                :
+max_var=1.d9                : terminate optimization iterations if this variance is reached
+write_de                    : writes delta E in file with .dat extension
+delta_e=                    : sets a fixed delta E for all parameters
+delta_e_[once|always]       : calculates the delta E for one or all iterations(default)
+delta_e_sample_size=        : use a subset of samples to calculate delta E
+delta_e_filename='filename' : reads delta E array from the file.
+quad                        : use a quadratic model to determine the step length with the minimum energy
+target_E, target_var        : required to determine step length (only when quad is present)
+
+====================================================================================
+
+$optimize_refs
+--------------
+
+read a .ref file and optimize all references (using LBFGS only)
+
+ref_file= ref file
+new_file= ref file to save all optimized references
+verbose=2
+max_grad=1.d-5   : max gradient (component)
+max_dist=1.d-4   : max distance (length of bfgs direction vector)
+max_f   =1.d-5   : max change of function value (from previous step)
+H_dist  = -1.d0  : if elec is closer to H (or He) nucleus than "H_dist (in bohr)",
+                   elec is put at nucleus and removed from minimization
+                   <0: do nothing
+                   if too small, LBFGS tends to fail near H nuclei (due to
+                   singularity). Sensible values are 0.1 .. 0.3 (smaller than
+                   half a bond length: H-H has half bond length 0.6)
+
+
+====================================================================================
+
+$plot_mos
+---------
+
+(see also $maximize_mos)
+
+x_grid_size=100           # number of grid points in x direction (half each in negative / positive direction)
+y_grid_size=100           # number of grid points in y direction
+z_grid_size=100           # number of grid points in z direction
+grid_step=0.02            # distance between grid points
+
+
+write cube file style formatted file (suffix .plt) containing MO function values on the grid:
+structure of .plt file:
+write(iu,'(i5,2g15.5)') xGridSize, xStart, xStep
+write(iu,'(i5,2g15.5)') yGridSize, yStart, yStep
+write(iu,'(i5,2g15.5)') zGridSize, zStart, zStep
+write(iu,'(i5)') getNOrb()
+loop over:
+  mo
+  do x
+     do y
+         do z
+
+
+====================================================================================
+
+$plot_mo_in_plane
+-----------------
+
+similar to $plot_mos, but 2d value in a given plane only. 2D coordinate system is
+specified by origin and 2 points. 1st unit vector is point1 - origin (possibly normalized).
+point2 - origin specifies the plane with 1st unit vector. 2nd unit vector is orthogonal
+to 1st in plane. Extra points to be included in plot are added. Nuclei in this plane are
+added to the output.
+
+nuc_in_plane_thresh=0.01    # threshold for identifying nuclei and extra points in given plane
+grid_step=0.02              # step size in unit vector directions
+grid_data=
+nExtraPoints, origin
+xGridSize, point1           # x/yGridSize: number of grid points in x/y direction
+yGridSize, point2
+extrapoint1
+...
+extrapointn
+
+origin, point1/2, extrapoint all require x,y,z coordinates.
+
+structure of .plt file:
+
+write(iu,'(i5,2g15.5)') xGridSize, xStart, xStep
+write(iu,'(i5,2g15.5)') yGridSize, yStart, yStep
+write(iu,'(i5)') getNOrb()
+loop over:
+  mo
+  do x
+     do y
+
+
+====================================================================================
+
+$print_results
+--------------
+
+start=1
+end=nn
+
+print saved results, all if start and end are not given.
+
+
+====================================================================================
+
+$params_numderivs
+-----------------
+
+THIS COMMAND IS CURRENTLY DISABLED
+
+options: type,mode,h and vmc options
+2nd line contains list of parameters (defined by their index) for which derivative
+is to be calculated.
+
+type='jastrow'|'ci'|'jas+ci'
+mode=1|2|3 optMode
+h=x where x is a small real number (default: 1.d-2) for difference quotients
+
+this calculates vmc gradient and diagonal hessian for selected parameters
+using 3-point rule with h
+
+====================================================================================
+
+$print_results
+-------------
+
+no options
+
+prints table of saved results (see $save_result)
+
+====================================================================================
+
+$props
+------
+
+
+initializes property calculation. Requires "proptype=[dma|totals]" in $wf.
+Currently disabled.
+
+
+====================================================================================
+
+
+$qmc
+----
+options: [vmc|dmc]
+
+vmc|dmc           : set appropriate defaults for VMC or DMC
+steps=1000        : total number of steps, format allows 'k' and 'M' for 1.000 and 1.000.000, e.g. 20k = 20000
+block_len=100     : # of blocks (or maximum # of blocks if std_dev is given)
+discard=0         : (first) steps to discard for averaging data. VMC: default 0; DMC: no default, discard required
+discard_all       : do not do any averaging over time steps
+step_stride=10    : do on-the-fly analysis as defined by previous commands (e.g. $init_max_analysis)
+                    every n-th step after discarded steps
+std_dev=dd        : if given stop calculation if standard deviation is obtained
+E_ref=0.0         : (initial) reference energy for weighting in DMC. if not given use mean total energy
+                    from the previous $qmc run (e.g. VMC)
+walker_block=1    : deprecated. Calculate blocks of walkers "simultaneously" (allow use of
+                      certain optimizations and efficient use of a GPU)
+walker=0          : default: keep previous sample. If given it denotes the "target walker size" per process
+
+time step options
+tau=dd            : time step, if given time step adaptation is turned off, default is time step adaptation
+initial_tau=dd    : initial time step for time step adaptation. The default initial_tau is calculated with
+                  : a simple model for acceptance ratio 0.5 (see propagator_m.f90:propagator_getInitialTau())
+accept_ratio=0.5  : adapt time step to obtain given accept ratio (no initial time step required)
+                    default for VMC: 0.5, for DMC: 0.9. In a standard VMC calculation no time step option is
+                    necessary.
+
+persist=nn        : remove "persistent" walker after nn rejected steps
+drift_scal=1.0    : scale the drift vector
+move=[rey|umr|two|gss]    : Reynolds, Umrigar, Two level Gaussian, and
+                            simple Gaussian propagation step for VMC and DMC. Two level and
+                            Gaussian are only valid for VMC (see twolevel.in) : new default: umr
+weight=[rey|umr|acc] : Reynolds or Umrigar weighting (or accept weighting): new default: umr
+no_exp            : do not use exponential sampling in Umrigar propagator
+[no_]load_balance : turn on/off load_balancing between nodes: default .true. for parallel DMC, else .false.
+no_auto_corr      : turn off calculation of autocorrelation of energy data
+auto_corr_max=500 : set array size (=steps) for autocorrelation calculation. Turn on calculation
+
+epart             : turns on the energy partitioning for a certain reference.
+   - cestat : turns on the "on the fly" chemical entity (ce) evaluation
+                             : a definition.ce file with ce definiton ist needed for this one (s. $ce )
+                             : currently on the E_int and E_ww values for a ce are calculated
+
+accumulate        : Accumulates all samples created by propagating the current walkers.
+                    After the qmc block is done, the current sample refers to the
+                    accumulated history, so that any optimizations/SED calculations
+                    are then done with the accumulated history instead of the actual
+                    VMC walkers.
+                    acc_step and acc_discard.
+acc_step=5        : How many steps have to pass between walkers being added to the
+                    history. acc_step=10 means, that every 10th sample is added
+                    to the history.
+                    The total number of accumulated samples after a VMC run is
+                       number of cores * accumulation sample size * floor(steps / acc_step) * blocks
+                    where accumulation sample size is the size of the sample that's being used in
+                    the accumulation run.
+acc_size=10000    : Total accumulation size per core (optional).
+acc_discard       : How many steps should be discarded in *each* block before walkers
+                    are added to the history.
+
+show_steps        : write block,step,E,var,stddev for each step to fort.900
+
+T_moves=[SIMPLE|SC]  : Only for DMC ECP calculations. For SIMPLE see DOI: 10.1103/PhysRevB.74.161102 and for SC
+                       DOI: 10.1063/1.3380831. SIMPLE is available only comparisons and SC should be used for
+                       productive calculations.
+
+For an example usage of the accumulation, see examples/h_accumulate.in
+
+====================================================================================
+
+$sample
+-------
+
+modi: [create|read|change_size|histogram|remove_outliers|unweight]
+
+modi with options:
+create
+   size=n: when create: create sample of size n
+read
+   pos_file=filename: read sample from file
+   size=n: up to size n (per process)
+   size_total=n: up to size n in total, and n//n_proc per process (integer division!)
+                 (the program aborts, if both (size and size_total) are given)
+change_size
+   new_size=n: sets sample size to new value (by deleting or randomly copying)
+   last: only keep the last n walkers. Useful in combination with $qmc(accumulate,...)
+histogram
+   - histogram of current sample is write to "basename"-histnn.txt where nn is increased with
+     each call to histogram. verbose>=3 writes histogram for each MPI process: "basename"tid-histnn.txt
+     histogram contains mean(!) of bin, bin weight, expected weight according to normal dist. with same mean/var.
+   histogram_width=fac: [fac=5.0] histogram interval [mean-fac*sqrt(var), mean+fac*sqrt(var)]
+   bins=n: [n=20] number of bins
+remove_outliers
+   two implementations: algo=[1|2], default is 2
+
+   algo=1: for large samples only: remove outliers in local sample iteratively
+   remove_factor=rf: [rf=10.0] remove outliers repeatedly until the # of outliers is less
+                     than rf x expected # of data (in normal distribution)
+   iterations=it [it=100] only outliers in outermost bins are removed in each iterations.
+                     Iterate until no outliers are found or "it" is reached
+   histogram_width=fac: [fac=5.0] histogram interval [mean-fac*sqrt(var), mean+fac*sqrt(var)]
+   bins=n: [n=20] number of bins
+
+   algo=2: for all samples: remove outliers parallel using the trimmed mean of global sample
+   [global|local]:  use global (i.e. all nodes) or local (per node) sample to determine outliers.
+                    default is global
+   no_replace:      default is to replace removed walkers by random copies of surviving walkers.
+                    no_replace prevents the replacement.
+   tol=tl           [tl=3.0] tolerance for survival: all walkers outside mean+/-tl*sigma are removed.
+                    Note that mean and sigma are calculated with the 10% trimmed sample (first and
+                    last 10% ignored).
+unweight
+   creates an unweighted sample (all weights = 1) from a weighted sample by multiplying and deleting walkers
+
+options:
+generate=[vmc|random|single_point], default: random
+   vmc: requires tau, steps [discard]. one walker vmc run to generate sample
+   random: random positions
+   single_point: generate size=n walkers all at same position (init_walker or random)
+
+start: how to start walker generation
+start=[gaussian,density[,lmo]], default: density
+   gaussian: simple gaussian distribution around nuclei
+   density: do simple density sampling for each atomic shell (only neutral closed shell)
+      rspread=rs: vary shell radius randomly with mean percentage rs
+   lmo: to be implemented
+
+E_min=xxx,E_max=yyy select only those random walkers in the given energy interval
+verbose=n   verbosity in $sample
+
+====================================================================================
+
+$save_result
+-------------
+
+options: 'idx=$idx' or 'idx=n'
+
+save (E,stddev,var) from the last calculation. Currently this works for $qmc
+and for $optimize_parameters. In the latter case only E and var are calculated
+(!) and the stddev is set to zero. The default index is the next index
+(starting from 1) unless idx=n is used. idx=$idx uses the loop index of
+$begin_loop.
+Use $print_results() tp print the full table of saved results
+
+
+====================================================================================
+
+$scan_bond_density
+-------------
+
+scans the single determinant Slater density between two atoms.
+
+A=nn     : index of atom 1
+B=nn     : index of atom 2
+steps=nn : number of positions to be calculated
+
+
+====================================================================================
+
+$sed
+----
+
+activates a sed calculation within a qmc run. This refers to the original sed version published with Rene Petz
+   qmc run is controlled by the qmc parameters (see $qmc)
+   step_stride=nn : run sed assignment only every nn-th step [default: nn=1]
+   grid=4d0       : defines a cube [-grid,-grid] in x,y,z direction, i.e. around the origin (no default)
+   ax=,bx=,ay=,by=,az=,bz= : give explicit coordinates of the cube (more precisely: cuboid!)
+   readref        : read reference from ref file with same base name
+   ref_file=filename : read reference from other file
+   bin_size=dd : sets the bin size of the grid (default: dd=0.1)
+   ref_nr=1       : can be used to choose a reference from the ref-file
+                    assignment parameters:
+   write_xyz      : write all permuted walkers to local file(s) in ref-format
+
+
+====================================================================================
+
+$test_balance
+-------------
+
+no options. At least three MPI processes required. Sends walkers and runs load_balance.
+Checks averages.
+Should be transferred in to module testing (for parallel code). Needs modification to use asserts
+instead of output.
+
+
+====================================================================================
+
+$trajectory
+-----------
+
+no options. Initializes trajectory output in a subsequent serial qmc run. Output in basename.trj
+
+
+====================================================================================
+
+$vxc
+----
+
+calculates Vee, Vcl and Vxc between two atoms or inside an atom using the given sample.
+
+A=nn                        : index of atom 1
+B=nn                        : index of atom 2  (if only A is given, Vxc is calculated inside the atom A)
+basin_search=[rho|rho_grid] : method for assigning electrons to basins (default: basin_search=rho).
+   With the 'rho' option basins are found maximizing the density calculated from the given wave function.
+   For this option to work $init_rho_analysis must be called before $vxc.
+   With the 'rho_grid' option basins are found by maximizing in the density grid calculated from the given sample.
+   For this option to work $init_rho_grid must be called before $vxc.
+
+====================================================================================
+
+$walker_stat
+------------
+
+option: 'spherical'
+
+Initializes walker statistics
+statistics (mean, stddev, cov) for random walkers positions (i.e. 3*ne dim)
+in cartesian (default) or spherical coordinates
+
+
+====================================================================================
+
+$wf
+---
+options: [[read|write]],file,[la_mode=n],[[no_]splineaos],[[no_]cuspcor],[spline_points=n],[aosopt],
+[[no_]aomo],[ao_cutoff=xxx],[mo_cutoff=xxx],[task],[prod_cutoff=xxx],[fastdet],[no_repeat_det_opt],
+[no_reorder_dets]
+
+read|write: read or write wave function file.
+
+file='fname.wf' containing the wave function to read or write. Use 'write'
+to save wave functions after optimizations. If the filename contains '$idx',
+every occurence is replaced with the current $begin_loop() index (or 1, if no
+loop is active). '$in' is replaced with the basename of the input file.
+
+these options for reading the file:
+
+la_mode=n: 1: BLAS in update inverse, 2: BLAS in MO calculation.
+  (i.e. 3=1+2 is LAPACK/BLAS in all cases, 0 turned off). Default n=3.
+
+[no_]splineaos: [do not] spline the atomic basis functions
+  - this is currently possible only for GTOs. Default: splineaos when possible
+[no_]cuspcor: [do not] correct the cusp at the nuclei.
+  - this is possible (and sensible) only for GTOs. Default: cuspcor when possible
+spline_points=n: change the # of spline points from default value
+aosopt: special option, if given, the cusp correction parameters are calculated (provided
+   suitable starting values are given for cusp correction parameter, see $basis block for wf file below). 
+   The run is terminated afterwards. The calculated cusp correction parameters need to be
+   added to the basis function definition. 
+epart: This is the command to initialize all data structures for the energy partitioning
+task: Use the OpenMP parallelized version of the AOMO calculation. Requires aomo to be set.
+   The environment variables OMP_NUM_THREADS determines the number of threads used for
+   the calculation. For "normal" MPI calculations, where the number of processes is
+   equal to the number of processor cores, this should be set to 1.
+prod_cutoff: Requires aomo,task to be set. The cutoff value for MO-coeff * exp(-\alpha r^2).
+fastdet: Uses the "fast" determinant calculation by Clark et al. (doi:10.1063/1.3665391).
+   This is mainly useful when having many determinants (more determinants than electrons)
+   with small excitations (i.e. mostly single and double excitations). Note that this
+   cannot be used together with ECPs or with CSF input.
+no_repeat_det_opt: Calculates all determinants in CSFs (as default repeated determinants are
+   not recalculated). Useful for debugging/testing only.
+no_reorder_dets: Do not reorder determinants to maxima coincidence with 1st determinant
+   Useful for debugging/testing 
+
+
+====================================================================================
+
+$wf_param_deriv_test
+--------------------
+
+tests the parameter derivatives using numerical derivatives (difference quotients)
+options: type,mode,h,rule
+
+type='jastrow'|'ci'|'jas+ci'  selects parameter
+mode=1|2|3          optMode
+h=x  where x is a small real number (default: 1.d-5) for difference quotients
+rule=n  3-point, 5-point or 7-point rule for numerical differentiation
+
+
+====================================================================================
+
+$write_sample
+-------------
+
+options: file=fname.pos
+
+write the current sample to the file. If no file name is given the default
+name 'basename.pos' is used. The data are written in binary format. Only the
+positions of the walkers are written, not any weights. This is not intended
+for check pointing (use serialization instead).
+Works for parallel runs by writing the samples of each process in the order of
+the MPI taskid.
+
+Read sample with the $sample(read) command.
+
+
+3. Description of wave function file (wf file)
+=============================================
+
+The default values for the wave function are defined in the file "wfData_m.f90"
+(But the may be overwritten before reading the .wf file in waveFunction_m.d90; they should not)
+
+Structure of wf file:
+=====================
+
+The wf file consists of the following blocks:
+$general
+$geom            # geometry
+$jastrow         # required only when jastrow given
+$basis           # atomic basis set, not required when library basis used
+$mos             # MO coefficient matrix
+$dets or $csfs   # Slater determinants and CI coefficients
+Each block ends with $end
+
+The order of the blocks is arbitrary, although the above order is
+sensible.
+
+
+$general
+========
+evfmt=[gau|gms|free|mol]   Gaussian, Gamess, free and Molden format (DESCRIBE!)
+basis=[gaussian|general|diff|<basis_name>]
+    gaussian: $basis block contains basis set in Gaussian format
+    general: $basis block contains basis set in Amolqc format
+    diff: requires a basis set name for each atom in $geom block
+    <basis_name>: if a basis name is given, the basis data are read from
+                  a basis file named 'basis_name.abs' or, if the .abs
+                  file does not exist, 'basis_name' in the directory
+                  $AMOLQC/bib
+                  The directory $AMOLQC/bib should contain pairs of
+                  basis sets ending .abs and .gbs containing the same
+                  basis in Amolqc and Gaussian format. A python script
+                  'runConvertBasis.py' is provided to convert basis sets
+                  in different formats including the EMSL format.
+jastrow=[none|sm|ic|de]
+     where smxx is a Schmidt-Moskowitz Jastrow. The following forms are implemented:
+           sm0|sm1|sm2|sm21|sm3|sm31|sm4|sm41
+           jastrow=sm reads a general Schmidt-Moskowitz Jastrow in the old format
+           ic is the new generalized power expansion of the Jastrow
+           de is an alias for ic with the double exponential distance type
+title='title string in apostrophes'
+charge=n   total charge. Requires 'atomic_charges', if not 0.
+separated_electrons=n   number of neglected electrons (i.e. core or sigma-backbone).
+                        The respective doubly occupied orbitals are not calculated and
+                        can be used to calculate a density, which is added to the
+                        potential part of the Hamiltonian. See the option $coulomb_density.
+                        Furthermore, the core-core potential Vnn is set to zero.
+                        Requires 'atomic_charges', if not 0.
+spin=n     spin multiplicity (2S+1)
+geom=[bohr|angstrom]   units for geometry (default:angstrom)
+atomic_charges         geom contains a charge for each atom (helping initial sampling)
+same_atoms_input       geom contains an index indicating atoms that are treated as identical
+                       (currently used for same en terms in Jastrow)
+no_hydrogen_jastrow    do not use en terms for H atoms
+norm=[.true.|.false.] (default: .true.) Normalize the basis read from a $basis block.
+
+
+$geom
+=====
+
+Format:
+
+$geom
+n
+<line for 1st atom>
+...
+<line for n-th atom>
+$end
+
+The format for atom lines is quite flexible and depending on parameters in $general.
+Only cartesian input is implemented. Use Gaussian/Molden/wxMacMolPlt ... to convert
+Z matrix input to cartesian form. $general(geom) determines the units angstrom or bohr.
+The atom line has the following format:
+[sym|Z]  [sa]  x  y  z  [ch]  [bas]
+
+with:
+sym: atom symbol H,He ...
+Z: atom number
+sa: required when 'same_atoms_input' is given in $general. The sa ('same atom') values
+ have to be integer values starting from one. Atoms with the same sa value share the
+ electron-nucleus and electron-electron-nucleus Jastrow terms. The default behaviour is:
+ All atoms with the same atomic number share the Jastrow terms. The sa values allow thus
+ to optimize and use different Jastrow terms for the same atom, e.g. Carbonyl-C and
+ Methyl-C can have different Jastrow terms when different sa values are used.
+ Make sure that all given sa values cover the full interval [1..max(sa)]
+ch: an integer charge that has to be supplied when 'atomic_charges' is given in $general.
+ This is used to assign electrons to nuclei. The default behaviour
+ is ch=0 for all atoms. The charge information is used only for generating initial electron
+ configurations. Equilibration is accelerated by starting with fairly probable electron
+ configurations. 'atomic_charges' is required for ions (to indicate _initially_ where the
+ molecular charge is located) and might be required for molecules with strongly polar
+ bonds.
+bas: When 'basis=diff' is given in general, 'bas' is the basis name (from $AMOLQC/bib)
+ used for this atom. This allows using easily different basis sets for different atoms.
+
+
+$basis
+===============
+
+basis input:
+
+$gen(basis=gaussian|general|<basisname>)
+
+(a) basis=gaussian
+
+generic gaussian format as in Gaussian program, additionally cusp correction
+parameters, given in $basis block:
+
+-------------------
+$basis
+<atom 1 block>
+ ****
+<atom 2 block>
+ ****
+...
+<atom n block>
+ ****
+$end
+-------------------
+
+Note, that there has to be a line for every atom, not just for every atom type. There are thus often duplicate lines.
+
+each <atom i block>:
+-------------------
+<atomname>
+ <l> <ngto> <scal> [<cusp1> <cusp2> <cusp3> <cusp4>]
+     <alpha_1> <c_1>
+     ...
+     <alpha_ngto> <c_ngto>
+------------------
+with <atomname>  atom symbol or name. Same symbols will obtain use same
+    spline interpolation function. Use e.g. "C1","C2" when different
+    basis functions are used for same atom
+    <l> : S|P|D  -type gaussian function. Note: <l> must be in 2nd column!
+    <ngto> # of primitive gaussian functions
+    <scal> scaling coefficient
+    <cusp1> .. <cusp4>  optional cusp correction parameters
+    <alpha_i>  orbital exponent
+    <c_i>      contraction coefficient
+
+where <cusp1> <cusp2> <cusp3> <cusp4> are the Amolqc cusp correction
+parameters a, c, p1, p2.
+
+Construction of cusp correction:
+a=0.1: construct cusp correction (see paper Manten/Luechow JCP) for 1S contracted GTO. p1, p2 define a max search radius and a right interval limit for 
+  fitting polynomial. Typical values for first row: p1 = p2 = 0.15
+a=-0.1: construct cusp correction for 2S contracted GTO
+
+
+(b) basis=general
+
+generic basis format allowing STO and GTO basis functions, given in $basis block
+
+-------------------
+$basis
+<atom 1 block>
+***
+<atom 2 block>
+***
+...
+<atom n block>
+***
+$end
+-------------------
+
+each <atom i block>:
+-------------------
+<atomname>
+<l1> STO|GTO  <alpha1>
+...
+<ln> STO|GTO  <alphan>
+-------------------
+mit <li>=1S|2P|3D
+    <alphai>  orbital exponent
+
+
+
+(c) basis=<basisname>
+
+where <basisname> is a string defining a basis set in the basis set library (see section 5)
+(a directory defined by $AMOLQC/bib).
+'basis=basisname' looks for a basis definition 'basisname.abs' in the basis set library.
+Don't use the suffix '.abs' in the command line!
+
+
+Input of Slater determinants
+===========================
+
+Antisymmetry of the wave function is enforced with Slater determinant(s). There
+are two variants for input of determinants: $dets and $csfs
+
+If only one determinant with restricted or unrestricted occupation (i.e. R- or RO- and U-) is required
+the occupation can be automatically generated with 
+$csfs
+  single [un]restricted
+$end 
+
+If more general determinants or csfs are required:
+
+$dets
+n                          (( number of determinants))
+ci-coeff occupied orbitals ((first alpha than beta spin))
+(repeated n-1 times)
+$end
+
+example for RHF H2O (five orbitals doubly occupied)
+
+$dets
+1
+1.0  1 2 3 4 5  1 2 3 4 5
+$end
+
+CSF input is similar, only the number of CSFs nCSF is given, followed by
+CSF coeff and number of determinants in the CSF, followed by the coupling
+coeffs and occupations. Example: 1 CSF with 2 determinants
+
+$csfs
+1
+1.0 2
+  0.707  1 2 3 4 5  1 2 3 4 6
+  0.707  1 2 3 4 6  1 2 3 4 5
+$end
+
+Input of Jastrow parameters
+===========================
+
+jastrow=ic|de:
+-------------
+<n_cores>
+<nuc_cusp> <ee_cusp>
+<u_max> <x_max> <f_max> [ <anisotropic definition> ]
+<ee_params>
+<en_params 1>
+<en_params 2>
+...
+<en_params n_core>
+<een_params 1>
+<een_params 2>
+...
+<een_params n_core>
+[ <anisotropic terms> ]
+<dist_type>
+<distance_params 1> <distance_params 2> ...
+------------------
+with
+  <n_cores>: number of cores for jastrow (if 0, then number of atoms in molecule is used)
+  <nuc_cusp>: T (true) ./. F (false) - satisfy nucleus-electron cusp exactly in jastrow
+                               currently only .false. implemented
+  <ee_cusp> : T (true) ./. F (false) - satisfy electron-electron cusp for spin like ee;
+                      default: F (false)
+                      false: same eecusp for spin like and spin-unlike ee pairs (1/2)
+                      true : different eecusp for spin like (1/4) and spin unlike (1/2) ee pairs
+                      details regaring cusp condition: doi: 10.1002/cpa.3160100201
+  <u_max>: max degree of electron-electron terms
+  <x_max>: max degree of electron-nucleus terms
+  <f_max>: max degree of electron-electron-nucleus terms
+  <anisotropic definition> : may be added upon user request
+                             defintion of anisotropic terms. See "add_aniso_terms" for details.
+  <ee_params>: u_max - 1 parameters (parameter for linear term is always 0.5)
+  <en_params i>: x_max - 1 parameters for core i (parameter for linear term is always 0 or Z)
+                 number of lines = n_cores
+  <een_params i>: f_max parameters for core i, number of lines = n_cores
+  <dist_type>: type of scaled distance to use (optional, default = 1 (2 if jastrow=de)):
+               1 = SM-type
+               2 = double exponential
+               3 = needs type (r/(a+r^b))
+  <distance_params i>: parameters for scaled distancs
+                       if type = SM-type: 1 + n_core_types parameters
+                          (A and B(:)),
+                          default: all = 1d0
+                       if type = double exp: 1 + n_core_types parameters
+                          (\alpha and \beta(:)),
+                          default: all = 1d0
+                       if type = needs: 2 + 2*n_core_types parameters
+                          (a_ee, a_en(:), b_ee, b_en(:)),
+                          default: all = 1d0
+  <anisotropic terms>: may be added upon user request
+                    order:
+                      enao
+                      eenao
+                      eennao
+                    order within one type of anisotropic parameters, ordered by cores:
+                      s function related parameters ( 1 parameters per s function per center)
+                      p function related parameters ( 3 parameters per p function per center)
+                      d function related parameters ( 6 parameters per d function per center)
+                      f function related parameters (10 parameters per f function per center)
+
+4. Utility programs
+===================
+
+are found in the tools directory.
+The python scripts require Python 3
+
+4.1 runConvertBasisFile.py
+==========================
+
+without arguments the usage is printed.
+For conversion of STO basis sets to .gbs (Gaussian basis set file format),
+data for the expansion of STO into GTOs is required. Currently the only
+file for conversion is 'sto2gto.dat'. It contains several expansions. The
+best is 'OPT14' with 14 primitive GTOs per STO.
+For conversion of an STO basis set in Amolqc format (abs) into the gbs format
+use:
+../tools/Basissets/runConvertBasisFile.py abs QZ4PAE.abs gbs QZ4PAE.gbs sto2gto.dat OPT14
+
+Current limitation: no expansion for 4F functions available
+(4F STO are also not yet implemented in Amolqc)
+
+
+5. Basis sets in Amolqc
+=======================
+
+are defined in the bib directory. Some older files there may or may not work.
+The current supported basis sets for Amolqc have the '.abs' suffix. They are
+paired with a '.gbs' file in the gaussian basis set format for gaussian calculations
+to create the orbitals for Amolqc.
+
+Since Amolqc has implemented STOs and GTOs (with STOs possibly faster than contracted GTOs)
+STO basis sets are preferred for all electron calculations. The corresponding .gbs files
+contain GTOs expansions of the STOs.
+
+With the 'basis=general' or 'basis=gaussian' an arbitrary basis consisting of STOs and GTOs can be
+defined.
+
+List of supported basis sets:
+
+CHAE:      Cade/Huo STO basis sets for highly accurate diatomic HF calculations
+TZPAE:     TZP all electron STO basis set from ADF
+QZ4PAE:    QZ all electron STO basis set with 4 pol functions from ADF (currently not usable due to 4F STOs)
+QZ4PAE-f:  same without the 4F functions
+S-311Gdp:  6-311G(d,p) with core function replaced by one STO (alpha optimized with UMP2 as in
+           original 6-311G(d,p) article. Unpublished basis set.
+cc-pVTZ:   Dunning's basis set, pure CGTO basis set
+cc-pVTZ-f: same without f functions.
+BFD-VTZ:   M. Burkatzki, C. Filippi, M. Dolg triple zeta basis for
+           corresponding ECP.

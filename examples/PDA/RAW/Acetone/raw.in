@@ -1,0 +1,7 @@
+$gen(seed=101)
+$wf(read, file='Acetone-em.wf')
+$generate_walker(steps=1000)
+$init_rawdata_generation(max_records=500k)
+$init_max_search(max_distance=0.05, latency=50)
+$qmc(vmc, steps=2000, block_len=100, step_stride=20) ! small vmc run with 2000/20=100 samples per core
+

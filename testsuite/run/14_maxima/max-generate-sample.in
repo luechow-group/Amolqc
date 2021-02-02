@@ -1,0 +1,6 @@
+$gen(seed=101)
+$wf(read, file='../../wavefunction/H2O-SM3.wf')
+$sample(create, start=density, generate=random, size=100)
+$qmc(vmc, steps=300, block_len=100, accept_ratio=0.5, discard_all)
+$write_sample(file='sample.pos')
+

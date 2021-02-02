@@ -1,0 +1,4 @@
+$gen(seed=101)
+$wf(read,file='../../wavefunction/C2-sm3-ECP.wf',no_cuspcor)
+$ecp(grid_points=6,full_cutoff,cutoff=1.d-7)
+$sample(create,start=XXX,generate=random,size=10)

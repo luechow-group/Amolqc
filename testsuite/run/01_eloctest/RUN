@@ -1,0 +1,20 @@
+#! /bin/bash
+rm -f *.in *.out *.out-*
+echo " wavefunction derivative and elocal tests (AE) ..."
+for i in f2-sm220 CH4-de440 H2O-SM3 H2O-sm444 CH4-de885 ethene-sm666 h2o-sm888 #  ethane-ccpvtz
+do
+  cp ../../templates/eloctest.in $i.in
+  $SED -i "s/XXX/$i/" $i.in
+  $AMOLQCRUN $i
+
+  C=`grep "passed!" $i.out | awk {'print $3'}`
+  if [ "passed!" == "$C" ] ; then
+     echo -e "    $i wf derivative and elocal test \033[32mpassed.\033[39m"
+     rm -f $i.in $i.out
+  else
+     export FAILED=1
+     echo -e "    $i wf derivative and elocal test \033[31mfailed.\033[39m"
+     echo "    Check $PWD/$i.out for more information."
+  fi
+done
+

@@ -1,0 +1,37 @@
+#! /bin/bash
+rm -f *in *out*
+echo " ECP parameter derivatives and optimization tests (except popt(mo+ci)) ..."
+echo ""
+for i in jastrow ci mo jas+mo+ci
+do
+  cp ../../templates/derivtestECP.in $i.in
+  $SED -i "s/XXX/$i/" $i.in
+  $AMOLQCRUN $i
+
+  C=`grep "passed!" $i.out | awk {'print $3'}`
+  if [ "passed!" == "$C" ] ; then
+    echo -e "    $i params deriv test \033[32mpassed.\033[39m"
+    rm -f $i.in $i.out
+  else
+    export FAILED=1
+    echo -e "    $i params deriv test \033[31mfailed.\033[39m"
+    echo "    Check $PWD/$i.out for more information."
+  fi
+done
+
+for i in varmin eminlin eminlm eminpopt
+do
+  cp ../../templates/$i\ECP.in ./$i.in
+  $AMOLQCRUN $i
+
+  R=`grep "total energy" $i.$REF|tail -n 1|awk {'print $4;'}`
+  C=`grep "total energy" $i.out|tail -n 1|awk {'print $6;'}`
+  if [ $R == $C ] ; then
+    echo -e "    $i opt test \033[32mpassed.\033[39m"
+    rm -f $i.in $i.out fort*
+  else
+    export FAILED=1
+    echo -e "    $i opt test \033[31mfailed.\033[39m"
+    echo "    Check $PWD/$i.out for more information."
+  fi
+done

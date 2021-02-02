@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+file=orca_h2o_vdz
+../../wfgen.py orca ./${file}.mkl ${file}.out cc-pVDZ sd write
+diff ${file}.wf ${file}.wf.ref > ${file}.diff
+if [ -s ${file}.diff ] 
+then
+   echo test ${file} failed. See ${file}.diff
+else
+   rm ${file}.diff
+   rm ${file}.wf
+fi

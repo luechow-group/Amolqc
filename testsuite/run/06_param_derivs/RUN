@@ -1,0 +1,20 @@
+#! /bin/bash
+rm -f *in *out*
+echo " parameter derivative tests (AE) ..."
+echo ""
+for i in jastrow ci mo jas+mo+ci
+do
+  cp ../../templates/paramderivtest.in $i.in
+  $SED -i "s/XXX/$i/" $i.in
+  $AMOLQCRUN $i
+
+  C=`grep "passed!" $i.out | awk {'print $3'}`
+  if [ "passed!" == "$C" ] ; then
+     echo -e "    $i parameter derivative test \033[32mpassed.\033[39m"
+     rm -f $i.in $i.out
+  else
+     export FAILED=1
+     echo -e "    $i parameter derivative test \033[31mfailed.\033[39m"
+     echo "    Check $PWD/$i.out for more information."
+  fi
+done
