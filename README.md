@@ -1,4 +1,10 @@
-### Getting and building Amolqc
+# Amolqc
+_Atoms and Molecules with quantum Monte Carlo_
+
+Amolqc is an open source software package for electron structure calculations with quantum Monte Carlo (QMC).
+The code features strong multideterminant and optimization capabilities.
+
+## Getting and building Amolqc
 
 Use git to clone this repository to your machine (this creates the directory Amolqc).
 Note, that this also initializes the submodule
@@ -14,7 +20,7 @@ Go into the directory:
 cd Amolqc
 ```
 
-#### Build with Make
+### Build with Make
 
 - prior to the Make build with compiled lapack/blas, the environment variable `$MATHLIBS` has to be
   set to their path (often /usr/lib or /usr/lib64).
@@ -53,7 +59,7 @@ F90FLAGS += -DCHKNANUP # Checks for NANs in Sherman Morrison updates and do ordi
                        # for these excited determinants.
 ```
 
-#### Build with CMake and Make
+### Build with CMake and Make
 
 CMake version 3.10 or higher is required.
 
@@ -94,10 +100,10 @@ set(WARNINGS ON)
 
 Note: on some machines, cmake and ctest are executed with 'cmake3' and 'ctest3'.
 
-### Running Amolqc
+## Running Amolqc
 
 Read the manual in **[doc/user_manual.txt](doc/user_manual.txt)** on how to run Amolqc.
 
-### Contributing to Amolqc
+## Contributing to Amolqc
 
 Please read **[CONTRIBUTING.md](CONTRIBUTING.md)** on how to contribute to Amolqc.
