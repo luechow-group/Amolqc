@@ -1,8 +1,8 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4502942.svg)](https://doi.org/10.5281/zenodo.4502942)
 
-# Amolqc
-_Atoms and Molecules with quantum Monte Carlo_
+# <img src="img/AmolqcLogo.png" alt="Amolqc Logo" height="128"/><img src="img/AmolqcIconTransparent.png" alt="Amolqc Icon" height="128"/>
+**Atoms and Molecules with quantum Monte Carlo**
 
 Amolqc is an open source software package for electron structure calculations with quantum Monte Carlo (QMC).
 The code features strong multideterminant and optimization capabilities.
