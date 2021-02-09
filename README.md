@@ -7,21 +7,7 @@
 Amolqc is an open source software package for electron structure calculations with quantum Monte Carlo (QMC).
 The code features strong multideterminant and optimization capabilities.
 
-## Getting and building Amolqc
-
-Use git to clone this repository to your machine (this creates the directory Amolqc).
-Note, that this also initializes the submodule
-[pFUnit](https://github.com/Goddard-Fortran-Ecosystem/pFUnit) (unit test environment).
-```
-git clone --recursive git@git.rwth-aachen.de:luechow-group/Amolqc.git
-```
-
-- prior to the installation with mkl, the environment variable `$MKLROOT` has to be set to its path.
-
-Go into the directory:
-```
-cd Amolqc
-```
+## Building Amolqc
 
 ### Build with Make
 
