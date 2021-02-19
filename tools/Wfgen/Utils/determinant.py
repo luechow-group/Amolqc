@@ -54,3 +54,21 @@ class Determinant:
         for integer in self.orbital_list:
             occupation_string += str(abs(integer))
         return int(occupation_string)
+
+
+def build_det(number_core_orbitals,occupation,orbital_map,coefficient):
+    determinant = Determinant()
+    determinant.coefficient = coefficient
+    for i in range(number_core_orbitals):
+        determinant.orbital_list.append(i + 1)
+        determinant.orbital_list.append(-(i+1))
+    for i in range(len(occupation)):
+        if occupation[i] == '2':
+            determinant.orbital_list.append(orbital_map[i])
+            determinant.orbital_list.append(-orbital_map[i])
+        if occupation[i] == 'a':
+            determinant.orbital_list.append(orbital_map[i])
+        if occupation[i] == 'b':
+            determinant.orbital_list.append(-orbital_map[i])
+    determinant.sort()
+    return determinant

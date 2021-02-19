@@ -93,7 +93,7 @@ elif program == 'orca':
     orcaout_name = sys.argv[3]
     basis = sys.argv[4]
     wf_type = sys.argv[5]
-    if not (wf_type == 'det' or wf_type == 'sd'):
+    if wf_type not in ['sd', 'csf']:
         sys.exit("Error: wave function type '" + wf_type + "' is unknown!")
     wf = orca_in(mkl_name, orcaout_name, basis, wf_type)
     

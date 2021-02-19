@@ -5,8 +5,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
 """
 
 import numpy as np
+import sys
 
 from .Utils import *
+from fractions import Fraction
 #
 # transformation of orca mkl file to amolqc wf.
 # use transformation dictionary as constructed from 'pure_and_cartesian_gaussians.py'
@@ -50,7 +52,7 @@ def orca_in(mkl_name, out_name, basis, wf_type):
 
     number_orbitals = mol.number_of_mos()
     orbitals = []
-    orbital_symmetries = []    
+    orbital_symmetries = []
     for i in range(number_orbitals):
         orbital = Orbital()
         for a in mol.atoms:
@@ -63,16 +65,92 @@ def orca_in(mkl_name, out_name, basis, wf_type):
     total_symmetry = None
     symmetry_list = []
 
-    determinant = Determinant()
-    for i in range((number_electrons + mult - 1) // 2):
-        determinant.orbital_list.append(i + 1)
-    for i in range((number_electrons - mult + 1) // 2):
-        determinant.orbital_list.append(-(i + 1))
-    csf = Csf()
-    csf.determinants.append(determinant)
-    csf.number_determinants = 1
-    csfs.append(csf)
+    with open(out_name, 'r') as outfile:
+        line = outfile.readline()
 
+        if wf_type != 'sd':
+            #reading csfs
+            if wf_type == 'csf':
+                while 'Extended CI Printing' not in line:
+                    line = outfile.readline()
+                    if not line:
+                        sys.exit('Error: Configurations not found')
+                for _ in range(5):
+                    line = outfile.readline()
+
+                words = line.split()
+                occupation = list(words[1])
+                number_active_orbitals = len(occupation)
+                number_active_electrons = sum([int(element) for element in occupation])
+                number_core_electrons = number_electrons - number_active_electrons
+                assert(number_core_electrons % 2 == 0), 'Number of core electrons has to be even'
+                number_core_orbitals = number_core_electrons // 2
+                orbital_map = list(range(number_core_orbitals+1,number_active_orbitals+number_core_orbitals+1))
+
+                # for speedup: determine number of maximum singly occupied orbitals
+                max_singly_occ = min(2 * number_active_orbitals - number_active_electrons, number_active_electrons)
+
+                # build genealogical_spin_functions (call genealogical.py)
+                spin = Fraction(mult - 1, 2)
+                if spin == 0:
+                    X = create_genealogical_spin_functions(max_singly_occ, singlet=True)
+                else:
+                    X = create_genealogical_spin_functions(max_singly_occ)
+
+                while 'CFG' in line:
+                    words = line.split()
+                    cfg_occupation = list(words[1])
+                    number_singly_occupied = cfg_occupation.count('1')
+                    i = 1
+                    for _ in range(3):
+                        line = outfile.readline()
+                    while 'CSF' in line:
+                        csf = Csf()
+                        words = line.split()
+                        csf.coefficient = float(words[-1])
+
+                        if number_singly_occupied != 0:
+                            spin_function = list(str(X[number_singly_occupied][spin//1][int(2*spin)][-i]).split())
+                            del spin_function[0]
+
+                            for j in range(len(spin_function)):
+                                occupation = list(cfg_occupation)
+                                single_occupation = []
+                                spin_coefficient = ''
+                                letters = list(spin_function[j])
+                                for k in range(len(spin_function[j])):
+                                    if letters[k] in ['a', 'b']:
+                                        single_occupation.append(letters[k])
+                                    elif letters[k] != '*':
+                                        spin_coefficient += letters[k]
+                                coefficient = float(abs(Fraction(spin_coefficient)))**0.5 \
+                                              * int(Fraction(spin_coefficient)/abs(Fraction(spin_coefficient)))
+                                for k in range(len(occupation)):
+                                    if occupation[k] == '1':
+                                        occupation[k] = single_occupation[0]
+                                        del single_occupation[0]
+                                determinant = build_det(number_core_orbitals, occupation, orbital_map, coefficient)
+                                csf.determinants.append(determinant)
+                        else:
+                            determinant = build_det(number_core_orbitals, cfg_occupation, orbital_map, 1.0)
+                            csf.determinants.append(determinant)
+
+                        i += 1
+                        csfs.append(csf)
+                        for _ in range(2):
+                            line = outfile.readline()
+        else:
+            determinant = Determinant()
+            for i in range((number_electrons + mult - 1) // 2):
+                determinant.orbital_list.append(i + 1)
+            for i in range((number_electrons - mult + 1) // 2):
+                determinant.orbital_list.append(-(i + 1))
+            csf = Csf()
+            csf.determinants.append(determinant)
+            csf.number_determinants = 1
+            csfs.append(csf)
+
+    outfile.close()
     jastrow = Jastrow()
     jastrow.type = 'none'
 
