@@ -56,12 +56,19 @@ class Determinant:
         return int(occupation_string)
 
 
-def build_det(number_core_orbitals,occupation,orbital_map,coefficient):
+def build_det(number_inactive_orbitals,occupation,orbital_map,coefficient):
     determinant = Determinant()
     determinant.coefficient = coefficient
-    for i in range(number_core_orbitals):
-        determinant.orbital_list.append(i + 1)
-        determinant.orbital_list.append(-(i+1))
+    inactive_orbitals = []
+    j = 1
+    for _ in range(number_inactive_orbitals):
+        while j in orbital_map:
+            j += 1
+        inactive_orbitals.append(j)
+        j += 1
+    for inactive_orbital in inactive_orbitals:
+        determinant.orbital_list.append(inactive_orbital)
+        determinant.orbital_list.append(-inactive_orbital)
     for i in range(len(occupation)):
         if occupation[i] == '2':
             determinant.orbital_list.append(orbital_map[i])
