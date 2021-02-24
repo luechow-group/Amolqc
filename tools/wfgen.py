@@ -146,7 +146,7 @@ while i < len(sys.argv) - arguments:
         wf.coeff_combine()
     elif command == 'symm_combine':
         if not wf.symmetry:
-            sys.exit('Error: symm_combine called, but no symmetry found. Has to be used directly when reading in molpro wf.')
+            sys.exit('Error: symm_combine called, but no symmetry found. Has to be used directly when reading in molpro or orca wf.')
         if wf.symmetry == 'VB':
             sys.exit('Error: symm_combine is not yet implemented for VB wave functions.')
         wf.symm_combine()

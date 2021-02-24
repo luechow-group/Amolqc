@@ -213,7 +213,6 @@ class WaveFunction:
             self.sort_dets()
             counter = 0
             orbital_groups = self.automatic_orbital_groups()
-            # print (orbital_groups)
 
             list_for_permutation = range(len(orbital_groups[0]))
             permutations = list(it.permutations(list_for_permutation))
