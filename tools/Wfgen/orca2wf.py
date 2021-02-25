@@ -145,14 +145,11 @@ def orca_in(mkl_name, out_name, basis, wf_type):
                                 csf.occupation[j] = '2'
 
                             # determine occupation for active orbitals
-                            count = 0
                             for l in range(number_active_orbitals):
                                 if cfg_occupation[l] in ['2','0']:
                                     csf.occupation[number_core_orbitals + l] = cfg_occupation[l]
-                                    count += 1
                                 else:
                                     csf.occupation[number_core_orbitals + l] = occupation_sheme[0]
-                                    count += 1
                                     del occupation_sheme[0]
                             # print(str(X[6][spin//1][int(2*spin)][0]))
                             del spin_function[0]
