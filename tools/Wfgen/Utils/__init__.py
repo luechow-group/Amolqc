@@ -1,7 +1,7 @@
 from .format import *
 from .data import *
 from .atom import Atom
-from .determinant import Determinant
+from .determinant import Determinant, build_det
 from .orbital import Orbital
 from .orbitalRotation import OrbitalRotation
 from .csf import Csf

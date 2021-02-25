@@ -93,7 +93,7 @@ elif program == 'orca':
     orcaout_name = sys.argv[3]
     basis = sys.argv[4]
     wf_type = sys.argv[5]
-    if not (wf_type == 'det' or wf_type == 'sd'):
+    if wf_type not in ['sd', 'csf']:
         sys.exit("Error: wave function type '" + wf_type + "' is unknown!")
     wf = orca_in(mkl_name, orcaout_name, basis, wf_type)
     
@@ -146,7 +146,7 @@ while i < len(sys.argv) - arguments:
         wf.coeff_combine()
     elif command == 'symm_combine':
         if not wf.symmetry:
-            sys.exit('Error: symm_combine called, but no symmetry found. Has to be used directly when reading in molpro wf.')
+            sys.exit('Error: symm_combine called, but no symmetry found. Has to be used directly when reading in molpro or orca wf.')
         if wf.symmetry == 'VB':
             sys.exit('Error: symm_combine is not yet implemented for VB wave functions.')
         wf.symm_combine()

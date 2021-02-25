@@ -1,0 +1,73 @@
+{
+  "title": "Amolqc",
+  "description": "<p><strong>Atoms and Molecules with Quantum Monte Carlo</strong></p>",
+  "license": "GPL-3.0-or-later",
+  "creators": [
+    {
+      "orcid": "0000-0002-1068-0674",
+      "affiliation": "RWTH Aachen University",
+      "name": "Lüchow, Arne"
+    },
+    {
+      "name": "Manten, Sebastian"
+    },
+    {
+      "name": "Diedrich, Christian"
+    },
+    {
+      "orcid": "0000-0003-3827-9169",
+      "name": "Bande, Annika"
+    },
+    {
+      "name": "Scott, Tony C."
+    },
+    {
+      "name": "Schwarz, Annett"
+    },
+    {
+      "name": "Berner, Raphael"
+    },
+    {
+      "name": "Petz, Rene"
+    },
+    {
+      "name": "Sturm, Alexander"
+    },
+    {
+      "name": "Hermsen,Marko"
+    },
+    {
+      "orcid": "0000-0002-8578-4961",
+      "affiliation": "RWTH Aachen University",
+      "name": "Mood, Kaveh Haghighi"
+    },
+    {
+      "affiliation": "RWTH Aachen University",
+      "name": "Schulte, Christoph"
+    },
+    {
+      "orcid": "0000-0001-5758-843X",
+      "affiliation": "RWTH Aachen University",
+      "name": "Reuter, Leonard"
+    },
+    {
+      "orcid": "0000-0003-2113-6129",
+      "affiliation": "RWTH Aachen University",
+      "name": "Heuer, Michael A."
+    },
+    {
+      "orcid": "0000-0002-4144-2089",
+      "affiliation": "RWTH Aachen University",
+      "name": "Ludovicy, Jil"
+    }
+  ],
+  "keywords": [
+    "quantum chemistry",
+    "variational Monte Carlo",
+    "diffusion Monte Carlo",
+    "wave function optimization",
+    "pseudo potentials",
+    "probability density sampling",
+    "local maximization"
+  ]
+}
