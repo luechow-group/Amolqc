@@ -52,7 +52,7 @@ def orca_in(mkl_name, out_name, basis, wf_type):
 
     number_orbitals = mol.number_of_mos()
     orbitals = []
-    orbital_symmetries = []
+
     for i in range(number_orbitals):
         orbital = Orbital()
         for a in mol.atoms:
@@ -68,7 +68,32 @@ def orca_in(mkl_name, out_name, basis, wf_type):
     with open(out_name, 'r') as outfile:
         line = outfile.readline()
 
+        # check if UseSym was used in the orca calculation
+        symmetry = True
+        while 'Used point group' not in line:
+            line = outfile.readline()
+            if 'ORCA-CASSCF' in line:
+                symmetry = False
+                print('Note: No symmetry was used in the calculation. CSFs cannot be combined based on symmetry. Use "UseSym" to turn on the symmetry in orca. ')
+                break
+
         if wf_type != 'sd':
+
+            if symmetry:
+                total_symmetry = line.split()[4]
+                symmetry_list = symmetries[total_symmetry]
+                while 'ORBITAL ENERGIES' not in line:
+                    line = outfile.readline()
+
+                for _ in range(4):
+                    line = outfile.readline()
+
+                for i in range(number_orbitals):
+                    words = line.split()
+                    orbital_symmetry = words[4].split('-')
+                    orbitals[i].symmetry = orbital_symmetry[0] + '.' + str(symmetry_list.index(orbital_symmetry[1])+1)
+                    line = outfile.readline()
+
             #reading csfs
             if wf_type == 'csf':
                 while 'Extended CI Printing' not in line:
@@ -104,13 +129,29 @@ def orca_in(mkl_name, out_name, basis, wf_type):
                     i = 1
                     for _ in range(3):
                         line = outfile.readline()
+
                     while 'CSF' in line:
                         csf = Csf()
+                        csf.occupation = ['0'] * number_orbitals
                         words = line.split()
                         csf.coefficient = float(words[-1])
 
                         if number_singly_occupied != 0:
                             spin_function = list(str(X[number_singly_occupied][spin//1][int(2*spin)][-i]).split())
+                            occupation_sheme = list(spin_function[0])
+
+                            # put 2 electrons core orbital
+                            for j in range(number_core_orbitals):
+                                csf.occupation[j] = '2'
+
+                            # determine occupation for active orbitals
+                            for l in range(number_active_orbitals):
+                                if cfg_occupation[l] in ['2','0']:
+                                    csf.occupation[number_core_orbitals + l] = cfg_occupation[l]
+                                else:
+                                    csf.occupation[number_core_orbitals + l] = occupation_sheme[0]
+                                    del occupation_sheme[0]
+                            # print(str(X[6][spin//1][int(2*spin)][0]))
                             del spin_function[0]
 
                             for j in range(len(spin_function)):
@@ -135,6 +176,15 @@ def orca_in(mkl_name, out_name, basis, wf_type):
                             determinant = build_det(number_core_orbitals, cfg_occupation, orbital_map, 1.0)
                             csf.determinants.append(determinant)
 
+                            # put 2 electrons in core orbital
+                            for j in range(number_core_orbitals):
+                                csf.occupation[j] = '2'
+
+                            # adopt occupation for active orbitals from cfg occupation
+                            for l in range(number_active_orbitals):
+                                csf.occupation[number_core_orbitals + l] = cfg_occupation[l]
+
+                        # print(csf.occupation[0:number_active_orbitals+number_core_orbitals])
                         i += 1
                         csfs.append(csf)
                         for _ in range(2):

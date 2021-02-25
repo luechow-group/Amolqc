@@ -215,7 +215,7 @@ def molpro_in(input_name,molden_name,basis,wf_type):
         if not line:
             sys.exit('Error: point group could not be read!')
     total_symmetry = line.split()[2]
-    symmetry_list = molpro_symmetries[total_symmetry]
+    symmetry_list = symmetries[total_symmetry]
 
     if wf_type != 'sd':
         #reading the symmetry of the occupied orbitals
@@ -413,14 +413,3 @@ def molpro_in(input_name,molden_name,basis,wf_type):
     wf = WaveFunction(input_name, orbital_format, basis, charge, multiplicity, atoms, orbitals,
                       csfs, jastrow, total_symmetry, symmetry_list)
     return wf
-
-
-molpro_symmetries = {
-    'D2h':['Ag','B3u','B2u','B1g','B1u','B2g','B3g','Au'],
-    'C2v':['A1','B1','B2','A2'],
-    'C2h':['Ag','Au','Bu','Bg'],
-    'D2':['A','B3','B2','B1'],
-    'Cs':["A'","A''"],
-    'C2':['A','B'],
-    'Ci':['Ag','Au'],
-    'C1':['A']}
