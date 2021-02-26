@@ -103,8 +103,9 @@ CONTAINS
         ! moinput reads MO related input (the MO coeffs in cmo) from file unit iu.
         !
         character(len = *), intent(in) :: lines(:)! input lines
-        integer i, ii, j, jj, alstat, idx
+        integer i, ii, j, jj, alstat, idx, nbas_check
         character fmt*19
+        character(len=:), allocatable :: words(:)
 
         !     // Read in number of MO's
         read(lines(2), *) norb
@@ -125,6 +126,21 @@ CONTAINS
         !     // note the different order of f functions in Gaussian and Turbomole/Gamess
         idx = 4
         if (evfmt=='tmx' .or. evfmt=='gau') then
+            ! check if # basis functions in wf file deviates from # basis functions for basis set (first orbital only)
+            nbas_check = 0
+            idx = 5
+            do
+                words = Py_split(lines(idx))
+                if (words(1) == '2' .or. TRIM(lines(idx)) == '$end') exit
+                nbas_check = nbas_check + 5
+                idx = idx + 1
+            end do
+            ! checking last line of first orbital
+            idx = idx - 1
+            nbas_check = nbas_check - ( 5 - (LEN(TRIM(lines(idx))) + 1) / 15 )
+            call assert(nbas_check == nbas, 'moinput: inconsistent number of individual basis functions')
+
+            idx = 4
             fmt = '(5D15.8)'
             do i = 1, norb
                 read(lines(idx), *) ii
@@ -136,6 +152,20 @@ CONTAINS
                 end do
             end do
         else if (evfmt .eq. 'gms') then
+            ! check if # basis functions in wf file deviates from # basis functions for basis set (first orbital only)
+            nbas_check = 0
+            do
+                words = Py_split(lines(idx))
+                if (words(1) == '2' .or. TRIM(lines(idx)) == '$end') exit
+                nbas_check = nbas_check + 5
+                idx = idx + 1
+            end do
+            ! checking last line of first orbital
+            idx = idx - 1
+            nbas_check = nbas_check - ( 5 - (LEN(TRIM(lines(idx))) + 1) / 15 )
+            call assert(nbas_check == nbas, 'moinput: inconsistent number of individual basis functions')
+
+            idx = 4
             fmt = '(5X,5E15.8)'
             do i = 1, norb
                 jj = 0
