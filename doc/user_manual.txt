@@ -631,14 +631,16 @@ and the analysis of the results.
 all parameters of '$init_max_search' are valid.
 
 other parameters:
-verbose=nn          (default 0)         : sets verbosity (high values can generate lots
-                                          of output)
-assign_thresh=dd    (default 0.1)       : threshold to assign electrons to atoms after max-
-                                          imization of rho
-print_thresh=dd     (default 0.05)      : threshold to print occupations (weight)
-fragments=nn;nn;... (default 1;2;...;N) : assignment of atoms to fragments for partition output,
-                                          must be of length N (number of atoms)
-use_log                                 : use -ln(rho) instead of -rho as function to minimize
+verbose=nn           (default 0)         : sets verbosity (high values can generate lots
+                                           of output)
+assign_thresh=dd     (default 0.1)       : threshold to assign electrons to atoms AFTER max-
+                                           imization of rho
+pre_assign_thresh=dd (default 0.01)      : threshold to assign electrons to atoms BEFORE max-
+                                           imization of rho
+print_thresh=dd      (default 0.05)      : threshold to print occupations (weight)
+fragments=nn;nn;...  (default 1;2;...;N) : assignment of atoms to fragments for partition output,
+                                           must be of length N (number of atoms)
+use_log                                  : use -ln(rho) instead of -rho as function to minimize
 
 
 ====================================================================================
