@@ -635,7 +635,7 @@ verbose=nn           (default 0)         : sets verbosity (high values can gener
                                            of output)
 assign_thresh=dd     (default 0.1)       : threshold to assign electrons to atoms AFTER max-
                                            imization of rho
-pre_assign_thresh=dd (default 0.01)      : threshold to assign electrons to atoms BEFORE max-
+assign_pre_thresh=dd (default 0.01)      : threshold to assign electrons to atoms BEFORE max-
                                            imization of rho
 print_thresh=dd      (default 0.05)      : threshold to print occupations (weight)
 fragments=nn;nn;...  (default 1;2;...;N) : assignment of atoms to fragments for partition output,

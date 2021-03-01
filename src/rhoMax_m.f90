@@ -71,7 +71,7 @@ contains
 
       if (finda(lines, nl, "use_log")) this%use_log = .true.
 
-      call getdbla(lines, nl, "pre_assign_thresh=", preAssignThresh, iflag)
+      call getdbla(lines, nl, "assign_pre_thresh=", preAssignThresh, iflag)
       if (iflag /= 0) preAssignThresh = 0.01
 
       if (asserts) call assert(SIZE(fragments) == getNNuc(), 'rhoMax_init: invalid fragments array size.')
