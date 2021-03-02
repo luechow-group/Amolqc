@@ -193,7 +193,7 @@ subroutine getdbla(lines, nl, target, value, iflag)
     !
     integer i, k, kf, nl, iflag
     real(r8) value
-    character lines(nl)*120, target*(*)
+    character lines(nl)*(*), target*(*)
 
     do i = 1, nl
         k = index(lines(i), target)
@@ -230,7 +230,7 @@ subroutine getdblarra(lines, nl, target, value, iflag)
     !
     integer i, k, kf, nl, iflag, n, io
     character str*80
-    character lines(nl)*120, target*(*)
+    character lines(nl)*(*), target*(*)
     character(len=:), allocatable :: token
     real(r8), allocatable :: value(:)
 
@@ -378,7 +378,7 @@ subroutine getinta(lines, nl, target, value, iflag)
     ! iflag: 0 if target found, 1 if not
     !
     integer i, k, kf, nl, value, iflag, n, io
-    character lines(nl)*120, target*(*)
+    character lines(nl)*(*), target*(*)
     character str*80
 
     do i = 1, nl
@@ -429,7 +429,7 @@ subroutine getintarra(lines, nl, target, value, iflag)
     ! iflag: 0 if target found, 1 if not
     !
     integer i, k, kf, nl, iflag, n, io
-    character lines(nl)*120, target*(*)
+    character lines(nl)*(*), target*(*)
     character str*80
     character(len=:), allocatable :: token
     integer, allocatable :: value(:)
@@ -487,7 +487,7 @@ subroutine getint8a(lines, nl, target, value, iflag)
     !
     integer(i8) value
     integer i, k, kf, n, nl, iflag, io
-    character lines(nl)*120, target*(*)
+    character lines(nl)*(*), target*(*)
     character str*80
 
     do i = 1, nl
@@ -579,7 +579,7 @@ subroutine getstra(lines, nl, target, str, iflag)
     ! iflag: 0 if target found, 1 if not
     !
     integer i, k, kf, nl, iflag, io
-    character lines(nl)*120, target*(*), str*(*)
+    character lines(nl)*(*), target*(*), str*(*)
 
     do i = 1, nl
         k = index(lines(i), target)
@@ -658,7 +658,7 @@ subroutine getloga(lines, nl, target, value, iflag)
     ! iflag: 0 if target found, 1 if not
     !
     integer i, k, kf, nl, iflag
-    character lines(nl)*120, target*(*)
+    character lines(nl)*(*), target*(*)
     logical value
 
     do i = 1, nl
@@ -735,7 +735,7 @@ logical function finda(lines, nl, target)
     ! lines(1:nl)
     !
     integer i, k, nl
-    character lines(nl)*120, target*(*)
+    character lines(nl)*(*), target*(*)
 
     do i = 1, nl
         k = index(lines(i), target)
@@ -763,7 +763,7 @@ integer function ifinda(lines, nl, target)
     ! else zero
     !
     integer i, k, nl
-    character lines(nl)*120, target*(*)
+    character lines(nl)*(*), target*(*)
 
     do i = 1, nl
         k = index(lines(i), target)

@@ -125,7 +125,6 @@ CONTAINS
       allocate(cci(ndet),mclist(ne,ndet),ndets(ndet),ccsf(1,ndet),stat=alstat)
       call assert(alstat==0, 'mdetinput: allocation failed')
 
-      if (ne>49) call abortp('mdetinput: multiline mdetinput has to be coded!!!')
 
       do n=1,ncsf
          ! Give each determinant pair as orbital occupancy. First alpha
@@ -204,7 +203,6 @@ CONTAINS
       allocate(cci(ncsf),mclist0(ne,ncsf*ndetcsfmax),ndets(ncsf),ccsf(ndetcsfmax,ncsf),stat=alstat)
       call assert(alstat==0, 'mdetinput: allocation failed')
 
-      if (ne>49) call abortp('mcsfinput: multiline mdetinput has to be coded!!!')
 
       n = 0    ! count for dets
       ndet = 0 ! ditto
