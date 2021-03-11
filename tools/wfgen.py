@@ -52,7 +52,7 @@ if len(sys.argv) == 1:
                              of determinants/csfs, where given orbitals are not
                              doubly occupied
         punch_moopt        - punches the orbital optimization section for Amolqc input
-                             and deletes all orbitals, that are not required
+                             and can delete all orbitals, that are not required
         max_dets           - prints the maximum number of determinants per csf
         share_dets         - prints indices of csfs that 'share' determinants
         replace_orbs       - replaces orbital indices in determinants

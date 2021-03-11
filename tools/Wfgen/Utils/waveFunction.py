@@ -358,23 +358,30 @@ class WaveFunction:
         orbital_rotations += self.get_orbital_rotations(inactive_orbitals, virtual_orbitals)
         orbital_rotations += self.get_orbital_rotations(active_orbitals, virtual_orbitals)
 
-        # identifying orbitals, that are in no orbital_rotation
-        orbital_mask = [True]*len(self.orbitals)
-        for i in range(len(self.orbitals)):
+        query = input('Should non-required virtual orbitals be deleted? [y/N]')
+        if query.lower() in ['y', 'yes']:
+            # identifying orbitals, that are in no orbital_rotation
+            orbital_mask = [True]*len(self.orbitals)
+            for i in range(len(self.orbitals)):
+                for orbital_rotation in orbital_rotations:
+                    if (i+1 in orbital_rotation.orbital_group[0]) or (i+1 in orbital_rotation.orbital_group[1]):
+                        break
+                else:  # no break
+                    orbital_mask[i] = False
+            index_mask = [index for index, required in zip(range(len(self.orbitals)), orbital_mask) if required]
+
+            # removing non-required orbitals
+            self.orbitals = [orbital for orbital, required in zip(self.orbitals, orbital_mask) if required]
+
+            # adapting orbital_rotations
             for orbital_rotation in orbital_rotations:
-                if (i+1 in orbital_rotation.orbital_group[0]) or (i+1 in orbital_rotation.orbital_group[1]):
-                    break
-            else:  # no break
-                orbital_mask[i] = False
-        index_mask = [index for index, required in zip(range(len(self.orbitals)), orbital_mask) if required]
-
-        # removing non-required orbitals
-        self.orbitals = [orbital for orbital, required in zip(self.orbitals, orbital_mask) if required]
-
-        # adapting orbital_rotations
-        for orbital_rotation in orbital_rotations:
-            for i in [0, 1]:
-                orbital_rotation.orbital_group[i] = [index_mask.index(orb-1)+1 for orb in orbital_rotation.orbital_group[i]]
+                for i in [0, 1]:
+                    orbital_rotation.orbital_group[i] = [index_mask.index(orb-1)+1
+                                                         for orb in orbital_rotation.orbital_group[i]]
+        elif query.lower() in ['n', 'no', '']:
+            pass
+        else:
+            exit('pleaser answer y or n')
 
         file.write('orbital_rotation_list=\n')
         file.write(str(len(orbital_rotations)) + '\n')
