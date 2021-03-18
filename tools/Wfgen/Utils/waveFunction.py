@@ -360,6 +360,8 @@ class WaveFunction:
 
         query = input('Should non-required virtual orbitals be deleted? [y/N]')
         if query.lower() in ['y', 'yes']:
+            print("!!! Warning: the orbital indices are changed. The command 'write' has to be used to get the correct "
+                  "wf !!!")
             # identifying orbitals, that are in no orbital_rotation
             orbital_mask = [True]*len(self.orbitals)
             for i in range(len(self.orbitals)):
