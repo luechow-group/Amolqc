@@ -5,7 +5,7 @@
 
 module maximizeSample_m
    use kinds_m, only: r8
-   use parsing_m
+   use parsing_m, only: getinta, getloga
    use global_m
    use mpiInterface_m, only: myMPIReduceSumInteger
    use rWSample_m, only: rWSample, getSampleSize, getFirst, isNext, getNext, getWalker
@@ -60,9 +60,15 @@ contains
       logical, intent(in) :: wout
       type(RandomWalker), pointer :: rwp
       integer :: walkerIndex, iflag
+      logical :: update_walker
+
       call getinta(lines,nl,'index=',walkerIndex,iflag)
+
+      call getloga(lines,nl,'update_walker=',update_walker,iflag)
+      if (iflag /= 0) update_walker = .true.
+
       rwp => getWalker(smpl,walkerIndex)
-      call psimax_obj%opt(rwp, update_walker=.true.)
+      call psimax_obj%opt(rwp, update_walker=update_walker)
       if (wout) then
          if (psimax_obj%is_converged()) then
             write(iul,'(a,i6,a)') " maximization of electron configuration #", walkerIndex, " did converge"
