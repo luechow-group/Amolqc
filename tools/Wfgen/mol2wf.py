@@ -332,8 +332,16 @@ def molpro_in(input_name,molden_name,basis,wf_type):
             for i in range(2):
                 line = out_file.readline()
             words = line.split()
+
+            number_of_states = len(words) - 1
+            if number_of_states > 1:
+                print('state-averaged wave function detected')
+                state = int(input('give the number of the state you want to read: '))
+            else:
+                state = 1
+
             while words:
-                csf_coefficients.append(words[1])
+                csf_coefficients.append(float(words[state]))
                 csf_occupations.append(list(words[0]))
                 line = out_file.readline()
                 words = line.split()
@@ -350,7 +358,7 @@ def molpro_in(input_name,molden_name,basis,wf_type):
                 for j in range((len(orbital_map))):
                     csf.occupation[orbital_map[j] - 1] = csf_occupations[i][j]
                 # add coefficient
-                csf.coefficient = float(csf_coefficients[i])
+                csf.coefficient = csf_coefficients[i]
 
                 # find occupation scheme (only singly occupied orbitals)
                 for j in range(number_vector_orbitals):
