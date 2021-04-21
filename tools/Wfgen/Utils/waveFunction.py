@@ -370,7 +370,7 @@ class WaveFunction:
                         break
                 else:  # no break
                     orbital_mask[i] = False
-            index_mask = [index for index, required in zip(range(len(self.orbitals)), orbital_mask) if required]
+            index_mask = [index for index, required in enumerate(orbital_mask) if required]
 
             # removing non-required orbitals
             self.orbitals = [orbital for orbital, required in zip(self.orbitals, orbital_mask) if required]
@@ -380,6 +380,12 @@ class WaveFunction:
                 for i in [0, 1]:
                     orbital_rotation.orbital_group[i] = [index_mask.index(orb-1)+1
                                                          for orb in orbital_rotation.orbital_group[i]]
+            # adapting csfs
+            for i, csf in enumerate(self.csfs):
+                for j, det in enumerate(csf.determinants):
+                    for k, orbital in enumerate(det.orbital_list):
+                        self.csfs[i].determinants[j].orbital_list[k] =\
+                        orbital // abs(orbital) * (index_mask.index(abs(orbital)-1) + 1)
         elif query.lower() in ['n', 'no', '']:
             pass
         else:
