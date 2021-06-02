@@ -352,25 +352,72 @@ class WaveFunction:
         virtual_orbitals = self.get_virtual_orbitals()
         active_orbitals = self.get_active_orbitals()
 
-        # get orbital_rotations
-        orbital_rotations = []
-        orbital_rotations += self.get_orbital_rotations(inactive_orbitals, active_orbitals)
-        orbital_rotations += self.get_orbital_rotations(inactive_orbitals, virtual_orbitals)
-        orbital_rotations += self.get_orbital_rotations(active_orbitals, virtual_orbitals)
+        query_all_symm = input('Are all orbital symmetries used for the mo opt? [Y/n] ')
+        if query_all_symm.lower() in ['n', 'no']:
+            print('''
+            Give the indices of irreps that should kept, separated by comma: ''')
+            print(self.symmetry)
+            for i in range(len(self.symmetry_list)):
+                print(str(i + 1) + ': ' + self.symmetry_list[i])
+            kept_symmetries = input('Group of kept irreps: ').split(",")
 
-        query = input('Should non-required virtual orbitals be deleted? [y/N]')
+            kept_orbitals = []
+            for i in range(len(self.orbitals)):
+                if (self.orbitals[i].symmetry.split(".")[1] in kept_symmetries):
+                   kept_orbitals.append(i+1)
+
+            # adapt orbital indices for kept orbitals
+            kept_inactive_orbitals =[]
+            kept_active_orbitals = []
+            kept_virtual_orbitals = []
+            for i in range(len(kept_orbitals)):
+                if kept_orbitals[i] in inactive_orbitals:
+                    kept_inactive_orbitals.append(kept_orbitals[i])
+                elif kept_orbitals[i] in active_orbitals:
+                    kept_active_orbitals.append(kept_orbitals[i])
+                else:
+                    kept_virtual_orbitals.append(kept_orbitals[i])
+
+
+            # get orbital_rotations
+            orbital_rotations = []
+            orbital_rotations += self.get_orbital_rotations(kept_inactive_orbitals, kept_active_orbitals,kept_symmetries)
+            orbital_rotations += self.get_orbital_rotations(kept_inactive_orbitals, kept_virtual_orbitals,kept_symmetries)
+            orbital_rotations += self.get_orbital_rotations(kept_active_orbitals, kept_virtual_orbitals,kept_symmetries)
+        elif query_all_symm.lower() in ['y', 'yes', '']:
+            # get orbital_rotations
+            orbital_rotations = []
+            orbital_rotations += self.get_orbital_rotations(inactive_orbitals, active_orbitals)
+            orbital_rotations += self.get_orbital_rotations(inactive_orbitals, virtual_orbitals)
+            orbital_rotations += self.get_orbital_rotations(active_orbitals, virtual_orbitals)
+        else:
+            exit('pleaser answer y or n')
+
+        query = input('Should non-required orbitals be deleted? [y/N] ')
         if query.lower() in ['y', 'yes']:
             print("!!! Warning: the orbital indices are changed. The command 'write' has to be used to get the correct "
                   "wf !!!")
-            # identifying orbitals, that are in no orbital_rotation
-            orbital_mask = [True]*len(self.orbitals)
-            for i in range(len(self.orbitals)):
-                for orbital_rotation in orbital_rotations:
-                    if (i+1 in orbital_rotation.orbital_group[0]) or (i+1 in orbital_rotation.orbital_group[1]):
-                        break
-                else:  # no break
-                    orbital_mask[i] = False
-            index_mask = [index for index, required in enumerate(orbital_mask) if required]
+            if query_all_symm.lower() in ['n', 'no']:
+                orbital_mask = [True]*len(self.orbitals)
+                for i in range(len(virtual_orbitals)):
+                    for orbital_rotation in orbital_rotations:
+                        if (i+int(len(inactive_orbitals))+int(len(active_orbitals))+1 in orbital_rotation.orbital_group[0]) or\
+                                (i+int(len(inactive_orbitals))+int(len(active_orbitals))+1 in orbital_rotation.orbital_group[1]):
+                            break
+                    else:  # no break
+                        orbital_mask[i+int(len(inactive_orbitals))+int(len(active_orbitals))] = False
+                index_mask = [index for index, required in enumerate(orbital_mask) if required]
+
+            else:
+                # identifying orbitals, that are in no orbital_rotation
+                orbital_mask = [True]*len(self.orbitals)
+                for i in range(len(self.orbitals)):
+                    for orbital_rotation in orbital_rotations:
+                        if (i+1 in orbital_rotation.orbital_group[0]) or (i+1 in orbital_rotation.orbital_group[1]):
+                            break
+                    else:  # no break
+                        orbital_mask[i] = False
+                index_mask = [index for index, required in enumerate(orbital_mask) if required]
 
             # removing non-required orbitals
             self.orbitals = [orbital for orbital, required in zip(self.orbitals, orbital_mask) if required]
@@ -380,6 +427,7 @@ class WaveFunction:
                 for i in [0, 1]:
                     orbital_rotation.orbital_group[i] = [index_mask.index(orb-1)+1
                                                          for orb in orbital_rotation.orbital_group[i]]
+
             # adapting csfs
             for i, csf in enumerate(self.csfs):
                 for j, det in enumerate(csf.determinants):
@@ -634,17 +682,20 @@ class WaveFunction:
             # print(self.symmetry_list)
             print(str(counter) + ' orbitals have been added to ' + self.symmetry_list[-1])
 
-    def get_orbital_rotations(self, group1_orbitals, group2_orbitals):
+    def get_orbital_rotations(self, group1_orbitals, group2_orbitals, kept_symmetries=None):
+        if not kept_symmetries:
+            kept_symmetries = self.symmetry_list
         orbital_rotations = []
-        for i, irrep in enumerate(self.symmetry_list):
+        for i, irrep in enumerate(kept_symmetries):
             group1 = []
             group2 = []
+
             for index in group1_orbitals:
-                if self.orbitals[index - 1].symmetry.split('.')[1] == str(i+1):
-                    group1.append(index)
+                if self.orbitals[index - 1].symmetry.split('.')[1] == irrep:
+                   group1.append(index)
             for index in group2_orbitals:
-                if self.orbitals[index - 1].symmetry.split('.')[1] == str(i+1):
-                    group2.append(index)
+                if self.orbitals[index - 1].symmetry.split('.')[1] == irrep:
+                   group2.append(index)
             if len(group1) != 0 and len(group2) != 0:
                 orbital_rotation = OrbitalRotation()
                 orbital_rotation.orbital_group.append(group1)
