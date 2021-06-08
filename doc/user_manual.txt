@@ -872,6 +872,28 @@ delta_e_filename='filename' : reads delta E array from the file.
 quad                        : use a quadratic model to determine the step length with the minimum energy
 target_E, target_var        : required to determine step length (only when quad is present)
 
+
+MO opt input:
+For CASSCF orbitals, non-redundant orbital rotations include: inactive to active, inactive to virtual, active to virtual.
+For HF/KS orbitals: closed to open, closed to virtual, open to virtual.
+An orbital rotation class is e.g. inactive to active. Only rotations between orbitals with the same irrep are sensible.
+
+!!! Important note for the orbital_rotation_list block: if (number of orbitals > 30): the input for the given orbital type
+has to be continued in the next line !!!
+
+Input:
+orbital_rotation_list=
+<number of orbital rotation classes>
+<number of orbitals (n) for irrep a and type b> <orbital 1> ... <orbital n>
+<number of orbitals (m) for irrep a and type c> <orbital 1> ... <orbital m>
+...
+(! one blank line !)
+mo_symmetrise_list=
+<number of equivalent orbital rotations>
+<number of degenerate orbitals (n) > <orbital 1> ... <orbital n>
+...
+
+
 ====================================================================================
 
 $optimize_refs

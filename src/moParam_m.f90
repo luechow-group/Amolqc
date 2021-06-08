@@ -60,7 +60,7 @@ contains
                                            !         optArray(0:,4) = |len, m'1, m'2, .. m'_len]
                                            ! meaning: all rotations \kappa_lm and all \kappa_l'm', ...
    integer, allocatable :: MOSymmetriseList(:,:)
-   integer np,i,j1,j2,k,l,l0,nClass,len,p,orb,iflag, nSym
+   integer np,i,j1,j2,k,l,l0,m,nClass,len,p,orb,iflag, nSym, counter
    integer p1, e1, e2
    integer entryVec(0:mMaxPairs)
    logical found
@@ -89,12 +89,28 @@ contains
    if (MASTER .and. logmode >= 2) write(iul,'(a,i3,a)') ' reading ',nClass,' classes of orbital rotations'
    allocate(optArray(0:norb,2*nClass))
    optArray = 0
+   m = 1
+   counter = 0
    do l=1,2*nClass,2
       if (l0+l+1 > nl) call abortp("$optimize_parameters: illegal format in MO parameter description")
-      read(lines(l0+l),*) len
-      read(lines(l0+l),*) (optArray(i,l),i=0,len)
-      read(lines(l0+l+1),*) len
-      read(lines(l0+l+1),*) (optArray(i,l+1),i=0,len)
+      m = l + counter
+      read(lines(l0+m),*) len
+      if (len > 30) then
+         read(lines(l0+m),*) (optArray(i,l),i=0,30)
+         read(lines(l0+m+1),*) (optArray(i,l),i=31,len)
+         counter = counter + 1
+      else
+         read(lines(l0+m),*) (optArray(i,l),i=0,len)
+      end if
+      m = l + counter
+      read(lines(l0+m+1),*) len
+      if (len > 30) then
+         read(lines(l0+m+1),*) (optArray(i,l+1),i=0,30)
+         read(lines(l0+m+2),*) (optArray(i,l+1),i=31,len)
+         counter = counter + 1
+      else
+         read(lines(l0+m+1),*) (optArray(i,l+1),i=0,len)
+      end if
    enddo
 
    do i=1,nl
