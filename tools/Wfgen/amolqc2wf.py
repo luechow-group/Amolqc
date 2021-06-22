@@ -39,6 +39,7 @@ def amolqc_in(input_name):
     general = {}
     general['atomic_charges'] = False
     general['evfmt'] = 'gau'
+    general['geom'] = 'ang'
     while "$end" not in line:
         while line[0] == ' ':
             line = line[1:]
