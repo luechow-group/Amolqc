@@ -58,6 +58,9 @@ def amolqc_in(input_name):
     orbital_format = general['evfmt']
     title = general['title']
     jastrow_type = general['jastrow']
+    bohr = False
+    if general['geom'] == 'bohr':
+        bohr = True
     
     #reading geometry
     while '$geom' not in line:
@@ -209,6 +212,6 @@ def amolqc_in(input_name):
             csfs.append(csf)
 
     wf = WaveFunction(input_name, orbital_format, basis, charge, multiplicity, atoms,
-                      orbitals, csfs, jastrow)
+                      orbitals, csfs, jastrow, bohr=bohr)
     
     return wf

@@ -15,7 +15,7 @@ from .data import multiplication_table, periodic_table
 
 class WaveFunction:
     def __init__(self, input_name, orbital_format, basis, charge, multiplicity, atoms, orbitals,
-                 csfs, jastrow, symmetry=None, symmetry_list=None):
+                 csfs, jastrow, symmetry=None, symmetry_list=None, bohr=False):
         self.title = input_name  # string
         self.orbital_format = orbital_format  # string
         self.basis = basis  # string
@@ -28,12 +28,17 @@ class WaveFunction:
         self.jastrow = jastrow
         self.symmetry_list = symmetry_list
         self.separated_electrons = 0
+        self.geom_unit = bohr  # logical
 
     def write(self):
         self.title = self.title.split('/')[-1]
         wf_filename = self.title + '.wf'
         out = open(wf_filename, 'w')
-        self.write_general_section(out)
+
+        if self.geom_unit:
+            self.write_general_section(out, self.geom_unit)
+        else:
+            self.write_general_section(out)
 
         # geometry
         self.write_geometry_section(out)
@@ -62,11 +67,13 @@ class WaveFunction:
         self.jastrow.write(out)
         out.write('$end' + '\n')
 
-    def write_general_section(self, out):
+    def write_general_section(self, out, bohr=False):
         out.write('$general' + '\n'
                   + ' title=' + self.title + '\n'
                   + ' evfmt=' + self.orbital_format + ', basis=' + self.basis + ', jastrow=' + self.jastrow.type + '\n'
                   + ' charge= ' + str(self.charge) + ', spin= ' + str(self.multiplicity))
+        if bohr:
+            out.write(', geom=bohr')
         if self.atomic_charges():
             out.write(', atomic_charges')
         if self.separated_electrons != 0:
