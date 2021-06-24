@@ -68,6 +68,8 @@ class WaveFunction:
         out.write('$end' + '\n')
 
     def write_general_section(self, out, bohr=False):
+        if self.orbital_format == 'fre':
+            self.orbital_format = 'gau'  # orbitals in 'fre' format will be transformed to 'gau' format
         out.write('$general' + '\n'
                   + ' title=' + self.title + '\n'
                   + ' evfmt=' + self.orbital_format + ', basis=' + self.basis + ', jastrow=' + self.jastrow.type + '\n'

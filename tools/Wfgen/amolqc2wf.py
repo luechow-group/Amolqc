@@ -117,25 +117,32 @@ def amolqc_in(input_name):
     for i in range(3):
         line = wf_file.readline()
     orbitals = []
-    if orbital_format == 'gau':
+    if orbital_format in ['gau', 'fre']:
         mo_lines -= 1
 
     for i in range(number_orbitals):
         orbital = Orbital()
-        if orbital_format == 'gau':
+        if orbital_format in ['gau', 'fre']:
             line = wf_file.readline()
-        for j in range(mo_lines):
-            for k in range(len(line)//15):
-                orbital_string = ''
-                for l in range(15):
-                    if orbital_format == 'gau':
-                        orbital_string += line[k * 15 + l]
-                    elif orbital_format == 'gms':
-                        orbital_string += line[k * 15 + l + 5]
-                    else:
-                        sys.exit('Error: only orbital format gau and gms are implemented for mo read')
-                orbital.coefficients.append(float(orbital_string.replace("D","E")))
-            line = wf_file.readline()
+        if orbital_format == 'fre':
+            for j in range(mo_lines):
+                for k in range(len(line.split())):
+                    orbital_string = line.split()[k]
+                    orbital.coefficients.append(float(orbital_string.replace("e", "E")))
+                line = wf_file.readline()
+        elif orbital_format in ['gau', 'gms']:
+            for j in range(mo_lines):
+                for k in range(len(line)//15):
+                    orbital_string = ''
+                    for l in range(15):
+                        if orbital_format == 'gau':
+                            orbital_string += line[k * 15 + l]
+                        elif orbital_format == 'gms':
+                            orbital_string += line[k * 15 + l + 5]
+                    orbital.coefficients.append(float(orbital_string.replace("D", "E")))
+                line = wf_file.readline()
+        else:
+            sys.exit('Error: orbital format mol is not implemented for mo read')
         orbitals.append(orbital)
 
     number_basisfunctions = len(orbitals[0].coefficients)
