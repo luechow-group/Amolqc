@@ -58,6 +58,7 @@ if len(sys.argv) == 1:
         replace_orbs       - replaces orbital indices in determinants
         reorder_atoms      - reorders atoms (and orbitals accordingly)
         separate_electrons - separates electrons (e.g. for pi-only calculations)
+        averaged_occupation- gives the average orbital occupation (det wf only)
         
     ''')
 
@@ -172,6 +173,8 @@ while i < len(sys.argv) - arguments:
         i += 1
         index = int(sys.argv[i + arguments])
         wf.print_csf(index)
+    elif command == 'averaged_occupation':
+        wf.averaged_occupation()
     else:
         sys.exit('Error: command '+command+' unknown!')
     i += 1

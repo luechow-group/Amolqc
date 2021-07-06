@@ -818,3 +818,24 @@ class WaveFunction:
 
         for i, atom in enumerate(self.atoms):
             self.atoms[i].charge = charges[atom.atomic_number]
+
+    def averaged_occupation(self):
+        averaged_occ = []
+
+        for i in range(len(self.orbitals)):
+            sum = 0
+            for j in range(len(self.csfs[0].determinants)):
+                occupation = 0
+                for k in range(len(self.csfs[0].determinants[0].orbital_list)):
+                    if abs(int(self.csfs[0].determinants[j].orbital_list[k])) == i+1:
+                        occupation += 1
+
+                weighted_occ = (self.csfs[0].determinants[j].coefficient) ** 2 * occupation
+                sum += weighted_occ
+
+            averaged_occ.append(sum)
+
+        print(averaged_occ)
+
+
+
