@@ -143,7 +143,7 @@ contains
             do i = 1, n
                write(iul,*) i, lambda(i)
                do k = 1, n/3
-                  write(iul,*) ( H( i, j ), j = 3*k-2, 3*k )
+                  write(iul,'(i5,3f15.6)') k, ( H( j, i ), j = 3*k-2, 3*k )
                end do
             end do
          end if

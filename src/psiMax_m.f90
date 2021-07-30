@@ -20,7 +20,7 @@ module psiMax_m
    use global_m, only: getNElec, iul, iull, MASTER, logmode, getMyTaskId
    use eloc_m, only: eloc
    use eConfigs_m, only: eConfigArray, eConfigArray_new, eConfigArray_set
-   use elocData_m, only: eloc_getStopAtSingularity, eloc_setStopAtSingularity, elEkini
+   use elocData_m, only: eloc_getStopAtSingularity, eloc_setStopAtSingularity, elEkini, elPhi, elU
    use wfData_m, only: atoms, getNNuc, getNAlpha
    use atom_m, only: atoms_getPositionMatrix
    use fPsi2_m
@@ -252,6 +252,8 @@ contains
 
       if (this%verbose_ >= 2) then
          write(iull,*) 'after minimize:'
+         write(iull,'(a,f20.15)') 'Phi: ',  -(LOG(ABS(elPhi(1))) + elU(1))
+         write(iull,'(a,f20.15)') 'Psi: ',  EXP(elU(1))*elPhi(1)
          do i = 1, n
             write(iull,'(i5,3f15.6)') i, x(i), y(i), z(i)
          end do

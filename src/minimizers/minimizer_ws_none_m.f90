@@ -38,10 +38,26 @@ contains
         class(Function_t), intent(in)                 :: fn
         real(r8), intent(inout)                       :: x(:)
 
+        real(r8)                                      :: f
+        integer                                       :: verbose, iul
+
+        verbose = this%verbose()
+        iul = this%verbose_unit()
+
+        if (verbose > 0) write(iul,"(a)") " *** NONE minimizer ***"
+        call this%reset()
+
+        f = fn%eval(x)
+
+        if (verbose > 0) then
+            write(iul,"(a,g20.10)") " initial position with function value f=", f
+        end if
+
         x = ieee_value(0._r8,ieee_quiet_nan)
         call this%set_converged(.true.)
         call this%set_value(ieee_value(0._r8,ieee_quiet_nan))
 
+        if (verbose > 0) write(iul,"(a)") " *** end NONE minimizer ***"
     end subroutine minimizer_ws_none_minimize
 
     subroutine write_params_minimizer_ws_none(this, iu)

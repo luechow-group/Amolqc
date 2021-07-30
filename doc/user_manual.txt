@@ -741,7 +741,8 @@ $maximize_walker
 This command maximizes psi^2 for one sample element and gives information about convergence
 and function evaluations. Maximization is done according to a preceding $init_max_search command.
 
-index=nn : index of the walker to be maximized
+index=nn                          : index of the walker to be maximized
+update_walker=ll (default .true.) : update walker after maximization
 
 
 =====================================================================================
