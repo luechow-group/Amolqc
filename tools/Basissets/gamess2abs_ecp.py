@@ -44,6 +44,8 @@ elem_names = (
         'Nihonium', 'Flerovium', 'Moscovium', 'Livermorium', 'Tennessine',
         'Oganesson')
 AO_types = 'SPDFGHIKLMNOQRTUVWXYZ'
+is_arr = lambda obj: hasattr(obj, '__len__') and hasattr(obj, '__getitem__') \
+    and not isinstance(obj, str)
 
 def read(filename):
     with open(filename, 'r') as file:
@@ -106,7 +108,7 @@ if __name__ == '__main__':
     bas_text = str_between(text, '$DATA', '$END')
     ecp_text = str_between(text, '$ECP', '$END')
 
-    separator = '****\n\n'
+    separator = '****\n'
 
     text = bas_text
     for name in findall(r'([A-Z]{3,})', text):
@@ -115,16 +117,17 @@ if __name__ == '__main__':
     text = sub((r'\n\d+', '\n'), text)
     text = comment_text.replace('!', '#') \
         + sub((r'\b([' + AO_types + ']) +(\d+)', r'\g<1> GTO \g<2>'), \
-        text)[len(separator) - 1 :] + separator
+        text)[len(separator) :] + separator
     write(filename + '.abs', text)
     
     text = ecp_text
     for substr, symb in findall(r'((\w{1,2})-ECP GEN)', text):
         if len(symb) == 2:
             symb = symb[0] + symb[1].lower()
-        text = text.replace(substr, separator + '# ' + symb + '\n' \
+        text = text.replace(substr, ' ' + separator + '####' \
+            + elem_names[elem_symbs.index(symb)] + '\n' \
             + str(elem_symbs.index(symb)), 1)
     text = comment_text.replace('!', '#') \
-        + sub((r' *-{5}.+? potential -{5}', ''), text)[len(separator) - 1 :] \
-        + separator
+        + sub((r' *-{5}.+? potential -{5}', ''), text)[len(separator) + 1 :] \
+        + ' ' + separator
     write(filename + '.ecp', text)
