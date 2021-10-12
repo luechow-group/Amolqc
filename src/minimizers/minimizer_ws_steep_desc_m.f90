@@ -82,6 +82,11 @@ contains
       call fn%eval_fg(x, f, g)
       n_eval = 1
 
+      ! before the first step, check for singularities, but with zero step and set particles to singularities
+      delta_x = 0._r8
+      call this%sc_%correct_for_singularities(x, delta_x, sp, is_corrected, correction_only=.false.)
+      where ( sp%At_singularity() ) g = 0.d0
+
       if (verbose > 0) then 
          write(iul,"(a,g20.10)") " initial position with function value f=", f
          call this%write_params(iul)
