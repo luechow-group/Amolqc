@@ -18,6 +18,7 @@ module minimizer_ws_newton_module
 
    type, extends(minimizer_w_sing) :: minimizer_ws_newton
       real(r8) :: dt = 1._r8
+      real(r8) :: delta_max = 0._r8
    contains
       procedure :: minimize => minimizer_ws_newton_minimize
       procedure :: write_params_minimizer_ws_newton
@@ -30,14 +31,16 @@ module minimizer_ws_newton_module
 
 contains
 
-   function constructor1(sc, dt) result(minimizer)
+   function constructor1(sc, dt, delta_max) result(minimizer)
       type(singularity_correction), intent(in)          :: sc
       real(r8), optional, intent(in) :: dt
+      real(r8), optional, intent(in) :: delta_max
       type(minimizer_ws_newton), pointer :: minimizer
       allocate(minimizer)
       minimizer%sc_ = sc
 
       if (PRESENT(dt)) minimizer%dt = dt
+      if (PRESENT(delta_max)) minimizer%delta_max = delta_max
    end function constructor1
 
    subroutine minimizer_ws_newton_minimize(this, fn, x)
@@ -48,7 +51,7 @@ contains
       real(r8)                   :: g(SIZE(x)), g_new(SIZE(x)), x_new(SIZE(x))
       real(r8)                   :: delta_x(SIZE(x)), H(SIZE(x),SIZE(x)), work(SIZE(x)**2)
       real(r8)                   :: ipiv(SIZE(x)), lambda(SIZE(X)), work2(3*SIZE(x)-1)
-      real(r8)                   :: gmax
+      real(r8)                   :: gmax, delta_x_scale
       integer                    :: iter, verbose, iul, i, j, k
       integer                    :: n, info, lwork
       type(singularity_particles):: sp
@@ -107,6 +110,15 @@ contains
 
          ! saving position and value before step
          if (this%do_write_opt_path()) call this%write_opt_path_entry(iter, x, f)
+
+         ! restriction of step length
+         if (this%delta_max > 0._r8) then
+            delta_x_scale = 1._r8
+            do i = 1, SIZE(delta_x), 3
+               delta_x_scale = MIN(delta_x_scale, this%delta_max / NORM2(delta_x(i:i+2)))
+            end do
+            delta_x = delta_x * delta_x_scale
+         end if
 
          ! doing step (with singularity correction)
          call this%sc_%correct_for_singularities(x, delta_x, sp, is_corrected, correction_only=.false.)
