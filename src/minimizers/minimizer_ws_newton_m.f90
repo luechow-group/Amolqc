@@ -98,7 +98,12 @@ contains
          delta_x = - this%dt*g
          ! ?SYSV info: https://software.intel.com/en-us/node/468912
          call DSYSV('U',n,1,H,n,ipiv,delta_x,n,work,n**2,info)
-         call assert(info==0, 'newton_minimize: inversion failed')
+         !call assert(info==0, 'newton_minimize: inversion failed')
+
+         if (info /= 0 .or. .not. all(abs(delta_x)<huge(1.d0))) then
+            call this%set_converged(.false.)
+            exit
+         end if
 
          ! saving position and value before step
          if (this%do_write_opt_path()) call this%write_opt_path_entry(iter, x, f)
