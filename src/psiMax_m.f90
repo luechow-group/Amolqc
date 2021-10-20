@@ -34,6 +34,7 @@ module psiMax_m
        maxana_getFirstF, maxana_getDiffMax
    use maxBasins_m, only: maxbas_isInitialized, maxbas_destroy, maxbas_add, maxbas_writeResults
    use mpiInterface_m, only: myMPIReduceSumDouble
+   use singularityParticles_m, only: singularity_particles
 
    implicit none
    private
@@ -49,6 +50,7 @@ module psiMax_m
       type(fctn_psi2)                  :: fg
       integer                          :: analyze_mode_ = NOANALYSIS
       logical                          :: allow_singularities_ = .true.
+      integer                          :: neg_eigv_
       integer                          :: verbose_ = 0
       logical                          :: save_opt_paths_ = .false.
       integer                          :: path_count_ = 0
@@ -69,7 +71,7 @@ module psiMax_m
    end type psimax
 
    ! counters variables:
-   real(r8)       :: sCounter(0:9) = 0.d0  ! counters: exit codes 0:7, 8 all, 9 successful minimizer calls
+   real(r8)       :: sCounter(0:10) = 0.d0  ! counters: exit codes 0:7, 8 all, 9 successful minimizer calls
 
 contains
 
@@ -84,6 +86,8 @@ contains
 
       this%minimizer_p => create_ws_minimizer(lines)
 
+      call getinta(lines, nl, "negative_eigenvectors=", this%neg_eigv_, iflag)
+      if (iflag /= 0) this%neg_eigv_ = -1
       call getinta(lines, nl, "verbose=", this%verbose_, iflag)
       call this%minimizer_p%set_verbose(this%verbose_)
       call this%minimizer_p%set_verbose_unit(iull)
@@ -110,6 +114,7 @@ contains
       else
          this%analyze_mode_ = NOANALYSIS
       endif
+
       if (finda(lines, nl, "save_opt_paths")) then
          this%save_opt_paths_ = .true.
          this%path_count_ = 0
@@ -199,14 +204,17 @@ contains
       logical, intent(in)               :: update_walker
       real(r8)  :: x(getNElec()), y(getNElec()), z(getNElec())
       real(r8)  :: xx(3*getNElec())
-      real(r8)  :: f
-      real(r8) :: maximum(3*getNElec())
-      real(r8) :: sample(3*getNElec())
-      real(r8) :: kinetic_energies(getNElec())
-      integer :: i, n, w, iflag
-      integer :: idx(getNElec())
-      logical :: lold
+      real(r8)  :: H(SIZE(xx),SIZE(xx))
+      real(r8)  :: g(SIZE(xx)), lambda(SIZE(xx)), work2(3*SIZE(xx)-1)
+      real(r8)  :: f, delta_x(SIZE(xx))
+      real(r8)  :: maximum(3*getNElec())
+      real(r8)  :: sample(3*getNElec())
+      real(r8)  :: kinetic_energies(getNElec())
+      integer   :: i, n, w, iflag, info, lwork, num_neg_eigv
+      integer   :: idx(getNElec())
+      logical   :: lold, correct_num_neg_eigv, is_minimum, is_corrected
       type(eConfigArray) :: sample_ec
+      type(singularity_particles):: sp
 
       n = getNElec()
 
@@ -250,6 +258,32 @@ contains
       end do
       maximum = xx
 
+      if (this%minimizer_p%is_converged()) then
+         is_minimum = .true.
+         correct_num_neg_eigv = .false.
+         call this%fg%eval_fgh(maximum,f,g,H)
+
+         !Correct for singularities
+         call sp%create(SIZE(maximum)/3, this%minimizer_p%sc_%n_singularities())
+         delta_x = 0._r8
+         call this%minimizer_p%sc_%correct_for_singularities(maximum, delta_x, sp, is_corrected, correction_only=.false.)
+         call sp%Fix_gradients(g, H)
+
+         lwork = 3*SIZE(maximum)-1
+         call DSYEV('V', 'U', SIZE(maximum), H, SIZE(maximum), lambda, work2, lwork, info)
+         if (this%neg_eigv_ /= -1) then
+            num_neg_eigv = 0
+            do i = 1, SIZE(maximum)
+               if (ABS(lambda(i)) > 1.0e-2_r8 .and. lambda(i) < 0._r8) num_neg_eigv = num_neg_eigv + 1
+            end do
+            if (num_neg_eigv == this%neg_eigv_) correct_num_neg_eigv = .true.
+         else
+            do i = 1, SIZE(maximum)
+               if (lambda(i) < 0._r8) is_minimum = .false.
+            end do
+         end if
+      end if
+      
       if (this%verbose_ >= 2) then
          write(iull,*) 'after minimize:'
          write(iull,'(a,f20.15)') 'Phi: ',  -(LOG(ABS(elPhi(1))) + elU(1))
@@ -267,12 +301,25 @@ contains
          sCounter(7) = sCounter(7) + this%minimizer_p%iterations()
          sCounter(6) = sCounter(6) + this%minimizer_p%function_evaluations()
          iflag = 0
+         if (correct_num_neg_eigv) sCounter(10) = sCounter(10) + 1._r8
       else
          iflag = 1
       end if
 
       idx = (/ (i, i = 1, n) /)
 
+      if (this%neg_eigv_ /= -1) then
+         if (.not. correct_num_neg_eigv) then
+            call this%minimizer_p%set_converged(.false.)
+            iflag = 1
+            end if
+      else
+         if (.not. is_minimum) then
+            call this%minimizer_p%set_converged(.false.)
+            iflag = 1
+            end if
+      end if
+      
       ! note: rw must contain input positions for maxbas_add
       select case (this%analyze_mode_)
       case (RAWDATA)
@@ -318,25 +365,37 @@ contains
    subroutine psimax_writeResults(this)
       class(psimax), intent(in)    :: this
       integer, parameter :: iu=12
-      real(r8)          :: min_save, rcvCount(0:9)
+      real(r8)          :: min_save, rcvCount(0:10)
       integer         :: i,k
       real(r8)          :: F
 
-      call myMPIReduceSumDouble(sCounter, rcvCount, 10)
+      call myMPIReduceSumDouble(sCounter, rcvCount, 11)
 
       if (MASTER) then
 
          write(iul,*)
-         write(iul,*) "Summary for maxima search:"
-         write(iul,*)
-
-
-         write(iul,'(a41,i8)') " # minimizer calls                      :", nint(rcvCount(8))
-         write(iul,'(a41,i8)') " # maxima analyzed (converged)          :", nint(rcvCount(9))
-         write(iul,'(a41,i8)') " average # iterations                   :", nint(rcvCount(7) / rcvCount(9))
-         write(iul,'(a41,i8)') " average # function/gradient evaluations:", nint(rcvCount(6) / rcvCount(9))
-        ! write(iul,'(a)') "  exit code percentages of minimizer:"
-         write(iul,*)
+         if (this%neg_eigv_ /= -1) then
+            write(iul,'(A)', advance='NO') "Summary for Saddlepoint ("
+            write(iul,'(I1.1)', advance='NO') this%neg_eigv_
+            write(iul,*) " negative eigenvalues) search:"
+            write(iul,*)
+            write(iul,'(a41,i8)') " # minimizer calls                      :", nint(rcvCount(8))
+            write(iul,'(a41,i8)') " # minimizer converged                  :", nint(rcvCount(9))
+            write(iul,'(a41,i8)') " # saddlepoints analyzed                :", nint(rcvCount(10))
+            write(iul,'(a41,i8)') " average # iterations                   :", nint(rcvCount(7) / rcvCount(9))
+            write(iul,'(a41,i8)') " average # function/gradient evaluations:", nint(rcvCount(6) / rcvCount(9))
+            ! write(iul,'(a)') "  exit code percentages of minimizer:"
+            write(iul,*)
+         else
+            write(iul,*) "Summary for maxima search:"
+            write(iul,*)
+            write(iul,'(a41,i8)') " # minimizer calls                      :", nint(rcvCount(8))
+            write(iul,'(a41,i8)') " # maxima analyzed (converged)          :", nint(rcvCount(9))
+            write(iul,'(a41,i8)') " average # iterations                   :", nint(rcvCount(7) / rcvCount(9))
+            write(iul,'(a41,i8)') " average # function/gradient evaluations:", nint(rcvCount(6) / rcvCount(9))
+            ! write(iul,'(a)') "  exit code percentages of minimizer:"
+            write(iul,*)
+         end if
       endif
 
       select case (this%analyze_mode_)
