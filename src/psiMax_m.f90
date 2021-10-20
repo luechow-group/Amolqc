@@ -86,7 +86,7 @@ contains
 
       this%minimizer_p => create_ws_minimizer(lines)
 
-      call getinta(lines, nl, "negative_eigenvectors=", this%neg_eigv_, iflag)
+      call getinta(lines, nl, "negative_eigenvalues=", this%neg_eigv_, iflag)
       if (iflag /= 0) this%neg_eigv_ = -1
       call getinta(lines, nl, "verbose=", this%verbose_, iflag)
       call this%minimizer_p%set_verbose(this%verbose_)
@@ -271,13 +271,13 @@ contains
 
          lwork = 3*SIZE(maximum)-1
          call DSYEV('V', 'U', SIZE(maximum), H, SIZE(maximum), lambda, work2, lwork, info)
-         if (this%neg_eigv_ /= -1) then
+         if (this%neg_eigv_ > 0) then
             num_neg_eigv = 0
             do i = 1, SIZE(maximum)
                if (ABS(lambda(i)) > 1.0e-2_r8 .and. lambda(i) < 0._r8) num_neg_eigv = num_neg_eigv + 1
             end do
             if (num_neg_eigv == this%neg_eigv_) correct_num_neg_eigv = .true.
-         else
+         elseif (this%neg_eigv_ == 0) then
             do i = 1, SIZE(maximum)
                if (lambda(i) < 0._r8) is_minimum = .false.
             end do
@@ -308,12 +308,12 @@ contains
 
       idx = (/ (i, i = 1, n) /)
 
-      if (this%neg_eigv_ /= -1) then
+      if (this%neg_eigv_ > 0) then
          if (.not. correct_num_neg_eigv) then
             call this%minimizer_p%set_converged(.false.)
             iflag = 1
             end if
-      else
+      elseif (this%neg_eigv_ == 0) then
          if (.not. is_minimum) then
             call this%minimizer_p%set_converged(.false.)
             iflag = 1
@@ -374,7 +374,7 @@ contains
       if (MASTER) then
 
          write(iul,*)
-         if (this%neg_eigv_ /= -1) then
+         if (this%neg_eigv_ > 0) then
             write(iul,'(A)', advance='NO') "Summary for Saddlepoint ("
             write(iul,'(I1.1)', advance='NO') this%neg_eigv_
             write(iul,*) " negative eigenvalues) search:"
