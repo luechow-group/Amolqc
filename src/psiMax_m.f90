@@ -271,16 +271,12 @@ contains
 
          lwork = 3*SIZE(maximum)-1
          call DSYEV('V', 'U', SIZE(maximum), H, SIZE(maximum), lambda, work2, lwork, info)
-         if (this%neg_eigv_ > 0) then
+         if (this%neg_eigv_ /= -1) then
             num_neg_eigv = 0
             do i = 1, SIZE(maximum)
                if (ABS(lambda(i)) > 1.0e-2_r8 .and. lambda(i) < 0._r8) num_neg_eigv = num_neg_eigv + 1
             end do
             if (num_neg_eigv == this%neg_eigv_) correct_num_neg_eigv = .true.
-         elseif (this%neg_eigv_ == 0) then
-            do i = 1, SIZE(maximum)
-               if (lambda(i) < 0._r8) is_minimum = .false.
-            end do
          end if
       end if
       
@@ -308,13 +304,8 @@ contains
 
       idx = (/ (i, i = 1, n) /)
 
-      if (this%neg_eigv_ > 0) then
+      if (this%neg_eigv_ /= -1) then
          if (.not. correct_num_neg_eigv) then
-            call this%minimizer_p%set_converged(.false.)
-            iflag = 1
-            end if
-      elseif (this%neg_eigv_ == 0) then
-         if (.not. is_minimum) then
             call this%minimizer_p%set_converged(.false.)
             iflag = 1
             end if
@@ -375,13 +366,29 @@ contains
 
          write(iul,*)
          if (this%neg_eigv_ > 0) then
-            write(iul,'(A)', advance='NO') "Summary for Saddlepoint ("
+            write(iul,'(A)', advance='NO') "Summary for saddlepoint ("
+            write(iul,'(I1.1)', advance='NO') this%neg_eigv_
+            if (this%neg_eigv_ == 1) then
+               write(iul,*) " negative eigenvalue) search:"
+            else
+               write(iul,*) " negative eigenvalues) search:"
+            end if
+            write(iul,*)
+            write(iul,'(a41,i8)') " # minimizer calls                      :", nint(rcvCount(8))
+            write(iul,'(a41,i8)') " # minimizer converged                  :", nint(rcvCount(9))
+            write(iul,'(a41,i8)') " # saddlepoints analyzed                :", nint(rcvCount(10))
+            write(iul,'(a41,i8)') " average # iterations                   :", nint(rcvCount(7) / rcvCount(9))
+            write(iul,'(a41,i8)') " average # function/gradient evaluations:", nint(rcvCount(6) / rcvCount(9))
+            ! write(iul,'(a)') "  exit code percentages of minimizer:"
+            write(iul,*)
+         elseif (this%neg_eigv_ == 0) then
+            write(iul,'(A)', advance='NO') "Summary for critical point ("
             write(iul,'(I1.1)', advance='NO') this%neg_eigv_
             write(iul,*) " negative eigenvalues) search:"
             write(iul,*)
             write(iul,'(a41,i8)') " # minimizer calls                      :", nint(rcvCount(8))
             write(iul,'(a41,i8)') " # minimizer converged                  :", nint(rcvCount(9))
-            write(iul,'(a41,i8)') " # saddlepoints analyzed                :", nint(rcvCount(10))
+            write(iul,'(a41,i8)') " # critical points analyzed             :", nint(rcvCount(10))
             write(iul,'(a41,i8)') " average # iterations                   :", nint(rcvCount(7) / rcvCount(9))
             write(iul,'(a41,i8)') " average # function/gradient evaluations:", nint(rcvCount(6) / rcvCount(9))
             ! write(iul,'(a)') "  exit code percentages of minimizer:"
