@@ -375,6 +375,25 @@ def molpro_in(input_name,molden_name,basis,wf_type):
                             spin_function = list(str(sf).split())
                     del spin_function[0]
 
+                    for j in range(len(spin_function)):
+                        occupation = list(csf_occupations[i])
+                        single_occupation = []
+                        letters = list(spin_function[j])
+                        for k in range(len(spin_function[j])):
+                            if letters[k] in ['a', 'b']:
+                                single_occupation.append(letters[k])
+                            elif letters[k] != '*':
+                                spin_coefficient += letters[k]
+                        coefficient = float(abs(Fraction(spin_coefficient)))**0.5 \
+                                      * int(Fraction(spin_coefficient)/abs(Fraction(spin_coefficient)))
+                        for k in range(len(occupation)):
+                            if occupation[k] in ['/', '\\']:
+                                occupation[k] = single_occupation[0]
+                                del single_occupation[0]
+                        determinant = build_det(number_core_orbitals, occupation, orbital_map, coefficient)
+                        csf.determinants.append(determinant)
+                        spin_coefficient = ''
+
 
                 else:  # if no singly occupied orbitals in csf
                     occupation = list(csf_occupations[i])
@@ -384,24 +403,7 @@ def molpro_in(input_name,molden_name,basis,wf_type):
 
                 csfs.append(csf)
                 occupation_scheme = ''
-                for j in range(len(spin_function)):
-                    occupation = list(csf_occupations[i])
-                    single_occupation = []
-                    letters = list(spin_function[j])
-                    for k in range(len(spin_function[j])):
-                        if letters[k] in ['a', 'b']:
-                            single_occupation.append(letters[k])
-                        elif letters[k] != '*':
-                            spin_coefficient += letters[k]
-                    coefficient = float(abs(Fraction(spin_coefficient)))**0.5 \
-                                  * int(Fraction(spin_coefficient)/abs(Fraction(spin_coefficient)))
-                    for k in range(len(occupation)):
-                        if occupation[k] in ['/', '\\']:
-                            occupation[k] = single_occupation[0]
-                            del single_occupation[0]
-                    determinant = build_det(number_core_orbitals, occupation, orbital_map, coefficient)
-                    csf.determinants.append(determinant)
-                    spin_coefficient = ''
+
     # construction for wf_type = 'sd'
     else:
         determinant = Determinant()
