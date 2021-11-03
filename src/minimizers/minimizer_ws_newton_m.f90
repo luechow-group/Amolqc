@@ -44,6 +44,7 @@ contains
    end function constructor1
 
    subroutine minimizer_ws_newton_minimize(this, fn, x)
+      use, intrinsic :: ieee_arithmetic, only: ieee_is_normal
       class(minimizer_ws_newton), intent(inout) :: this
       class(Function_t), intent(in)                  :: fn
       real(r8), intent(inout)                         :: x(:)
@@ -100,6 +101,12 @@ contains
          ! calculate delta_x = -H^-1 * g by solving H*delta_x = -g
          delta_x = - this%dt*g
          ! ?SYSV info: https://software.intel.com/en-us/node/468912
+
+         if (.not. (ALL(ieee_is_normal(delta_x)) .and. ALL(ieee_is_normal(H)))) then
+            call this%set_converged(.false.)
+            exit
+         end if
+
          call DSYSV('U',n,1,H,n,ipiv,delta_x,n,work,n**2,info)
          !call assert(info==0, 'newton_minimize: inversion failed')
 
@@ -155,7 +162,7 @@ contains
             ! Getting eigenvalues and -vectors of Hessian
             lwork = 3*SIZE(X)-1
             call DSYEV('V', 'U', n, H, n, lambda, work2, lwork, info)
-            call assert(info==0, 'newton_minimize: diagonalization failed')
+            !call assert(info==0, 'newton_minimize: diagonalization failed')
             write(iul,*) 'hessian eigenvalues and -vectors:'
             do i = 1, n
                write(iul,*) i, lambda(i)
