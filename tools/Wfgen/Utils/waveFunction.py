@@ -361,7 +361,7 @@ class WaveFunction:
         virtual_orbitals = self.get_virtual_orbitals()
         active_orbitals = self.get_active_orbitals()
 
-        query_all_symm = input('Are all orbital symmetries used for the mo opt? [Y/n] ')
+        query_all_symm = input('Are all orbital symmetries used for the MO opt? [Y/n] ')
         if query_all_symm.lower() in ['n', 'no']:
             print('''
             Give the indices of irreps that should kept, separated by comma: ''')
@@ -700,10 +700,10 @@ class WaveFunction:
             group2 = []
 
             for index in group1_orbitals:
-                if self.orbitals[index - 1].symmetry.split('.')[1] == irrep:
+                if self.orbitals[index - 1].symmetry.split('.')[1] == str(i+1):
                    group1.append(index)
             for index in group2_orbitals:
-                if self.orbitals[index - 1].symmetry.split('.')[1] == irrep:
+                if self.orbitals[index - 1].symmetry.split('.')[1] == str(i+1):
                    group2.append(index)
             if len(group1) != 0 and len(group2) != 0:
                 orbital_rotation = OrbitalRotation()
