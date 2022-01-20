@@ -22,6 +22,7 @@ module minimizer_module
       real(r8), allocatable           :: gradient_(:)
       real(r8)                        :: max_abs_gradient_ = 0.1d0
       real(r8)                        :: max_mean_gradient_ = 0.1d0
+      integer, allocatable            :: not_to_minimize_(:)
       logical                       :: converged_ = .false.
       integer                       :: current_iterations_ = 0
       integer                       :: max_iterations_ = 100
@@ -35,6 +36,7 @@ module minimizer_module
       procedure                                :: set_convergence_distance
       procedure                                :: set_convergence_gradient
       procedure                                :: set_convergence_gradnorm
+      procedure                                :: set_not_to_minimize
       procedure                                :: convergence_distance
       procedure                                :: convergence_gradient
       procedure                                :: convergence_gradnorm
@@ -46,6 +48,7 @@ module minimizer_module
       procedure                                :: gradient
       procedure                                :: gradnorm
       procedure                                :: set_gradient
+      procedure                                :: restrict_gradient
       procedure                                :: iterations
       procedure                                :: set_iterations
       procedure                                :: max_iterations
@@ -108,6 +111,31 @@ contains
       real(r8), intent(in)              :: gradnorm
       this%convergence_max_gradnorm_ = gradnorm
    end subroutine set_convergence_gradnorm
+
+   subroutine set_not_to_minimize(this, not_to_minimize)
+      class(minimizer), intent(inout) :: this
+      integer, intent(in)             :: not_to_minimize(:)
+      this%not_to_minimize_ = not_to_minimize
+   end subroutine set_not_to_minimize
+
+   subroutine restrict_gradient(this, gradient, hessian)
+      class(minimizer), intent(inout)   :: this
+      real(r8), intent(inout)           :: gradient(:)
+      real(r8), intent(inout), optional :: hessian(:,:)
+      integer                           :: i, j
+
+      if (ALLOCATED(this%not_to_minimize_)) then
+         do i=1, SIZE(this%not_to_minimize_)
+            j = this%not_to_minimize_(i)
+            gradient(j) = 0._r8
+            if (PRESENT(hessian)) then
+               hessian(j,:) = 0._r8
+               hessian(:,j) = 0._r8
+               hessian(j,j) = 1._r8
+            end if
+         end do
+      end if
+   end subroutine restrict_gradient
 
    function convergence_distance(this) result(distance)
       class(minimizer), intent(inout) :: this
@@ -238,6 +266,8 @@ contains
          write(iull, "(a,g13.5)") " convergence_gradient=", this%convergence_max_gradient_
       if (this%convergence_max_gradnorm_ > 0.d0)  &
          write(iull, "(a,g13.5)") " convergence_gradnorm=", this%convergence_max_gradnorm_
+      if (ALLOCATED(this%not_to_minimize_))  &
+         write(iull, "(a,g13.5)") " not_to_minimize=", this%not_to_minimize_
    end subroutine write_params_minimizer
 
    subroutine write_opt_path(this, counter)

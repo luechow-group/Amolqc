@@ -6,7 +6,7 @@ module minimizer_ws_factory_module
 
    use kinds_m, only: r8
    use error_m, only: error
-   use parsing_m, only: getdbla, getstra, getinta, finda
+   use parsing_m, only: getdbla, getstra, getinta, finda, getintarra
    use singularityCorrection_m, only: singularity_correction, NONE, CUTSTEP, UMRIGAR
    use line_search_ws_simple_module, only: line_search_ws_simple
    use line_search_weak_wolfe_module, only: line_search_weak_wolfe
@@ -31,6 +31,7 @@ contains
       integer iflag, iflag1, iflag2, nlines, max_iter, mode, latency, switch_step
       logical yn, scaling
       character(len=20) value, string, str
+      integer, allocatable :: not_to_minimize(:)
       type(fire_parameters) :: params
       type(line_search_ws_simple)     :: lss
       type(line_search_weak_wolfe)    :: lsww
@@ -193,6 +194,8 @@ contains
          gradient = 1.d-4
          call getdbla(lines, nlines, "convergence_gradient=", gradient, iflag)
          call minimizer_p%set_convergence_gradient(gradient)
+         call getintarra(lines, nlines, "not_to_minimize=", not_to_minimize, iflag)
+         if (iflag == 0) call minimizer_p%set_not_to_minimize(not_to_minimize)
       end if
 
    end function create_ws_minimizer

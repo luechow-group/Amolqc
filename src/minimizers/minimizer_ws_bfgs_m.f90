@@ -99,6 +99,8 @@ contains
       call this%sc_%correct_for_singularities(x, p, sp, is_corrected, correction_only=.false.)
       where ( sp%At_singularity() ) g = 0.d0
 
+      call this%restrict_gradient(g)
+
       if (verbose > 0) then 
          write(iul,"(a,g20.10)") " initial position with function value f=", f
          if (verbose > 1) then
@@ -174,7 +176,11 @@ contains
          end if
 
          !! line search with distance restriction
+         call this%restrict_gradient(g)
+
          call this%lss_%find_step(fn, this%sc_, x, f, g, p, x_new, g_new, ls_iter, is_corrected, sp)
+         call this%restrict_gradient(g_new)
+
 
          if (debug) call assert(all(abs(x)<huge(1.d0)), "minimizer_ws_bfgs_minimize: illegal x coords after find_step")
 

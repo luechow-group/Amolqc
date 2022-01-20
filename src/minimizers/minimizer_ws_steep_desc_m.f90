@@ -84,6 +84,7 @@ contains
 
       ! before the first step, check for singularities, but with zero step and set particles to singularities
       delta_x = 0._r8
+      call this%restrict_gradient(g)
       call this%sc_%correct_for_singularities(x, delta_x, sp, is_corrected, correction_only=.false.)
       where ( sp%At_singularity() ) g = 0.d0
 
@@ -103,6 +104,7 @@ contains
          if (verbose > 3) write(iul,"(a,i6)") " iter=", iter
 
          dt = this%dt_
+         call this%restrict_gradient(g)
          delta_x = - dt * g
          f_old = f
          ls_iter = 5
@@ -115,7 +117,7 @@ contains
 
          x = x_new
          g = g_new
-
+         call this%restrict_gradient(g)
          where ( sp%At_singularity() ) g = 0.d0
 
          gmax = maxval(abs(g))

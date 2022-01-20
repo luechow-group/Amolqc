@@ -564,6 +564,8 @@ save_opt_paths       : triggers saving the maximization path in the .ref format.
                        i.e. fort.300, fort.301, ... Entry (k, m) means: m-th iteration step of the k-th maximization
 negative_eigenvalues=-1 : if non-zero checks number of negative eigenvalues of the Hessian, with absolute value larger
                           than 1e-2. Only critical points with given number of negative eigenvalues are analyzed.
+not_to_minimize      : list of indices of coordinates, which should not be optimized (e.g. =3;6;9 in order to not
+                       optimize the z coordinates of the 1st, 2nd, and 3rd electrons)
 
 singularity correction parameters:
 correction_mode=[cut|umr|cut_all|umr_all|none]:
