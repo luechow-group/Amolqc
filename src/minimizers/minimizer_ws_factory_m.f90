@@ -109,8 +109,11 @@ contains
 
          call getdbla(lines, nlines, "step_size=", step_size, iflag)
          if (iflag /= 0) step_size = .02_r8
-
-         minimizer_p => minimizer_ws_newton(sc_p, step_size, delta_max)
+         if (iflag1 == 0) then
+            minimizer_p => minimizer_ws_newton(sc_p, step_size, delta_max)
+         else
+            minimizer_p => minimizer_ws_newton(sc_p, step_size)
+         end if
       else if (value == "fire") then
 
          call getdbla(lines, nlines, "tau_init=", params%tau_init, iflag)

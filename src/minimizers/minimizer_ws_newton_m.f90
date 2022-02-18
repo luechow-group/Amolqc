@@ -18,7 +18,7 @@ module minimizer_ws_newton_module
 
    type, extends(minimizer_w_sing) :: minimizer_ws_newton
       real(r8) :: dt = 1._r8
-      real(r8) :: delta_max = 0._r8
+      real(r8) :: delta_max = -1._r8
    contains
       procedure :: minimize => minimizer_ws_newton_minimize
       procedure :: write_params_minimizer_ws_newton
