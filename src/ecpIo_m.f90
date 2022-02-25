@@ -198,7 +198,8 @@ CONTAINS
             ! check if first 3 characters are ECP name, cycle if not
             ecpname = atoms(a)%ba(1:3)
             if (ecpname /= 'LES' .and. ecpname /= 'SBK' .and. ecpname /= 'STU'   &
-               .and. ecpname /= 'NEE' .and. ecpname /='BFD' .and. ecpname /='CRE' .and. ecpname /='MIT') cycle
+               .and. ecpname /= 'NEE' .and. ecpname /='BFD' .and. ecpname /='CRE' .and. ecpname /='MIT' &
+               .and. ecpname /='MHE') cycle
             ecpfname = trim(basispath)//'/ecp/'//ecpname//'.ecp'
             if (MASTER) then
                inquire(file=ecpfname,exist=fileExists)
@@ -216,7 +217,8 @@ CONTAINS
          ecpname = basis(1:3)
 
          if (ecpname == 'LES' .or. ecpname == 'SBK' .or. ecpname == 'STU'    &
-            .or. ecpname == 'NEE' .or. ecpname =='BFD' .or. ecpname =='CRE' .or. ecpname =='MIT') then
+            .or. ecpname == 'NEE' .or. ecpname =='BFD' .or. ecpname =='CRE' .or. ecpname =='MIT' &
+            .or. ecpname == 'MHE') then
             ecpfname = trim(basispath)//'/ecp/'//ecpname//'.ecp'
             if (MASTER) then
                inquire(file=ecpfname, exist=fileExists)
