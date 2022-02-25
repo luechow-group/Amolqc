@@ -1,0 +1,20 @@
+# He core ccECPs by Lubos Mitas. 
+#
+# Nickname: MHE
+# https://pseudopotentiallibrary.org/ 
+#
+# 3rd row main-group elements: J. Chem. Phys. 149, 104108 (2018)
+#
+
+####Silicon
+14 2 1
+3
+  12.000000 1 12.066048
+ 144.792575 3 15.276621
+ -99.229393 2 14.506273
+2
+  25.228329 2 92.046246
+ 150.483122 2 30.895726
+ ****
+
+
