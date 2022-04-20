@@ -43,7 +43,7 @@ contains
       na_all = na
       call myMPIReduceSumInteger(na, na_all, 4)
       if (wout) then
-         write(iul,'(a,2(i6,a))') " maximization of ", na_all(1), " electron configurations with", na_all(2), " converged"
+         write(iul,'(a,2(i8,a))') " maximization of ", na_all(1), " electron configurations with ", na_all(2), " converged"
          if (na_all(2) > 0) then
             write(iul,'(a,2(i6,a))') " mean # of function evaluations: ", na_all(3) / na_all(2)
             write(iul,'(a,2(i6,a))') " mean # of iterations          : ", na_all(4) / na_all(2)
