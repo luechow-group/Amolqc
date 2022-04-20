@@ -321,7 +321,8 @@ full_localisation: ECP localization with Jastrow factor(default)
 [no_]random_rotation: use [fixed] random axis system for grid integration
 cutoff=x: if given, ECP cutoff is turned on. This calculates for each atom
   a cutoff radius for the non-local part. The calculated radii are shown with
-  verbose>=2.
+  verbose>=2. They are calculated as the radii where all local components are
+  smaller than the given cutoff value.
 [full|no|nonlocal]_cutoff: Cutoff for all channels (local and non-local)
                            no cutoff Cutoff only for non-local channels(default)
 grid_points=n: Set same integration grid points for all atoms.
