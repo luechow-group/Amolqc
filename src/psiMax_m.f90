@@ -87,7 +87,7 @@ contains
       this%minimizer_p => create_ws_minimizer(lines)
 
       call getinta(lines, nl, "negative_eigenvalues=", this%neg_eigv_, iflag)
-      if (iflag /= 0) this%neg_eigv_ = -1
+      if (iflag /= 0) this%neg_eigv_ = 0
       call getinta(lines, nl, "verbose=", this%verbose_, iflag)
       call this%minimizer_p%set_verbose(this%verbose_)
       call this%minimizer_p%set_verbose_unit(iull)
@@ -274,7 +274,12 @@ contains
          if (this%neg_eigv_ /= -1) then
             num_neg_eigv = 0
             do i = 1, SIZE(maximum)
-               if (ABS(lambda(i)) > 1.0e-2_r8 .and. lambda(i) < 0._r8) num_neg_eigv = num_neg_eigv + 1
+               if (ABS(lambda(i)) > 1.0e-2_r8 .and. lambda(i) < 0._r8) then
+                  num_neg_eigv = num_neg_eigv + 1
+               else
+                  ! eigen values from *SYEV are sorted
+                  exit
+               end if
             end do
             if (num_neg_eigv == this%neg_eigv_) correct_num_neg_eigv = .true.
          end if
@@ -365,26 +370,14 @@ contains
       if (MASTER) then
 
          write(iul,*)
-         if (this%neg_eigv_ > 0) then
-            write(iul,'(A)', advance='NO') "Summary for saddlepoint ("
+         if (this%neg_eigv_ >= 0) then
+            write(iul,'(A)', advance='NO') "Summary for critical point ("
             write(iul,'(I1.1)', advance='NO') this%neg_eigv_
             if (this%neg_eigv_ == 1) then
                write(iul,*) " negative eigenvalue) search:"
             else
                write(iul,*) " negative eigenvalues) search:"
             end if
-            write(iul,*)
-            write(iul,'(a41,i8)') " # minimizer calls                      :", nint(rcvCount(8))
-            write(iul,'(a41,i8)') " # minimizer converged                  :", nint(rcvCount(9))
-            write(iul,'(a41,i8)') " # saddlepoints analyzed                :", nint(rcvCount(10))
-            write(iul,'(a41,i8)') " average # iterations                   :", nint(rcvCount(7) / rcvCount(9))
-            write(iul,'(a41,i8)') " average # function/gradient evaluations:", nint(rcvCount(6) / rcvCount(9))
-            ! write(iul,'(a)') "  exit code percentages of minimizer:"
-            write(iul,*)
-         elseif (this%neg_eigv_ == 0) then
-            write(iul,'(A)', advance='NO') "Summary for critical point ("
-            write(iul,'(I1.1)', advance='NO') this%neg_eigv_
-            write(iul,*) " negative eigenvalues) search:"
             write(iul,*)
             write(iul,'(a41,i8)') " # minimizer calls                      :", nint(rcvCount(8))
             write(iul,'(a41,i8)') " # minimizer converged                  :", nint(rcvCount(9))
