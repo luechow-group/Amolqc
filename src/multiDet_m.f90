@@ -1756,7 +1756,7 @@ CONTAINS
       deti = A
 
       !  LU decomposition using Lapack/NAG routine
-      call dgetrf(N,N,deti(1,1),size(deti,1),ipiv(1),info1)
+      call dgetrf(N,N,deti,size(deti,1),ipiv(1),info1)
 
       if (info1 == 0) then
 
