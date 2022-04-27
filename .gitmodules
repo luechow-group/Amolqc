@@ -1,6 +1,3 @@
 [submodule "pFUnit"]
 	path = pFUnit
 	url = https://github.com/Goddard-Fortran-Ecosystem/pFUnit.git
-[submodule "fortran-yaml"]
-	path = fortran-yaml
-	url = https://github.com/BoldingBruggeman/fortran-yaml
