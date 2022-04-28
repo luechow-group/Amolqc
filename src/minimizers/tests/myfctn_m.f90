@@ -49,8 +49,8 @@ contains
    subroutine myFunction_t_eval(this, x, f, g)
       class(myFunction_t), intent(in) :: this
       real(r8), intent(in) :: x(:)       ! coordinate
-      real(r8), intent(inout) :: f       ! function value
-      real(r8), intent(inout) :: g(:)    ! gradient
+      real(r8), intent(out) :: f       ! function value
+      real(r8), intent(out) :: g(:)    ! gradient
       integer i
       f = 0.d0
       do i = 1, size(x)
@@ -95,8 +95,8 @@ contains
    subroutine mysingFunction_t_eval(this, x, f, g)
       class(mysingFunction_t), intent(in) :: this
       real(r8), intent(in) :: x(:)       ! coordinate
-      real(r8), intent(inout) :: f       ! function value
-      real(r8), intent(inout) :: g(:)    ! gradient
+      real(r8), intent(out) :: f       ! function value
+      real(r8), intent(out) :: g(:)    ! gradient
       real(r8) g1d(3), g2d(3), h1d(3), h2d(3), f1d(3), f2d(3)
       real(r8) ra1, ra2, rb12, rb22, g1, g2, h1, h2
       if (asserts) call assert(size(x) == size(g) .and. size(x) == 6, "mysingfctn: size must be 6")

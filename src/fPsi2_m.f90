@@ -22,8 +22,8 @@ contains
    subroutine fpsi2_fg(this, x, f, g)
       class(fctn_psi2), intent(in)  :: this
       real(r8), intent(in) :: x(:)      ! electron vector (without elecs at cores)
-      real(r8), intent(inout) :: f      ! function value
-      real(r8), intent(inout) :: g(:)   ! gradient
+      real(r8), intent(out) :: f      ! function value
+      real(r8), intent(out) :: g(:)   ! gradient
       type(eConfigArray)  :: eca
       real(r8), allocatable :: xx(:), yy(:), zz(:)
       integer n, i, error_code

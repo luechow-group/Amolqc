@@ -52,8 +52,8 @@ contains
       ! currently simple symmetric 2-point formula with fixed h
       class(Function_t), intent(in)   :: this
       real(r8), intent(in)    :: x(:)    ! coordinate
-      real(r8), intent(inout) :: f       ! function value
-      real(r8), intent(inout) :: g(:)    ! gradient
+      real(r8), intent(out) :: f       ! function value
+      real(r8), intent(out) :: g(:)    ! gradient
       real(r8) :: xx(SIZE(x))
       real(r8) f1, f2
       integer i
@@ -78,9 +78,9 @@ contains
       ! currently simple symmetric 2-point formula with fixed h
       class(Function_t), intent(in)   :: this
       real(r8), intent(in)    :: x(:)    ! coordinate
-      real(r8), intent(inout) :: f       ! function value
-      real(r8), intent(inout) :: g(:)    ! gradient
-      real(r8), intent(inout) :: H(:,:)  ! hessian
+      real(r8), intent(out) :: f       ! function value
+      real(r8), intent(out) :: g(:)    ! gradient
+      real(r8), intent(out) :: H(:,:)  ! hessian
       real(r8) :: xx(SIZE(x))
       real(r8), dimension(SIZE(g)) :: g1, g2
       real(r8) :: f_temp
