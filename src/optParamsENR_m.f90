@@ -164,6 +164,38 @@ contains
                end if
             end do
             H = H0 + nu*Imat
+
+         else if (NRMode == 4) then
+
+            H = H0
+            do i=1,np
+               H(i,i) = H(i,i)*(1+nu)
+            enddo
+
+            if (logmode >= 2) write(iul,'(/a)') ' find Newton step:'
+            do iter=1,10
+               call dpotrf('L',np,H,np,info)  ! Cholesky decomposition
+               if (info == 0) then
+                  write(iul,'(i3,a,f15.6,a)') iter,':  nu = ',nu, ' Hessian positive definite'
+               else if (info > 0) then
+                  write(iul,'(i3,a,f15.6,a)') iter,':  nu = ',nu, ' Hessian not positive definite'
+               else
+                  write(iul,*) ' !!! WARNING !!! Cholesky decomp error'
+               end if
+               if (info > 0) then !! not positive definite
+                  nu = 4*nu
+                  H = H0
+                  do i=1,np
+                     H(i,i) = H(i,i)*(1+nu)
+                  enddo
+               else
+                  exit
+               end if
+            end do
+            H = H0
+            do i=1,np
+               H(i,i) = H(i,i)*(1+nu)
+            enddo
          end if
 
          p = wfparams_get(WFP)
@@ -301,12 +333,14 @@ contains
          NRMode = 3
          call getstra(lines,nl,'method=',optMethod,iflag)
          if (iflag==0) then
-            if (optMethod=='newton') then
+            if (optMethod=='nr' .or. optMethod=='newton') then  ! Newton-Raphson
                NRMode = 1
-            else if (optMethod=='scaled_newton') then
+            else if (optMethod=='scaled_nr' .or. optMethod=='scaled_newton') then
                NRMode = 2
-            else if (optMethod=='lm_newton') then
+            else if (optMethod=='snr' .or. optMethod=='lm_newton') then  ! stabilized Newton-Raphson
                NRMode = 3
+            else if (optMethod=='lm') then  ! Levenberg-Marquardt
+               NRMode = 4
             else
                call abortp("$optimize_parameters: illegal newton method name")
             end if
