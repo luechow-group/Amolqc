@@ -94,11 +94,12 @@ contains
          optERef=eOld
          ! In cases that user do not specify E_ref using sample emean as first E_ref
          ! is not usualy so 0.02 is added to improve initial value.
-         if (eqStep==0) optERef=optERef*1.02
+         if (eqStep==0) optERef=optERef*1.02_r8
 
      else
       if (.not.fixed .and. eqStep>0) optERef=eOld
      end if
+     EPsiTLM%EPTB%eRef = optERef
      varOld = ElocAndPsiTermsLM_varALL(EPsiTLM)
      varRefOld = ElocAndPsiTermsLM_varRefALL(EPsiTLM)
 

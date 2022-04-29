@@ -16,7 +16,6 @@ module elocAndPsiTermsLM_m
 
 
    type, public :: ElocAndPsiTermsLM
-      private
       type(ElocAndPsiTermsBase) :: EPTB
       real(r8), pointer :: vxSum(:) => null()
       real(r8), pointer :: vxySum(:,:) => null()
