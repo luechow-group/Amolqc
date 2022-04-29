@@ -441,7 +441,7 @@ contains
          real(r8)  :: e0,var0   ! E and Var for unit step length
          real(r8)  :: lambdaOpt ! calculated optimal step length
          integer n,cfIdx
-         real(r8) d,cfmin,cf,var,cf1
+         real(r8) d,cfmin,cf,var,cf1,cfs(6),x1,x2,x3,y1,y2,y3,r1,r2,r3
 
          lambda = (/ 0.02d0, 0.1d0, 0.3d0, 0.5d0, 0.7d0, 1.d0 /)
 
@@ -464,6 +464,7 @@ contains
             var = ElocAndPsiTermsENR_varALL(EPsiTENR)
 
             cf = abs(e0-targetE) + cffac* abs(var-targetVar)
+            cfs(n) = cf
             if (logmode >= 2) write(iul,'(I5,A,F10.2,A,F15.5,A,F15.5,A,F15.5)') &
                n,': lambda=',lambda(n),' Emean =',e0,' var = ',var,' cf = ',cf
             if (cf < cfmin) then
@@ -476,7 +477,20 @@ contains
 
          if (lambda(cfIdx) < dmax/d) then
             if ((cf1-cfmin)/cfmin > 0.05) then
-               lambdaOpt = lambda(cfIdx)
+               if (cfIdx > 1 .and. cfIdx < 6) then
+                  x1 = lambda(cfIdx - 1)
+                  x2 = lambda(cfIdx)
+                  x3 = lambda(cfIdx + 1)
+                  y1 = cfs(cfIdx - 1)
+                  y2 = cfs(cfIdx)
+                  y3 = cfs(cfIdx + 1)
+                  r1 = x1 * (y3 - y2)
+                  r2 = x2 * (y1 - y3)
+                  r3 = x3 * (y2 - y1)
+                  lambdaOpt = (x3 * r3 + x2 * r2 + x1 * r1) / (2 * (r1 + r2 + r3))
+               else
+                  lambdaOpt = lambda(cfIdx)
+               end if
             else
                lambdaOpt = 1.d0
             end if
