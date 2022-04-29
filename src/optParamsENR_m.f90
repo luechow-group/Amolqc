@@ -44,10 +44,10 @@ contains
    real(r8), allocatable                  :: fifj(:,:),fifjEL(:,:),fiELj(:,:),fij(:,:),fijEL(:,:)
    real(r8), allocatable                  :: A(:,:),B(:,:),D(:,:),Imat(:,:)
    !!!real(r8), allocatable                  :: eval(:),evec(:,:)
-   integer lwork,i,j,info,n,ierr,eqIter, eqStep, nSize, gmode, NRMode, iflag, iter,optIter
+   integer lwork,i,j,info,n,ierr,eqIter, eqStep, nSize, NRMode, iflag, iter,optIter
    integer, allocatable                 :: ipiv(:)
    real(r8), allocatable                  :: work(:)
-   real(r8)                               :: targetE, targetVar,cffac,dmax,maxVar, lambda(6), lambdaOpt, eRef
+   real(r8)                               :: targetE, targetVar,cffac,dmax,maxVar, lambda(6), lambdaOpt, eRef, gfac
    real(r8)                               :: nu,r,delta_q,delta_f,normdp,mabsdp,nuStart,deltaFmin
    type(ElocAndPsiTermsENR)             :: EPsiTENR
    character(len=80)                    :: subName,fname
@@ -70,7 +70,7 @@ contains
 
    if (logmode>=2) then
       write(iul,'(/A/)') '   - -  energy minimization using Newton-Raphson: initialization  - -'
-      write(iul,'(a,i3,a,i3)') ' parameters:  nrmethod = ',NRMode,'   gradient mode = ',gmode
+      write(iul,'(a,i3,a,f12.3)') ' parameters:  nrmethod = ',NRMode,'   gradient factor = ',gfac
    endif
 
    np = ElocAndPsiTermsENR_nParams(EPsiTENR)
@@ -345,8 +345,8 @@ contains
                call abortp("$optimize_parameters: illegal newton method name")
             end if
          end if
-         gmode = 1
-         call getinta(lines,nl,'gmode=',gmode,iflag)
+         gfac = 0
+         call getdbla(lines,nl,'gfac=',gfac,iflag)
          call getdbla(lines,nl,'target_E=',targetE,iflag)
          if (iflag /= 0 .and. NRmode==2) call abortp('scaled_newton: target_E option required')
          call getdbla(lines,nl,'target_var=',targetVar,iflag)
@@ -430,6 +430,8 @@ contains
          D = D + fiELj + TRANSPOSE(fiELj)
 
          H = A + B + D
+
+         g = g + gfac * ELi
       end subroutine internal_calcGradAndHessian
 
       subroutine internal_chooseStepLength(lambdaOpt)
