@@ -765,12 +765,13 @@ options: energy_min|variance_min,params,method,optmode,eq_iter
 params=[jastrow|ci|mo|jas+ci|jas+mo|mo+ci,jas+mo+ci]
         The order is important.
 energy_min: (minimization w.r.t. the sample energy)
-  method=[newton|scaled_newton|lm_newton|tr_newton|eminlin|popt] default is lm_newton
-   newton: simple several Newton-Raphson energy minimization
-   scaled_newton: Newton step is scaled w.r.t a cost function
-   lm_newton: Levenberg-Marquardt Newton step. Hessian is modified to ensure it is positive definite
-   tr_newton: trust-region Newton-Raphson energy using the DNMTR code (newton or eminlin is preferable)
-   eminlin: linear energy minimization as suggested by C. Umrigar with scaling step
+  method=[nr|scaled_nr|snr|lm|tr_newton|lin|popt] default is lm_newton
+   nr: simple several Newton-Raphson energy minimization
+   scaled_nr: Newton step is scaled w.r.t a cost function
+   snr: stabilized Newton-Raphson
+   lm: Levenberg-Marquardt Newton step. Hessian is modified to ensure it is positive definite
+   tr_newton: trust-region Newton-Raphson energy using the DNMTR code (nr or lin is preferable)
+   lin: linear energy minimization as suggested by C. Umrigar with scaling step
    popt: perturbative energy minimization Toulouse, Umrigar 2007
 variance_min: (minimization w.r.t. the sample variance)
   method=[varmin|lm] default is varmin
