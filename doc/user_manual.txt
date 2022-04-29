@@ -765,7 +765,7 @@ options: energy_min|variance_min,params,method,optmode,eq_iter
 params=[jastrow|ci|mo|jas+ci|jas+mo|mo+ci,jas+mo+ci]
         The order is important.
 energy_min: (minimization w.r.t. the sample energy)
-  method=[nr|scaled_nr|snr|lm|tr_newton|lin|popt] default is lm_newton
+  method=[nr|scaled_nr|snr|lm|tr_newton|lin|popt] default is snr
    nr: simple several Newton-Raphson energy minimization
    scaled_nr: Newton step is scaled w.r.t a cost function
    snr: stabilized Newton-Raphson

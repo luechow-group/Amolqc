@@ -55,7 +55,7 @@ contains
    if (varMin) then
       optMethod = 'varmin'
    else
-      optMethod = 'lm_newton'
+      optMethod = 'snr'
    end if
    call getstra(lines,nl,'method=',optMethod,iflag)
    optMode = 1
