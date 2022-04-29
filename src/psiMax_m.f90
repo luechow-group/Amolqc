@@ -68,6 +68,7 @@ module psiMax_m
       procedure :: iterations => psimax_iterations
       procedure :: write_results => psimax_writeResults
       procedure :: get_analyze_mode => psimax_getAnalyzeMode
+      procedure :: correctForSingularities => psimax_correctForSingularities
    end type psimax
 
    ! counters variables:
@@ -196,6 +197,33 @@ contains
 
       call this%minimizer_p%write_params(iu)
    end subroutine psimax_writeParams
+
+
+   subroutine psimax_correctForSingularities(this, sample, H)
+      class(psimax), intent(inout) :: this
+      type(singularity_particles)  :: sp
+      real(r8)                     :: x(getNElec()), y(getNElec()), z(getNElec())
+      real(r8), intent(inout)      :: sample(3*getNElec())
+      real(r8)                     :: xx(3*getNElec())
+      real(r8), intent(inout)      :: H(:,:)
+      real(r8)                     :: g(SIZE(xx))
+      real(r8)                     :: f, delta_x(SIZE(xx))
+      real(r8)                     :: step_size
+      logical                      :: is_corrected
+      integer                      :: n, i
+
+      !initialize variables
+      n = getNElec()
+      step_size = 0.2_r8
+
+      !correct for singularities
+      call this%fg%eval_fgh(sample, f, g, H)
+      call sp%create(SIZE(sample)/3, this%minimizer_p%sc_%n_singularities())
+      delta_x = 0._r8
+      call this%minimizer_p%sc_%correct_for_singularities(sample, delta_x, sp, is_corrected, correction_only=.false.)
+      call sp%Fix_gradients(g, H)
+
+   end subroutine psimax_correctForSingularities
 
 
    subroutine psimax_opt(this, rw, update_walker)
