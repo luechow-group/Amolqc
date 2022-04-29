@@ -38,7 +38,7 @@ contains
    integer                              :: nParams, np,npCI
    real(r8), allocatable                  :: p(:),p0(:)       ! parameter vector
    real(r8), allocatable                  :: delta_p(:)       ! change of parameter vector
-   real(r8), allocatable                  :: g(:),g1(:),bb(:),H(:,:),H0(:,:)  ! gradient and Hessian
+   real(r8), allocatable                  :: g(:),bb(:),H(:,:),H0(:,:)  ! gradient and Hessian
    real(r8)                               :: e0,var,pe0,pvar
    real(r8), allocatable                  :: fi(:),ELi(:),fiEL(:)
    real(r8), allocatable                  :: fifj(:,:),fifjEL(:,:),fiELj(:,:),fij(:,:),fijEL(:,:)
@@ -79,7 +79,7 @@ contains
 
 
    call assert(np>0,'eminNR_optimizeSample: no parameters')
-   allocate(p(np),p0(np),delta_p(np),bb(np),g(np),g1(np),H(np,np),H0(np,np),ipiv(np),work(np*np))
+   allocate(p(np),p0(np),delta_p(np),bb(np),g(np),H(np,np),H0(np,np),ipiv(np),work(np*np))
    allocate(fi(np),ELi(np),fiEL(np))
    allocate(fifj(np,np),fifjEL(np,np),fiELj(np,np),fij(np,np),fijEL(np,np))
    allocate(A(np,np),B(np,np),D(np,np),Imat(np,np))
@@ -318,7 +318,7 @@ contains
 
    call setCurrentResult(e0,0.d0,var)
 
-!    deallocate(p,p0,delta_p,bb,g,g1,H,H0,Imat,ipiv,work)
+!    deallocate(p,p0,delta_p,bb,g,H,H0,Imat,ipiv,work)
 !    deallocate(fi,ELi,fiEL)
 !    deallocate(fifj,fifjEL,fiELj,fij,fijEL)
 !    deallocate(A,B,D)
@@ -418,23 +418,16 @@ contains
       subroutine internal_calcGradAndHessian(g,H)
          real(r8) :: g(:)
          real(r8) :: H(:,:)
-         select case (gmode)
-         case (1)
-            g = 2*( fiEL - e0*fi )
-         case (2)
-            g = 2*( fiEL - e0*fi ) + ELi
-         case (3)
-            g = 2*( fiEL - e0*fi ) + 2*ELi
-         end select
-         g1 = 2*( fiEL - e0*fi )
 
-         A = 2*( fijEL - fij*e0 - fifjEL + fifj*e0 )
-         do j=1,np
-            B(:,j) = -2*( fi(:)*g1(j) + fi(j)*g1(:) )
-            D(:,j) = -fi(:)*ELi(j) - fi(j)*ELi(:)
+         g = 2 * (fiEL - fi * e0)
+
+         A = 2 * (fijEL - fij * e0 - fifjEL + fifj * e0)
+         do j = 1, np
+            B(:, j) = -2 * (fi(:) * g(j) + fi(j) * g(:))
+            D(:, j) = - fi(:) * ELi(j) - fi(j) * ELi(:)
          enddo
-         B = B + 4*( fijEL - fij*e0 )
-         D = D + fiELj + transpose(fiELj)
+         B = B + 4 * (fifjEL - fifj * e0)
+         D = D + fiELj + TRANSPOSE(fiELj)
 
          H = A + B + D
       end subroutine internal_calcGradAndHessian
