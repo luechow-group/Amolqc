@@ -50,7 +50,7 @@ $qmc(vmc,steps=300,block_len=100,accept_ratio=0.5,discard_all)
 $qmc(vmc,accumulate,step_stride=10,acc_size=700,block_len=100,
 accept_ratio=0.5,discard=1,move=umr)
 $sample(remove_outliers,no_replace)
-$optimize_parameters(params=jas+mo+ci,method=eminlin,eq_iter=2
+$optimize_parameters(params=jas+mo+ci,method=lin,eq_iter=2
 ,energy_min,eq_call=aeq,
 target_E=-75.0,target_var=0.0,max_ev=5,cffac=0.05,
 mo_update_mode=2, mo_param_mode=2,
