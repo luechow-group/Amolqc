@@ -3,7 +3,7 @@ $wf(read, file='H2O.wf')
 $generate_walker(steps=1500, block_len=500)
 $change_jastrow(new_jastrow=ic444)
 $qmc(vmc, steps=1500, block_len=500, discard_all)
-$jastrow_varmin_fast(E_ref=-77.00, acc_size=1500, block_len=300, eq_iter=5)
+$jas_varmin_fast(E_ref=-77.00, acc_size=1500, block_len=300, eq_iter=5)
 
 !You can run VMC after optimization with last parameter set.
 !but it is better to take a look on energy and variance of parameter set then
