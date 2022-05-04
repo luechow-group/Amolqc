@@ -1919,17 +1919,17 @@ contains
 
     if (this%en%gnum > 0) then
       do i=1,this%en%gnum
-        write(iu, "(D15.7)") this%en%gl(i)
+        write(iu, "(ES15.7)") this%en%gl(i)
       end do
     end if
     if (this%een%geennum > 0 ) then
       do i=1,this%een%geennum
-        write(iu, "(D15.7)") this%een%geen(i)
+        write(iu, "(ES15.7)") this%een%geen(i)
       end do
     end if
     if (this%eenn%geennnum > 0) then
       do i=1,this%eenn%geennnum
-        write(iu, "(D15.7)") this%eenn%geenn(i)
+        write(iu, "(ES15.7)") this%eenn%geenn(i)
       end do
     end if
 
