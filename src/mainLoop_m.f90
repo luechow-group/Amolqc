@@ -60,8 +60,6 @@ subroutine mainloop
    character(len=MAXLEN)       :: blockLines(MAXLINES)=''
    character(len=MAXLEN)       :: macroLines(MAXLINES)=''
    character(len=180)          :: macropath,macrofile,subName
-   character(len=15)           :: si = ' =======>      '
-   character(len=14)           :: sf = '      <======='
    type(RWSample)              :: smpl
    type(psimax)                :: psimax_obj
    type(rhoMax_t)              :: rhoMax
@@ -266,7 +264,7 @@ subroutine mainloop
             subLine = subLine + 1
             subLines(subLine,subIdx) = inLines(idx+subLine-1)
          end do
-         if (wout) write(iul,'(/a)') si//' $subroutine: storing subroutine '//trim(subName)//sf
+         if (wout) call printHeader(iul, getFormattedHeader('subroutine', 'storing subroutine' // trim(subName)))
       
       ! loop commands
       case('begin_loop')

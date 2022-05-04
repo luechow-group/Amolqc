@@ -67,8 +67,6 @@ subroutine subloop(subname, smpl, exitSubLoop, psimax_obj)
    character(len=MAXLEN)       :: inLines(MAXLINES)=''
    character(len=MAXLEN)       :: blockLines(MAXLINES)=''
    character(len=MAXLEN)       :: macroLines(MAXLINES)=''
-   character(len=15)           :: si = ' =======>      '
-   character(len=14)           :: sf = '      <======='
    character(len=180)          :: macropath,macrofile
    integer                     :: idx,nbl,nil,i,iuf,io,nnew,iflag,fileExistsInt,exitLoopInt,exitLoopSum
    integer                     :: loopIdx,loopIter,currentLoopIter,subIdx
@@ -137,48 +135,48 @@ subroutine subloop(subname, smpl, exitSubLoop, psimax_obj)
       call cpu_time(startCPU)
 
       if (token=='change_jastrow') then
-         if (wout) write(iul,'(/a/)') si//'$change_jastrow - changing Jastrow terms'//sf
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'changing Jastrow terms'))
          call jasChangeType(blocklines,nbl)
          call recalculateSample(smpl)
       else if (token=='change_parameters') then
-         if (wout) write(iul,'(/a/)') si//'$change_parameters'//sf
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'changing parameters'))
          call wfparams_change(blocklines,nbl)
       else if (token=='eloctest') then
-         if (wout) write(iul,'(/a/)') si//'$eloctest - testing local energies'//sf
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'testing local energies'))
          call runEloctest(blockLines,nbl,smpl)
       else if (token=='init_rawdata_generation') then
-         if (wout) write(iul,'(/a/)') si//'$init_rawdata_generation - initializing raw data generation'//sf
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'initializing raw data generation'))
          call maxraw_init(blocklines,nbl)
       else if (token=='init_max_analysis') then
-         if (wout) write(iul,'(/a/)') si//'$init_max_analysis - initializing maximum analysis'//sf
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'initializing maximum analysis'))
          call maxana_init(blocklines,nbl)
       else if (token=='init_basin_analysis') then
-         if (wout) write(iul,'(/a/)') si//'$init_basin_analysis - initializing basin analysis'//sf
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'initializing basin analysis'))
          call maxbas_init(blocklines,nbl)
       else if (token=='init_max_search') then
-         if (wout) write(iul,'(/a/)') si//'$init_max_search - initializing maxima search'//sf
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'initializing maxima search'))
          if (present(psimax_obj)) then
             call psimax_obj%init(blocklines, nbl)
          else
             call error("subloop: psimax not available")
          end if
       else if (token=='init_walker') then
-         if (wout) write(iul,'(/a/)') si//'$init_walker - setting an initial walker'//sf
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'setting an initial walker'))
          call initInitialWalker(blockLines,nbl)
       else if (token=='optimize_refs') then
-         if (wout) write(iul,'(/a/)') si//'$optimize_refs - optimizing references'//sf
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'optimizing references'))
          call references_optimize(blockLines,nbl)
       else if (token=='optimtest') then
-         if (wout) write(iul,'(/a/)') si//'$optimtest - testing the optimizers'//sf
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'testing the optimizers'))
          call optimizeTest(blockLines,nbl,smpl)
       else if (token=='print_results') then
-         if (wout) write(iul,'(/a/)') si//'$print_results - printing stored results'//sf
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'printing stored results'))
          call global_printSavedResults(blockLines,nbl)
       else if (token=='props') then
-         if (wout) write(iul,'(/a/)') si//'$props - calculting properties'//sf
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'calculting properties'))
          call propInit(blocklines,nbl)
       else if (token=='qmc') then
-         if (wout) write(iul,'(/a/)') si//'$qmc - running a qmc calculation'//sf
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'running a qmc calculation'))
          if (present(psimax_obj)) then
             call qmc_init(blockLines,nbl, smpl, psimax_obj)
             call qmc_run(smpl, psimax_obj)
@@ -187,13 +185,13 @@ subroutine subloop(subname, smpl, exitSubLoop, psimax_obj)
             call qmc_run(smpl)
          endif
       else if (token=='sample') then
-         if (wout) write(iul,'(/a/)') si//'$sample - creating or modifying the walker sample'//sf
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'creating or modifying the walker sample'))
          call sample(blockLines,nbl,smpl)
       else if (token=='save_result') then
-         if (wout) write(iul,'(/a/)') si//'$save_results - storing current results'//sf
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'storing current results'))
          call global_saveResult(blockLines,nbl)
       else if (token=='sed') then
-         if (wout) write(iul,'(/a/)') si//'$sed - running a sed calculation'//sf
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'running a sed calculation'))
          if (present(psimax_obj)) then
             call qmc_init(blockLines,nbl, smpl, psimax_obj)
             call qmc_run(smpl, psimax_obj)
@@ -209,7 +207,7 @@ subroutine subloop(subname, smpl, exitSubLoop, psimax_obj)
       else if (token=='test_balance') then
          call testBalance(smpl)
       else if (token=='write_sample') then
-         if (wout) write(iul,'(/a/)') si//'$write_sample - writing the walker sample'//sf
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'writing the walker sample'))
          call writeSampleCommand(blockLines,nbl,smpl)
       ! loop commands
       else if (token=='begin_loop') then
