@@ -18,9 +18,9 @@ $qmc(vmc,steps=300,block_len=100,accept_ratio=0.5,discard_all)
 $qmc(vmc,accumulate,step_stride=10,acc_size=500,block_len=100,
 accept_ratio=0.5,discard=1,move=umr)
 $sample(remove_outliers,no_replace)
-$optimize_parameters(params=jas+mo+ci,method=lm_newton,eq_iter=2
+$optimize_parameters(params=jas+mo+ci,method=lm,eq_iter=2
 ,energy_min,eq_call=aeq,E_ref=-76.0,
-nu=0.0001,delta_f_min=0.0001,max_var=10.0,
+nu=25,delta_f_min=0.0001,max_var=10.0,
 mo_update_mode=2, mo_param_mode=2
 ,orbital_rotation_list=
 6

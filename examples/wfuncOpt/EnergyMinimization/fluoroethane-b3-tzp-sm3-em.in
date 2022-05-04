@@ -1,7 +1,7 @@
 $gen(seed=201)
 $wf(read, file='fluoroethane-b3-tzp-sm3-vm.wf')
 $generate_walker(steps=3000, block_len=1000)
-$jastrow_emin_lin(acc_size=45k, eq_iter=5, target_E=-178.8, target_var=0.0, ev_sample_size=1000, block_len=5000)
+$jas_emin_lin(acc_size=45k, eq_iter=5, target_E=-178.8, target_var=0.0, ev_sample_size=1000, block_len=5000)
 
 
 

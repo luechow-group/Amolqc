@@ -376,10 +376,10 @@ subroutine jasoutput_ic()
 
   select case(distType)
   case(DIST_SM, DIST_DOUBLEEXP)
-    write(iul, "(2D15.7)") scaleEE, (scaleEN(a),a=1,ncdiff)
+    write(iul, "(2ES15.7)") scaleEE, (scaleEN(a),a=1,ncdiff)
   case(DIST_NEEDS)
-    write(iul, "(2D15.7)") scaleEE, (scaleEN(a),a=1,ncdiff)
-    write(iul, "(2D15.7)") powerEE, (powerEN(a),a=1,ncdiff)
+    write(iul, "(2ES15.7)") scaleEE, (scaleEN(a),a=1,ncdiff)
+    write(iul, "(2ES15.7)") powerEE, (powerEN(a),a=1,ncdiff)
   case default
     call abortp("Unknown Jastrow distance type in jasoutput")
   end select
@@ -407,7 +407,7 @@ subroutine jasoutput_ic_new(iu)
 
   if(unum > 0) then
     do m = 2, umax
-      write(iu, "(D15.7)", advance="no") alpha(m)
+      write(iu, "(ES15.7)", advance="no") alpha(m)
     enddo
     write(iu, *)
   endif
@@ -415,7 +415,7 @@ subroutine jasoutput_ic_new(iu)
   if(xnum > 0) then
     do i = 1, ncdiff
       do m = 2, xmax
-        write(iu, "(D15.7)", advance="no") beta(m, i)
+        write(iu, "(ES15.7)", advance="no") beta(m, i)
       enddo
       write(iu, *)
     enddo
@@ -424,7 +424,7 @@ subroutine jasoutput_ic_new(iu)
   if(fnum > 0) then
     do m = 1, fpnum
       do i = 1, ncdiff
-        write(iu, "(D15.7)", advance="no") gamma(m, i)
+        write(iu, "(ES15.7)", advance="no") gamma(m, i)
       enddo
       write(iu, *)
     enddo
@@ -436,10 +436,10 @@ subroutine jasoutput_ic_new(iu)
 
   select case(distType)
   case(DIST_SM, DIST_DOUBLEEXP)
-    write(iu, "(2D15.7)") scaleEE, (scaleEN(a),a=1,ncdiff)
+    write(iu, "(2ES15.7)") scaleEE, (scaleEN(a),a=1,ncdiff)
   case(DIST_NEEDS)
-    write(iu, "(2D15.7)") scaleEE, (scaleEN(a),a=1,ncdiff)
-    write(iu, "(2D15.7)") powerEE, (powerEN(a),a=1,ncdiff)
+    write(iu, "(2ES15.7)") scaleEE, (scaleEN(a),a=1,ncdiff)
+    write(iu, "(2ES15.7)") powerEE, (powerEN(a),a=1,ncdiff)
   case default
     call abortp("Unknown Jastrow distance type in jasoutput")
   end select

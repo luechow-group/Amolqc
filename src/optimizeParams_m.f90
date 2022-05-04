@@ -55,7 +55,7 @@ contains
    if (varMin) then
       optMethod = 'varmin'
    else
-      optMethod = 'lm_newton'
+      optMethod = 'snr'
    end if
    call getstra(lines,nl,'method=',optMethod,iflag)
    optMode = 1
@@ -86,9 +86,12 @@ contains
          call abortp('$optimize_parameters: method not available')
       end if
    else if (energyMin) then
-      if (optMethod=='eminlin') then
+      if (optMethod=='lin' .or. optMethod=='eminlin') then
          call eminlin_optimizeSample(lines,nl,wfp_p,sample,converged)
-      else if (optMethod=='newton' .or. optMethod=='scaled_newton' .or. optMethod=='lm_newton') then
+      else if (optMethod=='nr' .or. optMethod=='newton' &
+            .or. optMethod=='scaled_nr' .or. optMethod=='scaled_newton' &
+            .or. optMethod=='snr' .or. optMethod=='lm_newton' &
+            .or. optMethod=='lm') then
          call eminNR_optimizeSample(lines,nl,wfp_p,sample,converged)
       else if (optMethod=='popt') then
          call eminpopt_optimizeSample(lines,nl,wfp_p,sample,converged)

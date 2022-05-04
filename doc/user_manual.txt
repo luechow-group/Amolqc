@@ -108,11 +108,12 @@ Macro commands are intended to be written by the user. A few are provided:
 
 $generate_sample(size=100) :   generates an independent sample of size 100
 $generate_walker()         :   generates an independent sample of size=1
-$jastrow_varmin_fast()     :   jastrow variance minimization, see examples
-$jastrow_varmin_safe()     :   if 'fast' fails
-$jastrow_emin_lin()        :   linear energy minimization, see examples
-$jastrow_emin_lm()         :   Levenber-Marquardt energy minimization
-$jastrow_emin_nw()         :   Newton-Raphson energy minimization
+$jas_varmin_fast()         :   jastrow variance minimization, see examples
+$jas_varmin_safe()         :   if 'fast' fails
+$jas_emin_lin()            :   linear energy minimization, see examples
+$jas_emin_lm()             :   Levenber-Marquardt energy minimization
+$jas_emin_nr()             :   Newton-Raphson energy minimization
+$jas_emin_snr()            :   stabilized Newton-Raphson energy minimization
 
 
 
@@ -765,12 +766,13 @@ options: energy_min|variance_min,params,method,optmode,eq_iter
 params=[jastrow|ci|mo|jas+ci|jas+mo|mo+ci,jas+mo+ci]
         The order is important.
 energy_min: (minimization w.r.t. the sample energy)
-  method=[newton|scaled_newton|lm_newton|tr_newton|eminlin|popt] default is lm_newton
-   newton: simple several Newton-Raphson energy minimization
-   scaled_newton: Newton step is scaled w.r.t a cost function
-   lm_newton: Levenberg-Marquardt Newton step. Hessian is modified to ensure it is positive definite
-   tr_newton: trust-region Newton-Raphson energy using the DNMTR code (newton or eminlin is preferable)
-   eminlin: linear energy minimization as suggested by C. Umrigar with scaling step
+  method=[nr|scaled_nr|snr|lm|tr_newton|lin|popt] default is snr
+   nr: simple several Newton-Raphson energy minimization
+   scaled_nr: Newton step is scaled w.r.t a cost function
+   snr: stabilized Newton-Raphson
+   lm: Levenberg-Marquardt Newton step. Hessian is modified to ensure it is positive definite
+   tr_newton: trust-region Newton-Raphson energy using the DNMTR code (nr or lin is preferable)
+   lin: linear energy minimization as suggested by C. Umrigar with scaling step
    popt: perturbative energy minimization Toulouse, Umrigar 2007
 variance_min: (minimization w.r.t. the sample variance)
   method=[varmin|lm] default is varmin
@@ -809,7 +811,7 @@ eq_call=subname: expects a $begin_subroutine(name=subname) ... $end_subroutine b
 
 wf_write: write the wf file for the parameters of each iteration step
 
-varmin options:
+varmin (variance_min) options:
   E_ref=dd:  reference energy(Optional but recommended).In case of absence,
     emean+emean*0.02 for first optimization cycle and emean for rest cycles will
     be used as E_ref. Note that "emean" is Sample's mean, local energy.
@@ -822,7 +824,7 @@ varmin options:
   NL2SOL_D_mode=[0,1]: NL2SOL scale vector mode (varmin2).default is "0".  Only needed when no changes in parameters.
  mo_noise_coeff=0.0  : Add gaussian white noise fo starting orbital rotation params aroung
                         zero (startin params will be mo_noise_coef* g_rand ).
-lm options:
+lm (variance_min) options:
   E_ref=dd:  reference energy(Optional but recommended). In case of absence,
     emean+emean*0.02 for first optimization cycle and emean for rest cycles will
     be used as E_ref. Note that "emean" is Sample's mean, local energy.
@@ -833,7 +835,7 @@ lm options:
   lambda=0.001: value of lambda in varmin1. The diagonal elements are scaled with 1+lambda, lambda is
                 increased by a factor of 10 with each itaration that didn't succeed in decreasing the variance.
 
-newton options:
+nr (energy_min) options:
   max_var=1.d9: terminate optimization iterations if this variance is reached
   nrmethod=1: Standard Newton-Raphson, no further options
   nrmethod=2: Use scaled Newton-Raphson step, step length obtained from fixed sample
@@ -848,7 +850,7 @@ newton options:
     delta_f_min=0.d0: if set do not change nu if the change in the fixed sample energy is smaller than delta_f_min
       (because of the unavoidable random noise in the fixed sample energy)
 
-eminlin options   :
+lin (energy_min) options   :
   E_lb=dd         : lower bound for eigenvalue selection : currently disabled
   max_Im=1.d-3    : max allowed value for imaginary part for eigenvalue selection : currently disabled
   max_ev=5        : eigenvalue selection by choosing lowest fixed sample variance of the lowest max_ev eigenvalues
@@ -863,7 +865,7 @@ eminlin options   :
   quad            : use a quadratic model to determine the step length with minimum energy
 
 
-popt options                :
+popt (energy_min) options                :
 max_var=1.d9                : terminate optimization iterations if this variance is reached
 write_de                    : writes delta E in file with .dat extension
 delta_e=                    : sets a fixed delta E for all parameters

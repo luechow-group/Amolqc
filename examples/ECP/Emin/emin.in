@@ -82,7 +82,7 @@ $sample(remove_outliers,no_replace)
 
 $begin_loop(count=1)
 
-$optimize_parameters(params=jastrow,energy_min,method=eminlin,
+$optimize_parameters(params=jastrow,energy_min,method=lin,
 write_wf,eq_call=aeq,cffac=0.001,
 target_E=-140.00,target_var=2.0,eq_iter=1,max_ev=5,ev_sample_size=1000,
 )
@@ -152,7 +152,7 @@ accept_ratio=0.5,discard=1,move=umr)
 $save_result()
 $sample(remove_outliers,no_replace)
 
-$optimize_parameters(params=ci,energy_min,method=eminlin,
+$optimize_parameters(params=ci,energy_min,method=lin,
 write_wf,eq_call=aeq,max_prj,prt_prj,
 target_E=-140.00,target_var=2.0,eq_iter=1,max_ev=5,ev_sample_size=1000,
 )

@@ -446,7 +446,7 @@ contains
                do iz = 0, zGridSize
                   r(3) = zStart + iz * zStep
                   call mo_mo(r, mo, value)
-                  write(iu,'(e18.8)')  value
+                  write(iu,'(ES18.8)')  value
                end do
             end do
          end do
@@ -569,7 +569,7 @@ contains
             do iy = 0, yGridSize
                r = rStart + ix * xStep * ex0 + iy * yStep * ey0
                call mo_mo(r, mo, value)
-               write(iu,'(e18.8)')  value
+               write(iu,'(ES18.8)')  value
             end do
          end do
       end do

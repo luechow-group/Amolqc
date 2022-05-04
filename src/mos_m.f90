@@ -141,7 +141,7 @@ CONTAINS
             call assert(nbas_check == nbas, 'moinput: inconsistent number of individual basis functions')
 
             idx = 4
-            fmt = '(5D15.8)'
+            fmt = '(5ES15.8)'
             do i = 1, norb
                 read(lines(idx), *) ii
                 jj = 0; idx = idx + 1
@@ -166,7 +166,7 @@ CONTAINS
             call assert(nbas_check == nbas, 'moinput: inconsistent number of individual basis functions')
 
             idx = 4
-            fmt = '(5X,5E15.8)'
+            fmt = '(5X,5ES15.8)'
             do i = 1, norb
                 jj = 0
                 do
@@ -340,13 +340,13 @@ CONTAINS
         write(iu, '(i4)') norb
         write(iu, *)
         if (evfmt=='tmx' .or. evfmt=='gau') then
-            fmt = '(5D15.8)'
+            fmt = '(5ES15.8)'
             do i = 1, norb
                 write(iu, '(i4)') i
                 write(iu, fmt) (cmo(j, i), j = 1, nbas)
             enddo
         else if (evfmt .eq. 'gms') then
-            fmt = '(I2,I3,1P,5E15.8)'
+            fmt = '(I2,I3,1P,5ES15.8)'
             bidxmax = CEILING(nbas / real(5))
             bidx = 1
             max = 0

@@ -1,5 +1,8 @@
-x$sample(create,start=density,generate=random,size=100)
+x$sample(start=density,generate=random,size=100,
+create)
 $sample(remove_outliers)
-$qmc(vmc,accept_ratio=0.5,steps=30,block_len=10,persist=9,discard_all)
-x$qmc(vmc,accept_ratio=0.5,steps=400,block_len=10,discard_all)
+$qmc(steps=30,block_len=10,accept_ratio=.5,persist=9,
+vmc,discard_all)
+x$qmc(steps=400,block_len=10,accept_ratio=.5,
+vmc,discard_all)
 

@@ -38,16 +38,16 @@ contains
    integer                              :: nParams, np,npCI
    real(r8), allocatable                  :: p(:),p0(:)       ! parameter vector
    real(r8), allocatable                  :: delta_p(:)       ! change of parameter vector
-   real(r8), allocatable                  :: g(:),g1(:),bb(:),H(:,:),H0(:,:)  ! gradient and Hessian
+   real(r8), allocatable                  :: g(:),bb(:),H(:,:),H0(:,:)  ! gradient and Hessian
    real(r8)                               :: e0,var,pe0,pvar
    real(r8), allocatable                  :: fi(:),ELi(:),fiEL(:)
    real(r8), allocatable                  :: fifj(:,:),fifjEL(:,:),fiELj(:,:),fij(:,:),fijEL(:,:)
    real(r8), allocatable                  :: A(:,:),B(:,:),D(:,:),Imat(:,:)
    !!!real(r8), allocatable                  :: eval(:),evec(:,:)
-   integer lwork,i,j,info,n,ierr,eqIter, eqStep, nSize, gmode, NRMode, iflag, iter,optIter
+   integer lwork,i,j,info,n,ierr,eqIter, eqStep, nSize, NRMode, iflag, iter,optIter
    integer, allocatable                 :: ipiv(:)
    real(r8), allocatable                  :: work(:)
-   real(r8)                               :: targetE, targetVar,cffac,dmax,maxVar, lambda(6), lambdaOpt, eRef
+   real(r8)                               :: targetE, targetVar,cffac,dmax,maxVar, lambda(6), lambdaOpt, eRef, gfac
    real(r8)                               :: nu,r,delta_q,delta_f,normdp,mabsdp,nuStart,deltaFmin
    type(ElocAndPsiTermsENR)             :: EPsiTENR
    character(len=80)                    :: subName,fname
@@ -70,7 +70,7 @@ contains
 
    if (logmode>=2) then
       write(iul,'(/A/)') '   - -  energy minimization using Newton-Raphson: initialization  - -'
-      write(iul,'(a,i3,a,i3)') ' parameters:  nrmethod = ',NRMode,'   gradient mode = ',gmode
+      write(iul,'(a,i3,a,f12.3)') ' parameters:  nrmethod = ',NRMode,'   gradient factor = ',gfac
    endif
 
    np = ElocAndPsiTermsENR_nParams(EPsiTENR)
@@ -79,7 +79,7 @@ contains
 
 
    call assert(np>0,'eminNR_optimizeSample: no parameters')
-   allocate(p(np),p0(np),delta_p(np),bb(np),g(np),g1(np),H(np,np),H0(np,np),ipiv(np),work(np*np))
+   allocate(p(np),p0(np),delta_p(np),bb(np),g(np),H(np,np),H0(np,np),ipiv(np),work(np*np))
    allocate(fi(np),ELi(np),fiEL(np))
    allocate(fifj(np,np),fifjEL(np,np),fiELj(np,np),fij(np,np),fijEL(np,np))
    allocate(A(np,np),B(np,np),D(np,np),Imat(np,np))
@@ -164,6 +164,38 @@ contains
                end if
             end do
             H = H0 + nu*Imat
+
+         else if (NRMode == 4) then
+
+            H = H0
+            do i=1,np
+               H(i,i) = H(i,i)*(1+nu)
+            enddo
+
+            if (logmode >= 2) write(iul,'(/a)') ' find Newton step:'
+            do iter=1,10
+               call dpotrf('L',np,H,np,info)  ! Cholesky decomposition
+               if (info == 0) then
+                  write(iul,'(i3,a,f15.6,a)') iter,':  nu = ',nu, ' Hessian positive definite'
+               else if (info > 0) then
+                  write(iul,'(i3,a,f15.6,a)') iter,':  nu = ',nu, ' Hessian not positive definite'
+               else
+                  write(iul,*) ' !!! WARNING !!! Cholesky decomp error'
+               end if
+               if (info > 0) then !! not positive definite
+                  nu = 4*nu
+                  H = H0
+                  do i=1,np
+                     H(i,i) = H(i,i)*(1+nu)
+                  enddo
+               else
+                  exit
+               end if
+            end do
+            H = H0
+            do i=1,np
+               H(i,i) = H(i,i)*(1+nu)
+            enddo
          end if
 
          p = wfparams_get(WFP)
@@ -286,7 +318,7 @@ contains
 
    call setCurrentResult(e0,0.d0,var)
 
-!    deallocate(p,p0,delta_p,bb,g,g1,H,H0,Imat,ipiv,work)
+!    deallocate(p,p0,delta_p,bb,g,H,H0,Imat,ipiv,work)
 !    deallocate(fi,ELi,fiEL)
 !    deallocate(fifj,fifjEL,fiELj,fij,fijEL)
 !    deallocate(A,B,D)
@@ -301,18 +333,20 @@ contains
          NRMode = 3
          call getstra(lines,nl,'method=',optMethod,iflag)
          if (iflag==0) then
-            if (optMethod=='newton') then
+            if (optMethod=='nr' .or. optMethod=='newton') then  ! Newton-Raphson
                NRMode = 1
-            else if (optMethod=='scaled_newton') then
+            else if (optMethod=='scaled_nr' .or. optMethod=='scaled_newton') then
                NRMode = 2
-            else if (optMethod=='lm_newton') then
+            else if (optMethod=='snr' .or. optMethod=='lm_newton') then  ! stabilized Newton-Raphson
                NRMode = 3
+            else if (optMethod=='lm') then  ! Levenberg-Marquardt
+               NRMode = 4
             else
                call abortp("$optimize_parameters: illegal newton method name")
             end if
          end if
-         gmode = 1
-         call getinta(lines,nl,'gmode=',gmode,iflag)
+         gfac = 0
+         call getdbla(lines,nl,'gfac=',gfac,iflag)
          call getdbla(lines,nl,'target_E=',targetE,iflag)
          if (iflag /= 0 .and. NRmode==2) call abortp('scaled_newton: target_E option required')
          call getdbla(lines,nl,'target_var=',targetVar,iflag)
@@ -384,25 +418,20 @@ contains
       subroutine internal_calcGradAndHessian(g,H)
          real(r8) :: g(:)
          real(r8) :: H(:,:)
-         select case (gmode)
-         case (1)
-            g = 2*( fiEL - e0*fi )
-         case (2)
-            g = 2*( fiEL - e0*fi ) + ELi
-         case (3)
-            g = 2*( fiEL - e0*fi ) + 2*ELi
-         end select
-         g1 = 2*( fiEL - e0*fi )
 
-         A = 2*( fijEL - fij*e0 - fifjEL + fifj*e0 )
-         do j=1,np
-            B(:,j) = -2*( fi(:)*g1(j) + fi(j)*g1(:) )
-            D(:,j) = -fi(:)*ELi(j) - fi(j)*ELi(:)
+         g = 2 * (fiEL - fi * e0)
+
+         A = 2 * (fijEL - fij * e0 - fifjEL + fifj * e0)
+         do j = 1, np
+            B(:, j) = -2 * (fi(:) * g(j) + fi(j) * g(:))
+            D(:, j) = - fi(:) * ELi(j) - fi(j) * ELi(:)
          enddo
-         B = B + 4*( fijEL - fij*e0 )
-         D = D + fiELj + transpose(fiELj)
+         B = B + 4 * (fifjEL - fifj * e0)
+         D = D + fiELj + TRANSPOSE(fiELj)
 
          H = A + B + D
+
+         g = g + gfac * ELi
       end subroutine internal_calcGradAndHessian
 
       subroutine internal_chooseStepLength(lambdaOpt)
@@ -412,7 +441,7 @@ contains
          real(r8)  :: e0,var0   ! E and Var for unit step length
          real(r8)  :: lambdaOpt ! calculated optimal step length
          integer n,cfIdx
-         real(r8) d,cfmin,cf,var,cf1
+         real(r8) d,cfmin,cf,var,cf1,cfs(6),x1,x2,x3,y1,y2,y3,r1,r2,r3
 
          lambda = (/ 0.02d0, 0.1d0, 0.3d0, 0.5d0, 0.7d0, 1.d0 /)
 
@@ -435,6 +464,7 @@ contains
             var = ElocAndPsiTermsENR_varALL(EPsiTENR)
 
             cf = abs(e0-targetE) + cffac* abs(var-targetVar)
+            cfs(n) = cf
             if (logmode >= 2) write(iul,'(I5,A,F10.2,A,F15.5,A,F15.5,A,F15.5)') &
                n,': lambda=',lambda(n),' Emean =',e0,' var = ',var,' cf = ',cf
             if (cf < cfmin) then
@@ -447,7 +477,20 @@ contains
 
          if (lambda(cfIdx) < dmax/d) then
             if ((cf1-cfmin)/cfmin > 0.05) then
-               lambdaOpt = lambda(cfIdx)
+               if (cfIdx > 1 .and. cfIdx < 6) then
+                  x1 = lambda(cfIdx - 1)
+                  x2 = lambda(cfIdx)
+                  x3 = lambda(cfIdx + 1)
+                  y1 = cfs(cfIdx - 1)
+                  y2 = cfs(cfIdx)
+                  y3 = cfs(cfIdx + 1)
+                  r1 = x1 * (y3 - y2)
+                  r2 = x2 * (y1 - y3)
+                  r3 = x3 * (y2 - y1)
+                  lambdaOpt = (x3 * r3 + x2 * r2 + x1 * r1) / (2 * (r1 + r2 + r3))
+               else
+                  lambdaOpt = lambda(cfIdx)
+               end if
             else
                lambdaOpt = 1.d0
             end if

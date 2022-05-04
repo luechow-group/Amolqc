@@ -274,7 +274,7 @@ CONTAINS
         dp = y1 - x13 * ap - x12 * bp - x11 * cp
 
         if (mytid==0 .and. logmode>2) then
-            write(iul, '(A,4(1X,D16.10))')&
+            write(iul, '(A,4(1X,ES16.10))')&
                     ' coeffs of transition polynomial:', ap, bp, cp, dp
         endif
 
@@ -316,7 +316,7 @@ CONTAINS
                         - cp / 6d0 * csplx(point2)**3 - dp / 2d0 * csplx(point2)**2&
                         + tmp2 * csplx(point2) + y(point2)
             endif
-            if (logmode > 5) write(iul, '(I5,2X,7(D16.8,2X))')&
+            if (logmode > 5) write(iul, '(I5,2X,7(ES16.8,2X))')&
                     k, csplx(k), yold(k), y(k), yfdold(k), yfd(k), ysdold(k), ysd(k)
         enddo
 
@@ -336,7 +336,7 @@ CONTAINS
         !        dx = csplx(l) - csplx(j)
         !        yfd(l)=  csplb(k,j)+2*dx*csplc(k,j) + 3*dx*dx*cspld(k,j)
         !        ysd(l)=             2   *csplc(k,j) + 6*dx   *cspld(k,j)
-        !        if (logmode .ge. 3) write(iul,'(I5,2X,7(D16.8,2X))')
+        !        if (logmode .ge. 3) write(iul,'(I5,2X,7(ES16.8,2X))')
         !     .          l,csplx(l),yold(l),y(l),yfdold(l),yfd(l),ysdold(l),ysd(l)
         !      enddo
         !
