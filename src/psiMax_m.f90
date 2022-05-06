@@ -16,7 +16,7 @@ module psiMax_m
 
    use kinds_m, only: r8
    use error_m
-   use parsing_m
+   use parsing_m, only: getinta, getdbla, finda
    use global_m, only: getNElec, iul, iull, MASTER, logmode, getMyTaskId
    use eloc_m, only: eloc
    use eConfigs_m, only: eConfigArray, eConfigArray_new, eConfigArray_set
@@ -51,6 +51,7 @@ module psiMax_m
       integer                          :: analyze_mode_ = NOANALYSIS
       logical                          :: allow_singularities_ = .true.
       integer                          :: neg_eigv_
+      real(r8)                         :: neg_eigv_thresh_
       integer                          :: verbose_ = 0
       logical                          :: save_opt_paths_ = .false.
       integer                          :: path_count_ = 0
@@ -89,6 +90,8 @@ contains
 
       call getinta(lines, nl, "negative_eigenvalues=", this%neg_eigv_, iflag)
       if (iflag /= 0) this%neg_eigv_ = 0
+      call getdbla(lines, nl, "eigenvalue_threshold=", this%neg_eigv_thresh_, iflag)
+      if (iflag /= 0) this%neg_eigv_thresh_ = 1E-2_r8
       call getinta(lines, nl, "verbose=", this%verbose_, iflag)
       call this%minimizer_p%set_verbose(this%verbose_)
       call this%minimizer_p%set_verbose_unit(iull)
@@ -302,7 +305,7 @@ contains
          if (this%neg_eigv_ /= -1) then
             num_neg_eigv = 0
             do i = 1, SIZE(maximum)
-               if (ABS(lambda(i)) > 1.0e-2_r8 .and. lambda(i) < 0._r8) then
+               if (ABS(lambda(i)) > this%neg_eigv_thresh_ .and. lambda(i) < 0._r8) then
                   num_neg_eigv = num_neg_eigv + 1
                else
                   ! eigen values from *SYEV are sorted
