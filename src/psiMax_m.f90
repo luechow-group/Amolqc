@@ -396,8 +396,6 @@ contains
       call myMPIReduceSumDouble(sCounter, rcvCount, 11)
 
       if (MASTER) then
-
-         write(iul,*)
          if (this%neg_eigv_ >= 0) then
             write(iul,'(A)', advance='NO') "Summary for critical point ("
             write(iul,'(I1.1)', advance='NO') this%neg_eigv_
