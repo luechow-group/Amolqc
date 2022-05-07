@@ -52,7 +52,7 @@ contains
             !get eigenvalues and -vectors
             lwork = 3*SIZE(sample)-1
             call DSYEV('V', 'U', SIZE(sample), H, SIZE(sample), lambda, work2, lwork, info)
-            call assert(info == 0, 'eigenVectAnalysis: Inversion failed!')
+            !call assert(info == 0, 'eigenVectAnalysis: Inversion failed!')
 
             !write eigenvalues to document
             write(yml, '(a)', ADVANCE = 'no') '  - Eigenvalues: ['
