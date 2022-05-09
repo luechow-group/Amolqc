@@ -57,7 +57,7 @@ contains
             !write eigenvalues to document
             write(yml, '(a)', ADVANCE = 'no') '  - Eigenvalues: ['
             do i = 1, SIZE(lambda)
-                write(yml, '(es14.6)', ADVANCE = 'no') lambda(i)
+                write(yml, '(es16.6e3)', ADVANCE = 'no') lambda(i)
                 if (i /= SIZE(lambda)) write(yml, '(a)', ADVANCE = 'no') ','
             end do
             write(yml, '(a)')']'
@@ -66,9 +66,9 @@ contains
             write(yml, '(a)') '    Eigenvectors: ['
             do i = 1, SIZE(lambda)
                 do k = 1, SIZE(lambda)/3
-                    write(yml,'(a, es14.6, a)', ADVANCE = 'no') '      [', H(3*k-2, i), ','
-                    write(yml,'(es14.6, a)', ADVANCE = 'no') H(3*k-1, i), ','
-                    write(yml,'(es14.6, a)') H(3*k, i), '],'
+                    write(yml,'(a, es16.6e3, a)', ADVANCE = 'no') '      [', H(3*k-2, i), ','
+                    write(yml,'(es16.6e3, a)', ADVANCE = 'no') H(3*k-1, i), ','
+                    write(yml,'(es16.6e3, a)') H(3*k, i), '],'
                     end do
                 end do
             write(yml, '(a)')'      ]'
