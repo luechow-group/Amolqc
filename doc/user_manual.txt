@@ -333,6 +333,15 @@ grid_point_list=m: Set integration grid points for different atoms.
 
 ====================================================================================
 
+$eigenvect_analysis
+----------------
+
+no options. This command calculates the eigenvalues and -vectors of the Hessian for
+a given sample (.pos file) and writes the results into an eigenvect_analysis.yml file.
+
+
+=====================================================================================
+
 $eloctest
 ---------
 
