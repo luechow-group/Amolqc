@@ -78,9 +78,9 @@ contains
    end if
 
    if (varMin) then
-      if (optMethod=='lm') then
+      if (optMethod=='lm' .or. optMethod=='snr' .or. optMethod=='gd') then
          call varmin1_optimizeSample(lines,nl,wfp_p,sample,converged)
-      else if (optMethod=='varmin') then
+      else if (optMethod=='varmin' .or. optMethod=='nl2sol') then
          call varmin2_optimizeSample(lines,nl,wfp_p,sample,converged)
       else
          call abortp('$optimize_parameters: method not available')
