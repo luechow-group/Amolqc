@@ -1014,6 +1014,7 @@ CONTAINS
       if (nalpha == 1) then
 
          deter(1,nci)  =deta(1,1,nci)
+         detia(1,1,nci) = 1 / deta(1,1,nci)
          dgrad(1,1,nci)=det1xa(1,1,nci)
          dgrad(2,1,nci)=det1ya(1,1,nci)
          dgrad(3,1,nci)=det1za(1,1,nci)
@@ -1187,6 +1188,7 @@ CONTAINS
       if (nbeta==1) then
 
          deter(2,nci)  =detb(1,1,nci)
+         detib(1,1,nci) = 1 / detb(1,1,nci)
          dgrad(1,2,nci)=det1xb(1,1,nci)
          dgrad(2,2,nci)=det1yb(1,1,nci)
          dgrad(3,2,nci)=det1zb(1,1,nci)
