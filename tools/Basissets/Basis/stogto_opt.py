@@ -3,6 +3,11 @@
 
  SPDX-License-Identifier: GPL-3.0-or-later
 """
+
+import sys
+if sys.version_info[0] < 3:
+    sys.exit('This script requires Python 3')
+
 import numpy as np
 from scipy import integrate, linalg
 from scipy.special import eval_legendre
