@@ -91,7 +91,7 @@ contains
       if (this%do_write_opt_path()) call this%write_opt_path_entry(1, x, f)
 
       ! check if position is alread converged
-      if (this%is_gradient_converged(maxval(abs(g))) .or. (sp%n_sing() == size(x)/3)) then
+      if (this%is_gradient_converged(maxval(abs(g))) .or. (sp%n_sing() == size(x)/3) .or. this%is_value_converged(f)) then
          call this%set_converged(.true.)
       else
          do iter = 1, this%max_iterations()

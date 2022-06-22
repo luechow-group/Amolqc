@@ -5,7 +5,7 @@
 module minimizer_ws_factory_module
 
    use kinds_m, only: r8
-   use error_m, only: error
+   use error_m, only: error, assert
    use parsing_m, only: getdbla, getstra, getinta, finda, getintarra
    use singularityCorrection_m, only: singularity_correction, NONE, CUTSTEP, UMRIGAR
    use line_search_ws_simple_module, only: line_search_ws_simple
@@ -27,7 +27,7 @@ contains
    function create_ws_minimizer(lines) result(minimizer_p)
       character(len=*) :: lines(:)
       class(minimizer_w_sing), pointer :: minimizer_p
-      real(r8) step_size, delta_max, step_max, gradient, sing_thresh, corr_thresh, alpha, cc, rho, c1, c2
+      real(r8) step_size, delta_max, step_max, gradient, sing_thresh, corr_thresh, alpha, cc, rho, c1, c2, val, distance
       integer iflag, iflag1, iflag2, nlines, max_iter, mode, latency, switch_step
       logical yn, scaling
       character(len=20) value, string, str
@@ -194,9 +194,12 @@ contains
          max_iter = 1000
          call getinta(lines, nlines, "max_iter=", max_iter, iflag)
          call minimizer_p%set_max_iterations(max_iter)
-         gradient = 1.d-4
+         gradient = 1.e-4_r8
          call getdbla(lines, nlines, "convergence_gradient=", gradient, iflag)
          call minimizer_p%set_convergence_gradient(gradient)
+         val = -HUGE(0._r8)
+         call getdbla(lines, nlines, "convergence_value=", val, iflag)
+         call minimizer_p%set_convergence_value(val)
          call getintarra(lines, nlines, "not_to_minimize=", not_to_minimize, iflag)
          if (iflag == 0) call minimizer_p%set_not_to_minimize(not_to_minimize)
       end if

@@ -39,7 +39,7 @@ contains
       class(line_search_ws_simple), intent(in)        :: lss
       type(singularity_correction), intent(in)        :: sc
       logical, intent(in)                             :: yn
-      real(r8), optional, intent(in)                    :: step_size
+      real(r8), optional, intent(in)                  :: step_size
       integer, optional, intent(in)                   :: latency
       integer, optional, intent(in)                   :: switch_step
       type(minimizer_ws_bfgs), pointer :: constructor
@@ -219,7 +219,7 @@ contains
                 " n_sing=", sp%n_sing(), " is_corrected=", is_corrected, " steps_since_correct=", steps_since_correct
          end if
 
-         if (this%is_gradient_converged(gmax)) then
+         if (this%is_gradient_converged(gmax) .or. this%is_value_converged(f)) then
             x = x_new
             g = g_new
             call this%set_converged(.true.)

@@ -569,7 +569,10 @@ method=[bfgs|fire|steepest_descent|bfgst|newton] default: bfgs
 max_iter=1000        : maximal number of iterations (not function evaluations!)
 max_distance=dd      : if given total 3n-dim step is scaled to a max of dd for the largest step of one electron
 max_distance_one=dd  : if given each one-electron step is cut at dd (!just for testing atm)
-convergence_gradient=0.0001 : convergence if max(abs(gradient)) < 0.0001
+convergence_gradient=1.0e-4  : convergence if max(abs(gradient)) < 0.0001
+convergence_value=1.0e-3     : convergence if the value of the function to be minimized is below a certain threshold.
+numerical_denominator=1.0e-5 : numeric_denominator for the numerical evaluation of the gradient using the
+                               two-point formula.
 save_opt_paths       : triggers saving the maximization path in the .ref format. Data are stored at unit 300+taskid,
                        i.e. fort.300, fort.301, ... Entry (k, m) means: m-th iteration step of the k-th maximization
 negative_eigenvalues=0 : if non-zero checks number of negative eigenvalues of the Hessian, with absolute value larger
@@ -579,6 +582,9 @@ eigenvalue_threshold=1e-2 : only eigenvalues with absolute value larger than eig
                             counting the number of negative eigenvalues.
 not_to_minimize      : list of indices of coordinates, which should not be optimized (e.g. =3;6;9 in order to not
                        optimize the z coordinates of the 1st, 2nd, and 3rd electrons)
+minimize_grad_norm   : Instead of minimizing Phi, minimizes the magnitude of the gradient, in order to use the faster
+                       steepest descent method to find saddle points. (Note: This option can be used with every
+                       minimizer. However, it might not be sensible to use the Newton method.)
 
 singularity correction parameters:
 correction_mode=[cut|umr|cut_all|umr_all|none]:
