@@ -23,7 +23,9 @@ module psiMax_m
    use elocData_m, only: eloc_getStopAtSingularity, eloc_setStopAtSingularity, elEkini, elPhi, elU
    use wfData_m, only: atoms, getNNuc, getNAlpha
    use atom_m, only: atoms_getPositionMatrix
-   use fPsi2_m
+   use fctn_module, only: Function_t
+   use fPsi2_m, only: fctn_psi2
+   use fGradPsi2_m, only: fctn_gradpsi2
    use minimizer_w_sing_module
    use minimizer_ws_factory_module, only: create_ws_minimizer
    use randomWalker_m, only: RandomWalker, pos, resetTo
@@ -47,7 +49,8 @@ module psiMax_m
    type psimax
       private
       class(minimizer_w_sing), pointer :: minimizer_p => null()
-      type(fctn_psi2)                  :: fg
+      class(Function_t), allocatable   :: fg
+      type(fctn_psi2), allocatable     :: fpsi2
       integer                          :: analyze_mode_ = NOANALYSIS
       logical                          :: allow_singularities_ = .true.
       integer                          :: neg_eigv_
@@ -83,8 +86,14 @@ contains
       integer, intent(in)            :: nl
       logical l1, l2, l3
       integer iflag, i, iu
+      real(r8) :: h = 1.0e-5_r8
 
-      this%fg = fctn_psi2()
+      this%fpsi2 = fctn_psi2()
+      if (finda(lines, nl, "minimize_grad_norm")) then
+         this%fg =  fctn_gradpsi2()
+      else
+         this%fg = this%fpsi2
+      end if
 
       this%minimizer_p => create_ws_minimizer(lines)
 
@@ -93,6 +102,10 @@ contains
       call getdbla(lines, nl, "eigenvalue_threshold=", this%neg_eigv_thresh_, iflag)
       if (iflag /= 0) this%neg_eigv_thresh_ = 1E-2_r8
       call getinta(lines, nl, "verbose=", this%verbose_, iflag)
+      call getdbla(lines, nl, "eigenvalue_threshold=", this%neg_eigv_thresh_, iflag)
+      if (iflag /= 0) this%neg_eigv_thresh_ = 1E-2_r8
+      call getdbla(lines, nl, "numerical_denominator=", h, iflag)
+      if (iflag == 0) call this%fg%set_numerical_denominator(h)
       call this%minimizer_p%set_verbose(this%verbose_)
       call this%minimizer_p%set_verbose_unit(iull)
 
@@ -292,7 +305,7 @@ contains
       if (this%minimizer_p%is_converged()) then
          is_minimum = .true.
          correct_num_neg_eigv = .false.
-         call this%fg%eval_fgh(maximum,f,g,H)
+         call this%fpsi2%eval_fgh(maximum,f,g,H)
 
          !Correct for singularities
          call sp%create(SIZE(maximum)/3, this%minimizer_p%sc_%n_singularities())
@@ -318,8 +331,8 @@ contains
       
       if (this%verbose_ >= 2) then
          write(iull,*) 'after minimize:'
-         write(iull,'(a,f20.15)') 'Phi: ',  -(LOG(ABS(elPhi(1))) + elU(1))
-         write(iull,'(a,f20.15)') 'Psi: ',  EXP(elU(1))*elPhi(1)
+         write(iull,'(a,f15.8)') 'Phi: ',  -(LOG(ABS(elPhi(1))) + elU(1))
+         write(iull,'(a,ES20.8e3)') 'Psi: ',  EXP(elU(1))*elPhi(1)
          do i = 1, n
             write(iull,'(i5,3f15.6)') i, x(i), y(i), z(i)
          end do

@@ -88,6 +88,7 @@ add_fortran_library(src STATIC
         # Wave Function Analysis
         eigenVectAnalysis_m.f90
         psiMax_m.f90
+        fGradPsi2_m.f90
         #sed_m.f90
         assign_m.f90
         findNucElecs_m.f90
