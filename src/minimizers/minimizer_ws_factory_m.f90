@@ -200,6 +200,11 @@ contains
          val = -HUGE(0._r8)
          call getdbla(lines, nlines, "convergence_value=", val, iflag)
          call minimizer_p%set_convergence_value(val)
+         distance = HUGE(0._r8)
+         call getdbla(lines, nlines, "max_electron_distance=", distance, iflag)
+         call assert(iflag /= 0 .or. value == 'bfgs', &
+                 &"minimizer input: max_electron_distance only implemented for bfgs!")
+         call minimizer_p%set_max_electron_distance(distance)
          call getintarra(lines, nlines, "not_to_minimize=", not_to_minimize, iflag)
          if (iflag == 0) call minimizer_p%set_not_to_minimize(not_to_minimize)
       end if

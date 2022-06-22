@@ -297,6 +297,12 @@ contains
 
          x = x_new
          g = g_new
+
+         if (MAXVAL(ABS(x_new)) > this%max_electron_distance()) then
+            call this%set_converged(.false.)
+            exit
+         end if
+
       end do
 
       if (verbose > 0) then

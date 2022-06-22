@@ -585,6 +585,9 @@ not_to_minimize      : list of indices of coordinates, which should not be optim
 minimize_grad_norm   : Instead of minimizing Phi, minimizes the magnitude of the gradient, in order to use the faster
                        steepest descent method to find saddle points. (Note: This option can be used with every
                        minimizer. However, it might not be sensible to use the Newton method.)
+max_electron_distance=dd : (Important: only implemented for the bfgs minimizer!) if given and the coordinates of an
+                           electron (either x, y, or z) exceed the given number, the minimization process will be
+                           aborted (not converged).
 
 singularity correction parameters:
 correction_mode=[cut|umr|cut_all|umr_all|none]:

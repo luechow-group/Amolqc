@@ -23,6 +23,7 @@ module minimizer_module
       real(r8), allocatable           :: gradient_(:)
       real(r8)                        :: max_abs_gradient_ = 0.1d0
       real(r8)                        :: max_mean_gradient_ = 0.1d0
+      real(r8)                        :: max_electron_distance_ = HUGE(1._r8)
       integer, allocatable            :: not_to_minimize_(:)
       logical                       :: converged_ = .false.
       integer                       :: current_iterations_ = 0
@@ -38,11 +39,13 @@ module minimizer_module
       procedure                                :: set_convergence_gradient
       procedure                                :: set_convergence_gradnorm
       procedure                                :: set_convergence_value
+      procedure                                :: set_max_electron_distance
       procedure                                :: set_not_to_minimize
       procedure                                :: convergence_distance
       procedure                                :: convergence_gradient
       procedure                                :: convergence_gradnorm
       procedure                                :: convergence_value
+      procedure                                :: max_electron_distance
       procedure                                :: is_distance_converged
       procedure                                :: is_gradient_converged
       procedure                                :: is_gradnorm_converged
@@ -122,6 +125,12 @@ contains
       this%convergence_value_ = value
    end subroutine set_convergence_value
 
+   subroutine set_max_electron_distance(this, value)
+      class(minimizer), intent(inout) :: this
+      real(r8), intent(in)              :: value
+      this%max_electron_distance_ = value
+   end subroutine set_max_electron_distance
+
    subroutine set_not_to_minimize(this, not_to_minimize)
       class(minimizer), intent(inout) :: this
       integer, intent(in)             :: not_to_minimize(:)
@@ -170,6 +179,12 @@ contains
       real(r8)                          :: value
       value = this%convergence_value_
    end function convergence_value
+
+   function max_electron_distance(this) result(value)
+      class(minimizer), intent(inout) :: this
+      real(r8)                          :: value
+      value = this%max_electron_distance_
+   end function max_electron_distance
 
    function is_distance_converged(this, distance) result (res)
       class(minimizer), intent(in) :: this
