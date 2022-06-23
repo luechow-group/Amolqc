@@ -37,7 +37,8 @@ SRCOBJ4_ := elocAndPsiTermsBase_m.o elocAndPsiTermsLin_m.o elocAndPsiTermsLM_m.o
 SRCOBJ5_ := psiMax_m.o assign_m.o findNucElecs_m.o energyPart_m.o \
             hungarian_m.o maxBasins_m.o maxAnalysis_m.o maxRawData_m.o  \
             fPsi2_m.o maximizeSample_m.o electronDensity_m.o rhoMax_m.o rhoData_m.o rhoGrid_m.o \
-            maximizeSampleRho_m.o partition_m.o moMax_m.o posList_m.o vxc_m.o eigenVectAnalysis_m.o
+            maximizeSampleRho_m.o partition_m.o moMax_m.o posList_m.o vxc_m.o eigenVectAnalysis_m.o \
+            fGradPsi2_m.o
 
 FOPENMPTARGETS += $(dir)/aoMoTask_m.o
 
