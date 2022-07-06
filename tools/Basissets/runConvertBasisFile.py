@@ -4,7 +4,11 @@
 
  SPDX-License-Identifier: GPL-3.0-or-later
 """
+
 import sys
+if sys.version_info[0] < 3:
+    sys.exit('This script requires Python 3')
+
 from Basis import basisset
 
 if len(sys.argv)<5:

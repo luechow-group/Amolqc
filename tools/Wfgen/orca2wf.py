@@ -4,8 +4,11 @@
 SPDX-License-Identifier: GPL-3.0-or-later
 """
 
-import numpy as np
 import sys
+if sys.version_info[0] < 3:
+    sys.exit('This script requires Python 3')
+
+import numpy as np
 
 from .Utils import *
 from fractions import Fraction

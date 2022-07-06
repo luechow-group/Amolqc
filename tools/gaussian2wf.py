@@ -9,7 +9,12 @@
 
  SPDX-License-Identifier: GPL-3.0-or-later
 """
-import sys,getopt
+
+import sys
+if sys.version_info[0] < 3:
+    sys.exit('This script requires Python 3')
+
+import getopt
 #
 def get1st(item):
   return item[0]

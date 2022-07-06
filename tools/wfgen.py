@@ -7,6 +7,9 @@
 """
 
 import sys
+if sys.version_info[0] < 3:
+    sys.exit('This script requires Python 3')
+
 from Wfgen.xmvb2wf import xmvb_in
 from Wfgen.mol2wf import molpro_in
 from Wfgen.orca2wf import orca_in

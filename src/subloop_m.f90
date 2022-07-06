@@ -82,7 +82,7 @@ subroutine subloop(subname, smpl, exitSubLoop, psimax_obj)
 
    do subIdx=1,MAXSUBS
       if (subNames(subIdx)==subname) then
-         if (logmode >= 2) write(iul,'(/2a)') ' ================>     calling subroutine ',trim(subname)
+         if (logmode >= 2) call printHeader(iul, 'calling subroutine' // trim(subname), '-')
          exit
       end if
    end do
@@ -95,7 +95,7 @@ subroutine subloop(subname, smpl, exitSubLoop, psimax_obj)
             fileExistsInt = 0
             write(iul,'(//2a/)') "ERROR in .in file: unknown subroutine ",trim(subname)
          else
-            if (logmode >= 2) write(iul,'(/2a)') ' * * *  calling macro ',trim(subname)
+            if (logmode >= 2) call printHeader(iul, 'calling macro' // trim(subname), '-')
          end if
       end if
       call myMPIBcastInteger(fileExistsInt,1)
@@ -287,9 +287,9 @@ subroutine subloop(subname, smpl, exitSubLoop, psimax_obj)
 
    if (logmode >= 2) then
       if (subIdx>MAXSUBS) then
-         write(iul,'(/2a/)') ' =============>    end macro ',trim(subname)
+         call printHeader(iul, 'end macro ' // trim(subname), '-')
       else
-         write(iul,'(/2a/)') ' =============>    end subroutine ',trim(subname)
+         call printHeader(iul, 'end subroutine ' // trim(subname), '-')
       end if
    end if
 
