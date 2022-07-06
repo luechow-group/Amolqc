@@ -32,15 +32,15 @@ class WaveFunction:
         self.jastrow = jastrow
         self.symmetry_list = symmetry_list
         self.separated_electrons = 0
-        self.geom_unit = bohr  # logical
+        self.bohr = bohr  # logical
 
     def write(self):
         self.title = self.title.split('/')[-1]
         wf_filename = self.title + '.wf'
         out = open(wf_filename, 'w')
 
-        if self.geom_unit:
-            self.write_general_section(out, self.geom_unit)
+        if self.bohr:
+            self.write_general_section(out, self.bohr)
         else:
             self.write_general_section(out)
 
@@ -169,6 +169,16 @@ class WaveFunction:
                 else:
                     new_csf.determinants.append(new_det)
         self.csfs.append(new_csf)
+
+    def convert_to_bohr(self):
+        if self.bohr:
+            print('Warning: atom positions are already in Bohr, convert_to_bohr does nothing')
+        else:
+            bohr2ang = 0.52917721067  # 0.529177210903
+            for i in range(len(self.atoms)):
+                for j in range(3):
+                    self.atoms[i].position[j] /= bohr2ang
+            self.bohr = True
 
     def sort_ci(self):
         if len(self.csfs) == 1 and len(self.csfs[0].determinants) == 1:

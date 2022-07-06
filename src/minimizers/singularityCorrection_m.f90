@@ -288,9 +288,13 @@ contains
 
       if (verbose > 4) write(iul,"(a,18i3)") " singularity correction with slist:", sp%slist
       do i = 1, size(x)/3
-         if (sp%slist(i) /= 0) cycle
+         if (sp%slist(i) /= 0) cycle  ! electron i is already placed at a singularity
          call this%get_nearest_singularity(x(3*i-2:3*i), dd, x_diff, x_sing, idx_sing)
          if (verbose > 4) write(iul,"(i4,a,i3,7g13.5)") i, " dist:", idx_sing, dd, x_diff, x_sing
+         if (dd < this%sing_thresh_) then
+            call this%set_to_singularity(x, sp, is_corrected, x_sing, idx_sing, i)
+            cycle  ! electron i was just placed at a singularity
+         end if
          if (dd < this%corr_thresh_) then
             if (MOD(this%corr_mode_,10) == UMRIGAR) then
                is_corrected = .true.

@@ -86,7 +86,9 @@ add_fortran_library(src STATIC
         optParamsWBFGS_m.f90
         optParamsVNL2SOL_m.f90
         # Wave Function Analysis
+        eigenVectAnalysis_m.f90
         psiMax_m.f90
+        fGradPsi2_m.f90
         #sed_m.f90
         assign_m.f90
         findNucElecs_m.f90
@@ -117,6 +119,7 @@ set_file_compile_options(mos_m.f90 ${VECTORINFO_FLAGS})
 
 if (${CHKNANUP})
     set_file_compile_options(multiDet_m.f90 "-DCHKNANUP")
+    set_file_compile_options(waveFunction_m.f90 "-DCHKNANUP")
 endif()
 
 if (${WFMAXLINES})

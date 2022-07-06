@@ -39,7 +39,7 @@ contains
       class(line_search_ws_simple), intent(in)        :: lss
       type(singularity_correction), intent(in)        :: sc
       logical, intent(in)                             :: yn
-      real(r8), optional, intent(in)                    :: step_size
+      real(r8), optional, intent(in)                  :: step_size
       integer, optional, intent(in)                   :: latency
       integer, optional, intent(in)                   :: switch_step
       type(minimizer_ws_bfgs), pointer :: constructor
@@ -93,6 +93,13 @@ contains
 
       call fn%eval_fg(x, f, g)
       nr_eval = 1
+
+      ! before the first step, check for singularities, but with zero step and set particles to singularities
+      p = 0._r8
+      call this%sc_%correct_for_singularities(x, p, sp, is_corrected, correction_only=.false.)
+      where ( sp%At_singularity() ) g = 0.d0
+
+      call this%restrict_gradient(g)
 
       if (verbose > 0) then 
          write(iul,"(a,g20.10)") " initial position with function value f=", f
@@ -169,7 +176,11 @@ contains
          end if
 
          !! line search with distance restriction
+         call this%restrict_gradient(g)
+
          call this%lss_%find_step(fn, this%sc_, x, f, g, p, x_new, g_new, ls_iter, is_corrected, sp)
+         call this%restrict_gradient(g_new)
+
 
          if (debug) call assert(all(abs(x)<huge(1.d0)), "minimizer_ws_bfgs_minimize: illegal x coords after find_step")
 
@@ -208,7 +219,7 @@ contains
                 " n_sing=", sp%n_sing(), " is_corrected=", is_corrected, " steps_since_correct=", steps_since_correct
          end if
 
-         if (this%is_gradient_converged(gmax)) then
+         if (this%is_gradient_converged(gmax) .or. this%is_value_converged(f)) then
             x = x_new
             g = g_new
             call this%set_converged(.true.)
@@ -286,6 +297,12 @@ contains
 
          x = x_new
          g = g_new
+
+         if (MAXVAL(ABS(x_new)) > this%max_electron_distance()) then
+            call this%set_converged(.false.)
+            exit
+         end if
+
       end do
 
       if (verbose > 0) then

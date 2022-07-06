@@ -44,6 +44,7 @@ CONTAINS
     character(len=3)              :: s
     character(len=26)             :: s26
     logical                       :: found,ltmp,readMode,writeMode,writeBasis
+    real(r8)                      :: value
 
     call getinta(lines,nl,"jas_init=",i,iflag)
     if (iflag == 0) then
@@ -131,6 +132,26 @@ CONTAINS
        doReorderDets = .false.
     endif
 
+    directDet = finda(lines, nl, 'direct_det')
+
+    call getdbla(lines,nl,'det_inverse_threshold=', value , iflag)
+    if (iflag == 0) then
+#ifndef CHKNANUP
+      call error(" direct calculation of determinants requires -DCHKNANUP")
+#else
+      call setDetInverseThreshold(value)
+#endif
+    end if
+
+    call getdbla(lines,nl,'switch_direct_threshold=', value , iflag)
+    if (iflag == 0) then
+#ifndef CHKNANUP
+      call error(" direct calculation of determinants requires -DCHKNANUP")
+#else
+      call setSwitchDirectThreshold(value)
+#endif
+    end if
+
     found = finda(lines,nl,'task')
     if(found) then
       aomotask = .true.
@@ -215,6 +236,8 @@ CONTAINS
           write(iul,*)
        end if
     endif
+
+
 
     call readWF(wfFile,ecp)
 

@@ -111,8 +111,8 @@ contains
    subroutine rho_fg(this, x, f, g)
       class(fctn_rho), intent(in)  :: this
       real(r8), intent(in) :: x(:)
-      real(r8), intent(inout) :: f
-      real(r8), intent(inout) :: g(:)
+      real(r8), intent(out) :: f
+      real(r8), intent(out) :: g(:)
 
       call assert(SIZE(x) == 3 .and. SIZE(g) == 3, "rho_fg: illegal size")
 
@@ -135,8 +135,8 @@ contains
    subroutine log_rho_fg(this, x, f, g)
       class(fctn_log_rho), intent(in)  :: this
       real(r8), intent(in) :: x(:)
-      real(r8), intent(inout) :: f
-      real(r8), intent(inout) :: g(:)
+      real(r8), intent(out) :: f
+      real(r8), intent(out) :: g(:)
 
       call assert(SIZE(x) == 3 .and. SIZE(g) == 3, "rho_fg: illegal size")
 

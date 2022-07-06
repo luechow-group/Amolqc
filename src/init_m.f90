@@ -144,7 +144,8 @@ subroutine initFiles(lines,nl)
       write(iul,'(A)')    '  Sebastian Manten, Christian Diedrich, Annika Bande, Tony C. Scott,'
       write(iul,'(A)')    '  Annett Schwarz, Rene Petz, Raphael Berner, Alexander Sturm,'
       write(iul,'(A)')    '  Marko Hermsen, Kaveh Haghighi Mood, Christoph Schulte,'
-      write(iul,'(A)')    '  Leonard Reuter, Michael A. Heuer, Jil Ludovicy'
+      write(iul,'(A)')    '  Leonard Reuter, Michael A. Heuer, Jil Ludovicy, Vladimir Terzi,'
+      write(iul,'(A)')    '  Michel V. Heinz'
  
 #ifdef VERSION
       write(iul,'(//2A)')  ' version:          ', VERSION

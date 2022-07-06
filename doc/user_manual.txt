@@ -321,7 +321,8 @@ full_localisation: ECP localization with Jastrow factor(default)
 [no_]random_rotation: use [fixed] random axis system for grid integration
 cutoff=x: if given, ECP cutoff is turned on. This calculates for each atom
   a cutoff radius for the non-local part. The calculated radii are shown with
-  verbose>=2.
+  verbose>=2. They are calculated as the radii where all local components are
+  smaller than the given cutoff value.
 [full|no|nonlocal]_cutoff: Cutoff for all channels (local and non-local)
                            no cutoff Cutoff only for non-local channels(default)
 grid_points=n: Set same integration grid points for all atoms.
@@ -331,6 +332,15 @@ grid_point_list=m: Set integration grid points for different atoms.
 
 
 ====================================================================================
+
+$eigenvect_analysis
+----------------
+
+no options. This command calculates the eigenvalues and -vectors of the Hessian for
+a given sample (.pos file) and writes the results into an eigenvect_analysis.yml file.
+
+
+=====================================================================================
 
 $eloctest
 ---------
@@ -559,9 +569,25 @@ method=[bfgs|fire|steepest_descent|bfgst|newton] default: bfgs
 max_iter=1000        : maximal number of iterations (not function evaluations!)
 max_distance=dd      : if given total 3n-dim step is scaled to a max of dd for the largest step of one electron
 max_distance_one=dd  : if given each one-electron step is cut at dd (!just for testing atm)
-convergence_gradient=0.0001 : convergence if max(abs(gradient)) < 0.0001
+convergence_gradient=1.0e-4  : convergence if max(abs(gradient)) < 0.0001
+convergence_value=1.0e-3     : convergence if the value of the function to be minimized is below a certain threshold.
+numerical_denominator=1.0e-5 : numeric_denominator for the numerical evaluation of the gradient using the
+                               two-point formula.
 save_opt_paths       : triggers saving the maximization path in the .ref format. Data are stored at unit 300+taskid,
                        i.e. fort.300, fort.301, ... Entry (k, m) means: m-th iteration step of the k-th maximization
+negative_eigenvalues=0 : if non-zero checks number of negative eigenvalues of the Hessian, with absolute value larger
+                          than eigenvalue_threshold. Only critical points with given number of negative eigenvalues are
+                          analyzed.
+eigenvalue_threshold=1e-2 : only eigenvalues with absolute value larger than eigenvalue_threshold are considered for
+                            counting the number of negative eigenvalues.
+not_to_minimize      : list of indices of coordinates, which should not be optimized (e.g. =3;6;9 in order to not
+                       optimize the z coordinates of the 1st, 2nd, and 3rd electrons)
+minimize_grad_norm   : Instead of minimizing Phi, minimizes the magnitude of the gradient, in order to use the faster
+                       steepest descent method to find saddle points. (Note: This option can be used with every
+                       minimizer. However, it might not be sensible to use the Newton method.)
+max_electron_distance=dd : (Important: only implemented for the bfgs minimizer!) if given and the coordinates of an
+                           electron (either x, y, or z) exceed the given number, the minimization process will be
+                           aborted (not converged).
 
 singularity correction parameters:
 correction_mode=[cut|umr|cut_all|umr_all|none]:

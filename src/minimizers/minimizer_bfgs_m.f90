@@ -107,7 +107,7 @@ contains
             end if
          end if
 
-         if (this%is_gradient_converged(gmax)) then
+         if (this%is_gradient_converged(gmax) .or. this%is_value_converged(f)) then
             x = x_new
             g = g_new
             call this%set_converged(.true.)

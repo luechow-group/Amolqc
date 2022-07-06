@@ -53,8 +53,7 @@ def amolqc_in(input_name):
             else:
                 general[words[i]] = True
         line = wf_file.readline()
-    for key in general:
-        print(key)
+
     charge = int(general['charge'])
     multiplicity = int(general['spin'])
     atomic_charges = general['atomic_charges']

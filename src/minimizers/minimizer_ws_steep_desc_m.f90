@@ -82,6 +82,12 @@ contains
       call fn%eval_fg(x, f, g)
       n_eval = 1
 
+      ! before the first step, check for singularities, but with zero step and set particles to singularities
+      delta_x = 0._r8
+      call this%restrict_gradient(g)
+      call this%sc_%correct_for_singularities(x, delta_x, sp, is_corrected, correction_only=.false.)
+      where ( sp%At_singularity() ) g = 0.d0
+
       if (verbose > 0) then 
          write(iul,"(a,g20.10)") " initial position with function value f=", f
          call this%write_params(iul)
@@ -98,6 +104,7 @@ contains
          if (verbose > 3) write(iul,"(a,i6)") " iter=", iter
 
          dt = this%dt_
+         call this%restrict_gradient(g)
          delta_x = - dt * g
          f_old = f
          ls_iter = 5
@@ -110,7 +117,7 @@ contains
 
          x = x_new
          g = g_new
-
+         call this%restrict_gradient(g)
          where ( sp%At_singularity() ) g = 0.d0
 
          gmax = maxval(abs(g))
@@ -123,7 +130,7 @@ contains
             end if
          end if
 
-         if (this%is_gradient_converged(gmax) .or. (sp%n_sing() == size(x)/3)) then
+         if (this%is_gradient_converged(gmax) .or. (sp%n_sing() == size(x)/3) .or. this%is_value_converged(f)) then
             call this%set_converged(.true.)
             exit
          end if

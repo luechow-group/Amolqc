@@ -18,6 +18,7 @@ module minimizer_ws_newton_module
 
    type, extends(minimizer_w_sing) :: minimizer_ws_newton
       real(r8) :: dt = 1._r8
+      real(r8) :: delta_max = -1._r8
    contains
       procedure :: minimize => minimizer_ws_newton_minimize
       procedure :: write_params_minimizer_ws_newton
@@ -30,17 +31,20 @@ module minimizer_ws_newton_module
 
 contains
 
-   function constructor1(sc, dt) result(minimizer)
+   function constructor1(sc, dt, delta_max) result(minimizer)
       type(singularity_correction), intent(in)          :: sc
       real(r8), optional, intent(in) :: dt
+      real(r8), optional, intent(in) :: delta_max
       type(minimizer_ws_newton), pointer :: minimizer
       allocate(minimizer)
       minimizer%sc_ = sc
 
       if (PRESENT(dt)) minimizer%dt = dt
+      if (PRESENT(delta_max)) minimizer%delta_max = delta_max
    end function constructor1
 
    subroutine minimizer_ws_newton_minimize(this, fn, x)
+      use, intrinsic :: ieee_arithmetic, only: ieee_is_normal
       class(minimizer_ws_newton), intent(inout) :: this
       class(Function_t), intent(in)                  :: fn
       real(r8), intent(inout)                         :: x(:)
@@ -48,7 +52,7 @@ contains
       real(r8)                   :: g(SIZE(x)), g_new(SIZE(x)), x_new(SIZE(x))
       real(r8)                   :: delta_x(SIZE(x)), H(SIZE(x),SIZE(x)), work(SIZE(x)**2)
       real(r8)                   :: ipiv(SIZE(x)), lambda(SIZE(X)), work2(3*SIZE(x)-1)
-      real(r8)                   :: gmax
+      real(r8)                   :: gmax, delta_x_scale
       integer                    :: iter, verbose, iul, i, j, k
       integer                    :: n, info, lwork
       type(singularity_particles):: sp
@@ -86,43 +90,68 @@ contains
 
       if (this%do_write_opt_path()) call this%write_opt_path_entry(1, x, f)
 
-      do iter = 1, this%max_iterations()
-         if (verbose > 3) write(iul,"(a,i6)") " iter=", iter
-         f_old = f
+      ! check if position is alread converged
+      if (this%is_gradient_converged(maxval(abs(g))) .or. (sp%n_sing() == size(x)/3) .or. this%is_value_converged(f)) then
+         call this%set_converged(.true.)
+      else
+         do iter = 1, this%max_iterations()
+            if (verbose > 3) write(iul,"(a,i6)") " iter=", iter
+            f_old = f
 
-         ! calculating step
-         call fn%eval_fgh(x, f, g, H)
-         call sp%Fix_gradients(g, H)
+            ! calculating step
+            call fn%eval_fgh(x, f, g, H)
+            call sp%Fix_gradients(g, H)
 
-         ! calculate delta_x = -H^-1 * g by solving H*delta_x = -g
-         delta_x = - this%dt*g
-         ! ?SYSV info: https://software.intel.com/en-us/node/468912
-         call DSYSV('U',n,1,H,n,ipiv,delta_x,n,work,n**2,info)
-         call assert(info==0, 'newton_minimize: inversion failed')
+            ! calculate delta_x = -H^-1 * g by solving H*delta_x = -g
+            delta_x = - this%dt*g
+            ! ?SYSV info: https://software.intel.com/en-us/node/468912
 
-         ! saving position and value before step
-         if (this%do_write_opt_path()) call this%write_opt_path_entry(iter, x, f)
-
-         ! doing step (with singularity correction)
-         call this%sc_%correct_for_singularities(x, delta_x, sp, is_corrected, correction_only=.false.)
-
-         if (verbose > 4) write(iul,"(2i6,3g18.10)") iter, f, f_old
-
-         gmax = maxval(abs(g))
-         if (verbose > 2) then
-            write(iul,"(i6,2(a,g18.10),(a,g12.3))") iter, " f=", f, " gmax=", gmax, " dt=", this%dt
-            if (verbose > 3) then
-               write(iul,"(9g13.5)") x
-               write(iul,"(9g13.5)") g
+            if (.not. (ALL(ieee_is_normal(delta_x)) .and. ALL(ieee_is_normal(H)))) then
+               call this%set_converged(.false.)
+               exit
             end if
-         end if
 
-         if (this%is_gradient_converged(gmax) .or. (sp%n_sing() == size(x)/3)) then
-            call this%set_converged(.true.)
-            exit
-         end if
+            call DSYSV('U',n,1,H,n,ipiv,delta_x,n,work,n**2,info)
+            !call assert(info==0, 'newton_minimize: inversion failed')
 
-      end do
+            if (info /= 0 .or. .not. all(abs(delta_x)<huge(1.d0))) then
+               call this%set_converged(.false.)
+               exit
+            end if
+
+            ! saving position and value before step
+            if (this%do_write_opt_path()) call this%write_opt_path_entry(iter, x, f)
+
+            ! restriction of step length
+            if (this%delta_max > 0._r8) then
+               delta_x_scale = 1._r8
+               do i = 1, SIZE(delta_x), 3
+                  delta_x_scale = MIN(delta_x_scale, this%delta_max / NORM2(delta_x(i:i+2)))
+               end do
+               delta_x = delta_x * delta_x_scale
+            end if
+
+            ! doing step (with singularity correction)
+            call this%sc_%correct_for_singularities(x, delta_x, sp, is_corrected, correction_only=.false.)
+
+            if (verbose > 4) write(iul,"(2i6,3g18.10)") iter, f, f_old
+
+            gmax = maxval(abs(g))
+            if (verbose > 2) then
+               write(iul,"(i6,2(a,g18.10),(a,g12.3))") iter, " f=", f, " gmax=", gmax, " dt=", this%dt
+               if (verbose > 3) then
+                  write(iul,"(9g13.5)") x
+                  write(iul,"(9g13.5)") g
+               end if
+            end if
+
+            if (this%is_gradient_converged(gmax) .or. (sp%n_sing() == size(x)/3)) then
+               call this%set_converged(.true.)
+               exit
+            end if
+
+         end do
+      end if
 
       if (verbose > 0) then
          write(iul,"(a,g20.10)") " final position with function value f=", f
@@ -138,7 +167,7 @@ contains
             ! Getting eigenvalues and -vectors of Hessian
             lwork = 3*SIZE(X)-1
             call DSYEV('V', 'U', n, H, n, lambda, work2, lwork, info)
-            call assert(info==0, 'newton_minimize: diagonalization failed')
+            !call assert(info==0, 'newton_minimize: diagonalization failed')
             write(iul,*) 'hessian eigenvalues and -vectors:'
             do i = 1, n
                write(iul,*) i, lambda(i)

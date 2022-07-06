@@ -39,6 +39,7 @@ subroutine mainloop
    use rhoMax_m, only: rhoMax_t
    use moMax_m, only: moMax_run, moMax_plot, moMax_plot_plane
    use maximizeSample_m, only: maximizeSample, maximizeWalker
+   use eigenVectAnalysis_m
    use maximizeSampleRho_m, only: maximizeSampleRho, maximizeWalkerRho
    use maxRawData_m, only: maxraw_init
    use maxAnalysis_m, only: maxana_init
@@ -173,6 +174,9 @@ subroutine mainloop
       case('maximize_sample')
          if (wout) call printHeader(iul, getFormattedHeader(token, 'get psi^2 maxima of sample'))
          call maximizeSample(smpl, psimax_obj, wout)
+      case('eigenvect_analysis')
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'get eigenvalues and eigenvectors of sample'))
+         call eigenVectAnalysis(smpl, psimax_obj)
       case('maximize_sample_rho')
          if (wout) call printHeader(iul, getFormattedHeader(token, 'get rho maxima of sample'))
          call maximizeSampleRho(smpl, rhoMax)
