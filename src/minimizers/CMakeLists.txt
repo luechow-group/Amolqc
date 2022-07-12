@@ -13,6 +13,7 @@ add_fortran_library(minimizers STATIC
         singularityParticles_m.f90
         minimizer_steep_desc_m.f90
         line_search_ws_simple_m.f90
+        line_search_ws_simple_both_dir_m.f90
         line_search_simple_m.f90
         minimizer_w_sing_m.f90
         minimizer_ws_fire_m.f90
