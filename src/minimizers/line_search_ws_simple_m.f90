@@ -91,9 +91,12 @@ contains
 
          if (debug) call internal_test_xalpha()
 
-         call ff%eval_fg(xalpha, falpha, gradalpha)
+         falpha = ff%eval(xalpha)
 
-      if (falpha < f + this%c_ * alpha * dir_deriv .or. nfeval == maxiter) exit
+         if (falpha < f + this%c_ * alpha * dir_deriv .or. nfeval == maxiter) then
+            call ff%eval_fg(xalpha, falpha, gradalpha)
+            exit
+         end if
 
          alpha = this%rho_ * alpha
          sp = sp_old
