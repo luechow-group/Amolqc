@@ -9,7 +9,7 @@ module minimizer_ws_bfgs_module
    use fctn_module, only: Function_t
    use singularityCorrection_m, only: singularity_correction
    use singularityParticles_m, only: singularity_particles
-   use line_search_ws_simple_module, only: line_search_ws_simple
+   use line_search_ws_m, only: line_search_ws
    use minimizer_w_sing_module, only: minimizer_w_sing
    implicit none
 
@@ -18,7 +18,7 @@ module minimizer_ws_bfgs_module
 
    type, extends(minimizer_w_sing) :: minimizer_ws_bfgs
       private
-      type(line_search_ws_simple)     :: lss_
+      class(line_search_ws), allocatable     :: lss_
       logical                         :: scale_initial_H_ = .false.  ! .t. recommended by Nocedal
       real(r8)                    :: step_size_ = 0.d0
       integer                         :: latency_ = 0
@@ -36,7 +36,7 @@ module minimizer_ws_bfgs_module
 contains
 
    function constructor(lss, sc, yn, step_size, latency, switch_step)
-      class(line_search_ws_simple), intent(in)        :: lss
+      class(line_search_ws), intent(in)        :: lss
       type(singularity_correction), intent(in)        :: sc
       logical, intent(in)                             :: yn
       real(r8), optional, intent(in)                  :: step_size

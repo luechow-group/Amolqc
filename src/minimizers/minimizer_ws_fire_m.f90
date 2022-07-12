@@ -8,7 +8,7 @@ module minimizer_ws_fire_module
    use fctn_module, only: Function_t
    use singularityCorrection_m, only: singularity_correction
    use singularityParticles_m, only: singularity_particles
-   use line_search_ws_simple_module, only: line_search_ws_simple
+   use line_search_ws_m, only: line_search_ws
    use minimizer_w_sing_module, only: minimizer_w_sing
    use minimizer_fire_module, only: fire_parameters, PASS, BACKTRACK
    implicit none
@@ -17,7 +17,7 @@ module minimizer_ws_fire_module
    public :: minimizer_ws_fire, fire_parameters, PASS, BACKTRACK
 
    type, extends(minimizer_w_sing) :: minimizer_ws_fire
-      type(line_search_ws_simple)  :: lss_
+      class(line_search_ws), allocatable   :: lss_
       type(fire_parameters) :: params_
    contains
       procedure :: minimize => minimizer_ws_fire_minimize
@@ -32,7 +32,7 @@ module minimizer_ws_fire_module
 contains
 
    function constructor1(lss, sc, params)
-      class(line_search_ws_simple), intent(in)    :: lss
+      class(line_search_ws), intent(in)   :: lss
       type(singularity_correction), intent(in)    :: sc
       type(fire_parameters), intent(in)           :: params
       type(minimizer_ws_fire), pointer :: constructor1

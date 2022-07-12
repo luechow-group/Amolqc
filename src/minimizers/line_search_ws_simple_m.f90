@@ -2,28 +2,22 @@
 !
 ! SPDX-License-Identifier: GPL-3.0-or-later
 
-module line_search_ws_simple_module
+module line_search_ws_simple_m
    use kinds_m, only: r8
    use error_m, only: assert, asserts, debug, abortp
    use fctn_module, only: Function_t
+   use line_search_ws_m, only: line_search_ws
    use singularityCorrection_m, only: singularity_correction
    use singularityParticles_m, only: singularity_particles
-   use verbosity_m, only: Verbosity_t
+
 
    implicit none
 
    private
 
-   type, extends(Verbosity_t) :: line_search_ws_simple
-      !!!private              ! with private the default constructor is impossible
-      real(r8)      :: alpha_ = 1.d0   ! line search parameter
-      real(r8)      :: c_ = 0.1d0
-      real(r8)      :: rho_ = 0.33d0
-      real(r8)      :: delta_max_ = 0.d0   ! maximum step length (scaling search direction)
-      real(r8)      :: step_max_  = 0.d0   ! maximum step length per particle (modifying search direction)
+   type, extends(line_search_ws) :: line_search_ws_simple
    contains
       procedure   :: find_step => find_step_ws_simple
-      procedure   :: write_params => line_search_ws_simple_write_params
    end type line_search_ws_simple
 
    public :: line_search_ws_simple
@@ -80,7 +74,7 @@ contains
 
          p = alpha * d
 
-         if (this%step_max_ > 0.d0) call restrict_particle_step(p, this%step_max_)
+         if (this%step_max_ > 0.d0) call this%restrict_particle_step(p, this%step_max_)
 
          sp_old = sp
 
@@ -122,37 +116,5 @@ contains
 
    end subroutine find_step_ws_simple
 
-   subroutine line_search_ws_simple_write_params(this, iu)
-      class(line_search_ws_simple), intent(in)    :: this
-      integer, intent(in) , optional  :: iu
-      integer iull
 
-      iull = this%verbose_unit()
-      if (present(iu)) iull = iu
-      write(iull, "(/a/a)") " -- simple line search with step correction", " with:"
-      write(iull,"(a,g12.3)") " alpha               =", this%alpha_
-      write(iull,"(a,g12.3)") " c                   =", this%c_
-      write(iull,"(a,g12.3)") " rho                 =", this%rho_
-      if (this%delta_max_ > 0.d0)  &
-         write(iull, "(a,g12.3)")  " max_distance        =", this%delta_max_
-      if (this%step_max_ > 0.d0)   &
-         write(iull, "(a,g12.3)")  " max_step            =", this%step_max_
-   end subroutine line_search_ws_simple_write_params
-
-   subroutine restrict_particle_step(p, step_max)
-      real(r8), intent(inout)  :: p(:)
-      real(r8), intent(in)     :: step_max
-      real(r8) :: step_length
-      integer i
-
-      call assert(mod(size(p),3) == 0, "restrict_particle_step: illegal size")
-      do i = 1, size(p), 3
-         step_length = NORM2(p(i:i+2))
-         if (step_length > step_max) then
-            p(i:i+2) = p(i:i+2) * step_max / step_length
-         end if
-      end do
-   end subroutine restrict_particle_step
-
-
-end module line_search_ws_simple_module
+end module line_search_ws_simple_m

@@ -8,7 +8,7 @@ module minimizer_ws_factory_module
    use error_m, only: error, assert
    use parsing_m, only: getdbla, getstra, getinta, finda, getintarra
    use singularityCorrection_m, only: singularity_correction, NONE, CUTSTEP, UMRIGAR
-   use line_search_ws_simple_module, only: line_search_ws_simple
+   use line_search_ws_simple_m, only: line_search_ws_simple
    use line_search_weak_wolfe_module, only: line_search_weak_wolfe
    use minimizer_w_sing_module, only: minimizer_w_sing
    use minimizer_ws_steep_desc_module, only: minimizer_ws_steep_desc
