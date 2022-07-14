@@ -267,10 +267,7 @@ contains
              call abortp("$qmc: unknown move given")
        end select
     end if
-    if (move == 2) then
-       found = finda(lines,nl,'no_exp')
-       if (found) call setNoExp()
-    endif
+
     call getstra(lines,nl,'weight=',s,iflag)   ! weight overrides default values
     if (iflag == 0) then
        if (s=='none') then
@@ -429,7 +426,13 @@ contains
     if (found) mShowDetails = 1
 
     call propagator_reset()
-    blockdiscard = INT(mStepsDiscard / mBlockLen)
+
+    if (move == 2) then
+        found = finda(lines,nl,'no_exp')
+        if (found) call setNoExp()
+    endif
+
+    blockdiscard = mStepsDiscard / mBlockLen
     call propagator_init(mWeight,move,tmove,blockdiscard,bgte,tau,ds,ar,rc,mt,mWalkerBlock)
 
     !Max Analysis - Check for consistent sample size on each core
