@@ -205,7 +205,7 @@ contains
          call getdblarra(lines, nlines, "max_electron_distance=", distance, iflag)
          call assert(iflag /= 0 .or. value == 'bfgs', &
                  &"minimizer input: max_electron_distance only implemented for bfgs!")
-         if (ALLOCATED(distance)) then
+         if (iflag == 0) then
             if (SIZE(distance) == 1) then
                tmp = distance(1)
                deallocate(distance)
@@ -214,11 +214,10 @@ contains
             else if (SIZE(distance) /= 3) then
                call assert(.false., "minimizer input: max_electron_distance needs either 1 or 3 numbers as input!")
             end if
-         else if (iflag == 1)then
+         else
             allocate(distance(3))
             distance = HUGE(0._r8)
          end if
-         print*, distance
          call minimizer_p%set_max_electron_distance(distance)
          call getintarra(lines, nlines, "not_to_minimize=", not_to_minimize, iflag)
          if (iflag == 0) call minimizer_p%set_not_to_minimize(not_to_minimize)
