@@ -401,7 +401,6 @@ contains
        accepted = 0.d0
        do i = 1, walkerBlockSize
           xi = myran()
-          print*, accRatio(i)
           if (accRatio(i) > xi) then
              isAccepted(i) = .true.
              accepted = accepted + 1.d0/walkerBlockSize
@@ -1084,7 +1083,6 @@ contains
           else
               accratio(w) = (phi(rwb(w))/phiOld(w))**2 * exp( 2.d0*(ju(rwb(w))-uold(w)) )  * gf1/gf
           end if
-          !print*, accratio(w), phi(rwb(w)),phiOld(w),ju(rwb(w)),uold(w),gf1,gf
 
       endif
 
