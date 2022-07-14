@@ -47,13 +47,14 @@ contains
       h = this%h
    end function get_numerical_denominator
 
-   subroutine eval_fg_num(this, x, f, g)
+   subroutine eval_fg_num(this, x, f, g, mask)
       ! calculates numerical gradients using this%eval(x)
       ! currently simple symmetric 2-point formula with fixed h
       class(Function_t), intent(in)   :: this
       real(r8), intent(in)    :: x(:)    ! coordinate
       real(r8), intent(out) :: f       ! function value
       real(r8), intent(out) :: g(:)    ! gradient
+      logical, intent(in), optional :: mask(SIZE(x)) ! where false -> gradient is not calculated
       real(r8) :: xx(SIZE(x))
       real(r8) f1, f2
       integer i
@@ -61,19 +62,34 @@ contains
       if (asserts) call assert(size(x) == size(g), "eval_fg_num: inconsistent sizes")
 
       xx = x
-      do i = 1, size(x)
-         xx(i) = x(i) + this%h
-         f1 = this%eval(xx)
-         xx(i) = x(i) - this%h
-         f2 = this%eval(xx)
-         g(i) = (f1 - f2) / (2.d0 * this%h)
-         xx(i) = x(i)
-      end do
+      if (PRESENT(mask)) then
+         do i = 1, size(x)
+            if (.not. mask(i)) then
+               xx(i) = x(i) + this%h
+               f1 = this%eval(xx)
+               xx(i) = x(i) - this%h
+               f2 = this%eval(xx)
+               g(i) = (f1 - f2) / (2.d0 * this%h)
+               xx(i) = x(i)
+            else
+               g(i) = 0
+            end if
+         end do
+      else
+         do i = 1, size(x)
+            xx(i) = x(i) + this%h
+            f1 = this%eval(xx)
+            xx(i) = x(i) - this%h
+            f2 = this%eval(xx)
+            g(i) = (f1 - f2) / (2.d0 * this%h)
+            xx(i) = x(i)
+         end do
+      end if
 
       f = this%eval(x)
    end subroutine eval_fg_num
 
-   subroutine eval_fgh_num(this, x, f, g, H)
+   subroutine eval_fgh_num(this, x, f, g, H, mask)
       ! calculates numerical hessian using this%eval_fg(x)
       ! currently simple symmetric 2-point formula with fixed h
       class(Function_t), intent(in)   :: this
@@ -81,6 +97,7 @@ contains
       real(r8), intent(out) :: f       ! function value
       real(r8), intent(out) :: g(:)    ! gradient
       real(r8), intent(out) :: H(:,:)  ! hessian
+      logical, intent(in), optional :: mask(SIZE(x))
       real(r8) :: xx(SIZE(x))
       real(r8), dimension(SIZE(g)) :: g1, g2
       real(r8) :: f_temp
@@ -93,14 +110,31 @@ contains
       end if
 
       xx = x
-      do i = 1, SIZE(x)
-         xx(i) = x(i) + this%h
-         call this%eval_fg(xx,f_temp,g1)
-         xx(i) = x(i) - this%h
-         call this%eval_fg(xx,f_temp,g2)
-         H(i,:) = (g1 - g2) / (2.d0 * this%h)
-         xx(i) = x(i)
-      end do
+      if (PRESENT(mask)) then
+         do i = 1, SIZE(x)
+            if (.not. mask(i)) then
+               xx(i) = x(i) + this%h
+               call this%eval_fg(xx,f_temp,g1,mask)
+               xx(i) = x(i) - this%h
+               call this%eval_fg(xx,f_temp,g2,mask)
+               H(i,:) = (g1 - g2) / (2.d0 * this%h)
+               xx(i) = x(i)
+            else
+               H(i,:) = 0
+               H(i,i) = 1
+            end if
+         end do
+      else
+         do i = 1, SIZE(x)
+            xx(i) = x(i) + this%h
+            call this%eval_fg(xx,f_temp,g1)
+            xx(i) = x(i) - this%h
+            call this%eval_fg(xx,f_temp,g2)
+            H(i,:) = (g1 - g2) / (2.d0 * this%h)
+            xx(i) = x(i)
+         end do
+      end if
+
 
       ! enforcing symmetry
       H = (H + TRANSPOSE(H)) / 2

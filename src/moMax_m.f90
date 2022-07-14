@@ -57,11 +57,12 @@ contains
    end function mo_f
 
 
-   subroutine mo_fg(this, x, f, g)
+   subroutine mo_fg(this, x, f, g, mask)
       class(fctn_mo), intent(in)  :: this
       real(r8), intent(in) :: x(:)
       real(r8), intent(out) :: f
       real(r8), intent(out) :: g(:)
+      logical, intent(in), optional :: mask(SIZE(x))
 
       call assert(SIZE(x) == 3 .and. SIZE(g) == 3, "mo_fg: illegal size")
 

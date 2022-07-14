@@ -19,11 +19,12 @@ module fPsi2_m
 
 contains
 
-   subroutine fpsi2_fg(this, x, f, g)
+   subroutine fpsi2_fg(this, x, f, g, mask)
       class(fctn_psi2), intent(in)  :: this
       real(r8), intent(in) :: x(:)      ! electron vector (without elecs at cores)
       real(r8), intent(out) :: f      ! function value
       real(r8), intent(out) :: g(:)   ! gradient
+      logical, intent(in), optional :: mask(SIZE(x))
       type(eConfigArray)  :: eca
       real(r8), allocatable :: xx(:), yy(:), zz(:)
       integer n, i, error_code
