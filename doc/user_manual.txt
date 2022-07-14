@@ -1120,6 +1120,10 @@ T_moves=[SIMPLE|SC]  : Only for DMC ECP calculations. For SIMPLE see DOI: 10.110
                        DOI: 10.1063/1.3380831. SIMPLE is available only comparisons and SC should be used for
                        productive calculations.
 
+fixed_electrons      : list of electrons, which should not be propagated (e.g. =3;6;9 in order to not
+                       move the electrons 3, 6, and 9 from the $init_walker section.) This is only implemented for the
+                       Reynolds and Umrigar propagator and is usefull for the systematic saddle point search.
+
 For an example usage of the accumulation, see examples/h_accumulate.in
 
 ====================================================================================

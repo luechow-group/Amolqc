@@ -142,6 +142,7 @@ contains
 
 
     integer iflag,i
+    integer, allocatable       :: fixed_electrons(:)
     character(len=3)           :: s,mt
     character(len=12)          :: s1
     logical                    :: found,found1,found2
@@ -433,8 +434,13 @@ contains
     endif
 
     blockdiscard = mStepsDiscard / mBlockLen
-    call propagator_init(mWeight,move,tmove,blockdiscard,bgte,tau,ds,ar,rc,mt,mWalkerBlock)
-
+    call getintarra(lines, nl, "fixed_electrons=", fixed_electrons, iflag)
+    if (iflag == 0) then
+        call assert(move==1 .or. move==2, 'qmc_init: Fixed electrons only implemented for Reynolds and Umrigar propagator!')
+        call propagator_init(mWeight,move,tmove,blockdiscard,bgte,tau,ds,ar,rc,mt,mWalkerBlock,fixed_electrons)
+    else
+        call propagator_init(mWeight,move,tmove,blockdiscard,bgte,tau,ds,ar,rc,mt,mWalkerBlock)
+    end if
     !Max Analysis - Check for consistent sample size on each core
     !happens if outliers are removed and not replaced on any core
     if (mMaxAnalysis) then
