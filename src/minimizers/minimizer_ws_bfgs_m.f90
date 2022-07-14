@@ -71,7 +71,7 @@ contains
       integer                    :: i, iter, verbose, iul, n, ls_iter, info, nr_eval
       integer                    :: steps_since_correct
       type(singularity_particles):: sp
-      logical                    :: gmask(size(x))      ! .true. for components of particles at a singularity
+      logical                    :: gmask(size(x)), mask(size(x))   ! .true. for components of particles at a singularity
       logical is_corrected, new_sing
 
       if (asserts) then
@@ -97,6 +97,9 @@ contains
       ! before the first step, check for singularities, but with zero step and set particles to singularities
       p = 0._r8
       call this%sc_%correct_for_singularities(x, p, sp, is_corrected, correction_only=.false.)
+      mask = sp%At_singularity()
+      call fn%eval_fg(x, f, g, mask)
+
       where ( sp%At_singularity() ) g = 0.d0
 
       call this%restrict_gradient(g)

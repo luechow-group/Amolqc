@@ -40,6 +40,7 @@ contains
       logical, intent(inout):: is_corrected ! indicates whether step is scaled direction or a corrected scaled direction
       type(singularity_particles), intent(inout) :: sp
       real(r8) :: p(size(x0))
+      logical :: mask(SIZE(x0))
       real(r8) alpha, f, dir_deriv
       integer i, maxiter
       type(singularity_particles) :: sp_old
@@ -94,7 +95,8 @@ contains
          falpha = ff%eval(xalpha)
 
          if (falpha < f + this%c_ * alpha * dir_deriv .or. nfeval == maxiter) then
-            call ff%eval_fg(xalpha, falpha, gradalpha)
+            mask = sp%At_singularity()
+            call ff%eval_fg(xalpha, falpha, gradalpha, mask)
             exit
          end if
 
