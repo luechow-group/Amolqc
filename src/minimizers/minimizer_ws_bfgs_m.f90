@@ -68,7 +68,8 @@ contains
       real(r8)                     :: v(size(x)), v1(size(x))    ! aux vectors
       real(r8)                     :: curv, rho
       real(r8), allocatable        :: sings(:,:)
-      integer                    :: i, iter, verbose, iul, n, ls_iter, info, nr_eval
+      real(r8)                     :: xyz(SIZE(x)/3, 3)
+      integer                    :: i, iter, verbose, iul, n, ls_iter, info, nr_eval, max_d_flag
       integer                    :: steps_since_correct
       type(singularity_particles):: sp
       logical                    :: gmask(size(x)), mask(size(x))   ! .true. for components of particles at a singularity
@@ -301,9 +302,18 @@ contains
          x = x_new
          g = g_new
 
-         if (MAXVAL(ABS(x_new)) > this%max_electron_distance()) then
-            call this%set_converged(.false.)
-            exit
+         max_d_flag = 0
+
+         if (MAXVAL(ABS(x_new)) > MINVAL(this%max_electron_distance())) then
+            xyz = RESHAPE(x_new, [SIZE(x_new)/3,3])
+            do i = 1, 3
+               if (MAXVAL(ABS(xyz(:,i))) > MINVAL(this%max_electron_distance())) then
+                  max_d_flag = 1
+                  call this%set_converged(.false.)
+                  exit
+               end if
+            end do
+            if (max_d_flag == 1) exit
          end if
 
       end do

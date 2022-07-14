@@ -23,7 +23,7 @@ module minimizer_module
       real(r8), allocatable           :: gradient_(:)
       real(r8)                        :: max_abs_gradient_ = 0.1d0
       real(r8)                        :: max_mean_gradient_ = 0.1d0
-      real(r8)                        :: max_electron_distance_ = HUGE(1._r8)
+      real(r8)                        :: max_electron_distance_(3) = HUGE(1._r8)
       integer, allocatable            :: not_to_minimize_(:)
       logical                       :: converged_ = .false.
       integer                       :: current_iterations_ = 0
@@ -127,7 +127,7 @@ contains
 
    subroutine set_max_electron_distance(this, value)
       class(minimizer), intent(inout) :: this
-      real(r8), intent(in)              :: value
+      real(r8), intent(in)              :: value(3)
       this%max_electron_distance_ = value
    end subroutine set_max_electron_distance
 
@@ -182,7 +182,7 @@ contains
 
    function max_electron_distance(this) result(value)
       class(minimizer), intent(inout) :: this
-      real(r8)                          :: value
+      real(r8)                          :: value(3)
       value = this%max_electron_distance_
    end function max_electron_distance
 
