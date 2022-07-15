@@ -96,7 +96,7 @@ contains
 
       ! before the first step, check for singularities, but with zero step and set particles to singularities
       p = 0._r8
-      call this%sc_%correct_for_singularities(x, p, sp, is_corrected, correction_only=.false.)
+      call this%sc_%correct_for_singularities(x, p, sp, is_corrected, correction_only=.true.)
       mask = sp%At_singularity()
       call fn%eval_fg(x, f, g, mask)
 
