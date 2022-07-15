@@ -26,6 +26,7 @@ module minimizer_module
       real(r8)                        :: max_electron_distance_(3) = HUGE(1._r8)
       integer, allocatable            :: not_to_minimize_(:)
       logical                       :: converged_ = .false.
+      logical                       :: value_convergence_ = .false.
       integer                       :: current_iterations_ = 0
       integer                       :: max_iterations_ = 100
       integer                       :: current_fctn_eval_ = 0
@@ -41,7 +42,9 @@ module minimizer_module
       procedure                                :: set_convergence_value
       procedure                                :: set_max_electron_distance
       procedure                                :: set_not_to_minimize
+      procedure                                :: set_value_convergence
       procedure                                :: convergence_distance
+      procedure                                :: value_convergence
       procedure                                :: convergence_gradient
       procedure                                :: convergence_gradnorm
       procedure                                :: convergence_value
@@ -112,6 +115,12 @@ contains
       real(r8), intent(in)              :: gradient
       this%convergence_max_gradient_ = gradient
    end subroutine set_convergence_gradient
+
+   subroutine set_value_convergence(this, value_convergence)
+      class(minimizer), intent(inout) :: this
+      logical, intent(in)             :: value_convergence
+      this%value_convergence_ = value_convergence
+   end subroutine set_value_convergence
 
    subroutine set_convergence_gradnorm(this, gradnorm)
       class(minimizer), intent(inout) :: this
@@ -185,6 +194,12 @@ contains
       real(r8)                          :: value(3)
       value = this%max_electron_distance_
    end function max_electron_distance
+
+   function value_convergence(this) result(value)
+      class(minimizer), intent(inout) :: this
+      logical                         :: value
+      value = this%value_convergence_
+   end function value_convergence
 
    function is_distance_converged(this, distance) result (res)
       class(minimizer), intent(in) :: this
