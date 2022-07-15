@@ -223,6 +223,12 @@ contains
          if (iflag == 0) call minimizer_p%set_not_to_minimize(not_to_minimize)
       end if
 
+      if (finda(lines, nlines, "minimize_grad_norm")) then
+         minimizer_p%value_convergence_ = .true.
+      else
+         minimizer_p%value_convergence_ = .false.
+      end if
+
    end function create_ws_minimizer
 
 end module minimizer_ws_factory_module

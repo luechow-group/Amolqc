@@ -222,7 +222,20 @@ contains
                 " n_sing=", sp%n_sing(), " is_corrected=", is_corrected, " steps_since_correct=", steps_since_correct
          end if
 
-         if (this%is_gradient_converged(gmax) .or. this%is_value_converged(f)) then
+
+         if (this%is_gradient_converged(gmax)) then
+            if (this%value_convergence_) then
+               call this%set_converged(.false.)
+               exit
+            else
+               x = x_new
+               g = g_new
+               call this%set_converged(.true.)
+               exit
+            end if
+         end if
+
+         if (this%is_value_converged(f) .and. this%value_convergence_) then
             x = x_new
             g = g_new
             call this%set_converged(.true.)
