@@ -92,7 +92,6 @@ contains
 
       n = size(x)
 
-      call fn%eval_fg(x, f, g)
       nr_eval = 1
 
       ! before the first step, check for singularities, but with zero step and set particles to singularities
