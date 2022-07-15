@@ -309,26 +309,20 @@ contains
 
       is_corrected = is_corrected .or. ANY(tau /= tau_0)
 
-      do i = 1, size(x)/3
-         if (sp%slist(i) /= 0) cycle
-         if (this%corr_mode_ < 10) then
-            ! individual tau values
-            if (do_step .or. (tau(i) /= 1._r8)) then
-               x(3*i-2:3*i) = x(3*i-2:3*i) + v(3*i-2:3*i) * tau(i)
-            end if
-         else
-            ! _all -> same tau value for all electrons
-            if (do_step .or. (tau(i) /= 1._r8)) then
-               x(3*i-2:3*i) = x(3*i-2:3*i) + v(3*i-2:3*i) * MINVAL(tau)
-            end if
+      if (do_step) then
+         if (.not. this%corr_mode_ < 10) then
+            tau = MINVAL(tau)
          end if
-
-         ! setting to singularities
-         call this%get_nearest_singularity(x(3*i-2:3*i), dd, x_diff, x_sing, idx_sing)
-         if (dd < this%sing_thresh_) then
-            call this%set_to_singularity(x, sp, is_corrected, x_sing, idx_sing, i)
-         end if
-      end do
+         do i = 1, size(x)/3
+            if (sp%slist(i) /= 0) cycle
+            x(3*i-2:3*i) = x(3*i-2:3*i) + v(3*i-2:3*i) * tau(i)
+            ! setting to singularities
+            call this%get_nearest_singularity(x(3*i-2:3*i), dd, x_diff, x_sing, idx_sing)
+            if (dd < this%sing_thresh_) then
+               call this%set_to_singularity(x, sp, is_corrected, x_sing, idx_sing, i)
+            end if
+         end do
+      end if
    end subroutine correct_for_singularities
 
    subroutine write_params_singularity_correction(this, iu)
