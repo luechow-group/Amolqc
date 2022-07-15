@@ -39,6 +39,7 @@ contains
       integer, intent(inout):: nfeval    ! in: maxiter, out: function evaluations
       logical, intent(inout):: is_corrected ! indicates whether step is scaled direction or a corrected scaled direction
       type(singularity_particles), intent(inout) :: sp
+      real(r8) :: initial_step(SIZE(d))
       real(r8) :: p(size(x0))
       logical :: mask(SIZE(x0))
       real(r8) alpha, f, dir_deriv
@@ -69,13 +70,15 @@ contains
          return
       end if
 
+      initial_step = d
+
+      if (this%step_max_ > 0.d0) call this%restrict_particle_step(initial_step, this%step_max_)
+
       do nfeval = 1, maxiter
 
          xalpha = x0
 
-         p = alpha * d
-
-         if (this%step_max_ > 0.d0) call this%restrict_particle_step(p, this%step_max_)
+         p = alpha * initial_step
 
          sp_old = sp
 
