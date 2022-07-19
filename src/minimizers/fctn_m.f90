@@ -120,6 +120,7 @@ contains
                H(i,:) = (g1 - g2) / (2.d0 * this%h)
                xx(i) = x(i)
             else
+               H(:,i) = 0
                H(i,:) = 0
                H(i,i) = 1
             end if
@@ -139,7 +140,7 @@ contains
       ! enforcing symmetry
       H = (H + TRANSPOSE(H)) / 2
 
-      call this%eval_fg(x,f,g)
+      call this%eval_fg(x,f,g,mask)
    end subroutine eval_fgh_num
 
 end module fctn_module
