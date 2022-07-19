@@ -56,7 +56,7 @@ contains
       integer                    :: iter, verbose, iul, i, j, k
       integer                    :: n, info, lwork
       type(singularity_particles):: sp
-      logical                    :: is_corrected
+      logical                    :: is_corrected, mask(SIZE(x))
 
       n = SIZE(x)
 
@@ -72,18 +72,21 @@ contains
 
       ! before the first step, check for singularities, but with zero step.
       delta_x = 0._r8
-      call this%sc_%correct_for_singularities(x, delta_x, sp, is_corrected, correction_only=.false.)
+      call this%sc_%correct_for_singularities(x, delta_x, sp, is_corrected, correction_only=.true.)
+
+      mask = sp%At_singularity()
 
       ! these calculations are just for printing the initial position
-      call fn%eval_fgh(x, f, g, H)
-      call sp%Fix_gradients(g, H)
+      call fn%eval_fgh(x, f, g, H, mask)
 
       if (verbose > 0) then
          write(iul,"(a,g20.10)") " initial position with function value f=", f
          write(iul,"(a,g20.10)") "                           and exp(-f) =", EXP(-f)
          call this%write_params(iul)
          if (verbose > 1) then
+            write(iul,*) 'position:'
             write(iul,"(9g13.5)") x
+            write(iul,*) 'gradient:'
             write(iul,"(9g13.5)") g
          end if
       end if
@@ -99,8 +102,7 @@ contains
             f_old = f
 
             ! calculating step
-            call fn%eval_fgh(x, f, g, H)
-            call sp%Fix_gradients(g, H)
+            call fn%eval_fgh(x, f, g, H, mask)
 
             ! calculate delta_x = -H^-1 * g by solving H*delta_x = -g
             delta_x = - this%dt*g
