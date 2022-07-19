@@ -1,3 +1,7 @@
+! Copyright (C) 2022 Michel V. Heinz
+!
+! SPDX-License-Identifier: GPL-3.0-or-later
+
 module eigenVectAnalysis_m
     use kinds_m, only: r8, i4
     use parsing_m, only: getinta, getloga
