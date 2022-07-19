@@ -120,6 +120,7 @@ contains
       call rho(x, f, g)
       f = -1 * f
       g = -1 * g
+      if (PRESENT(mask)) where (mask) g = 0._r8
    end subroutine rho_fg
 
    function log_rho_f(this, x) result(f)
@@ -145,6 +146,7 @@ contains
       call rho(x, f, g)
       g = -1._r8/f * g
       f = -LOG(f)
+      if (PRESENT(mask)) where (mask) g = 0._r8
    end subroutine log_rho_fg
 
    subroutine rho(position, value, gradient, orbitals)

@@ -70,6 +70,7 @@ contains
       if (f > 0) then
          f = - f
          g = - g
+         if (PRESENT(mask)) where (mask) g = 0._r8
       end if
    end subroutine mo_fg
 

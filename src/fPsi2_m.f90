@@ -60,6 +60,7 @@ contains
          g(3*i)   = - 2.d0 * elzDrift(i, 1)
       end do
       call eConfigArray_destroy(eca)
+      if (PRESENT(mask)) where (mask) g = 0._r8
    end subroutine fpsi2_fg
 
 
