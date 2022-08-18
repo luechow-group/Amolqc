@@ -62,6 +62,7 @@ if len(sys.argv) == 1:
         reorder_atoms      - reorders atoms (and orbitals accordingly)
         separate_electrons - separates electrons (e.g. for pi-only calculations)
         averaged_occupation- gives the average orbital occupation (det wf only)
+        punch_selection    - punches molpro selection input for a given weight threshold
         
     ''')
 
@@ -178,6 +179,10 @@ while i < len(sys.argv) - arguments:
         wf.print_csf(index)
     elif command == 'averaged_occupation':
         wf.averaged_occupation()
+    elif command == 'punch_selection':
+        i += 1
+        threshold = float(sys.argv[i + arguments])
+        wf.punch_selection(threshold)
     else:
         sys.exit('Error: command '+command+' unknown!')
     i += 1
