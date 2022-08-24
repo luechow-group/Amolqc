@@ -148,25 +148,23 @@ class WaveFunction:
         index, irrep = self.orbitals[i].symmetry.split('.')
         return int(index) + int(irrep)*1000000
 
-    def punch_selection(self, threshold):
+    def punch_selection(self):
         active_orbitals = self.get_active_orbitals()
         active_orbitals.sort(key=lambda x: self.orbital_molpro_sort_index(x - 1))
         self.sort_ci()
         configurations = []
 
         for csf in self.csfs:
-            if csf.coefficient**2 >= threshold:
-                for det in csf.determinants:
-                    configuration = [0]*len(active_orbitals)
-                    for i, active_orbital in enumerate(active_orbitals):
-                        configuration[i] += det.orbital_list.count(active_orbital)
-                        configuration[i] += det.orbital_list.count(-active_orbital)
-                    configuration = tuple(configuration)
-                    if configuration not in configurations:
-                        configurations.append(configuration)
-            else:
-                break
+            for det in csf.determinants:
+                configuration = [0]*len(active_orbitals)
+                for i, active_orbital in enumerate(active_orbitals):
+                    configuration[i] += det.orbital_list.count(active_orbital)
+                    configuration[i] += det.orbital_list.count(-active_orbital)
+                configuration = tuple(configuration)
+                if configuration not in configurations:
+                    configurations.append(configuration)
 
+        print(f'{len(configurations)} configurations')
         for configuration in configurations:
             print('con', end='')
             for occ in configuration:
@@ -246,6 +244,15 @@ class WaveFunction:
                     break
             for _ in range(len(self.csfs[0].determinants) - i):
                 del self.csfs[0].determinants[i]
+
+    def keep_weight(self, percentage):
+        self.sort_ci()
+        to_keep = 0
+        weight_sum = 0.0
+        while weight_sum <= percentage/100 and to_keep < len(self.csfs):
+            weight_sum += self.csfs[to_keep].coefficient**2
+            to_keep += 1
+        self.csfs = self.csfs[:to_keep]
 
     def symm_combine(self):
         if len(self.csfs) == 1:

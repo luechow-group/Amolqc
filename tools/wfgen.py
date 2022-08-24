@@ -43,6 +43,7 @@ if len(sys.argv) == 1:
         sort_ci            - sorts the CI vector by coefficient
         convert            - converts csf type to det type
         cut_ci [threshold] - cuts csf CI vector at given threshold
+        keep_weight [perc] - cuts the CI vector only keeping the given percentage as weight
         add_symmetry       - adds symmetry (eg. delta for C2v)
         symm_combine       - combines csfs based on symmetry (molpro only)
         coeff_combine      - combines csfs with equal (diff < 1E-6) coeffs
@@ -62,7 +63,7 @@ if len(sys.argv) == 1:
         reorder_atoms      - reorders atoms (and orbitals accordingly)
         separate_electrons - separates electrons (e.g. for pi-only calculations)
         averaged_occupation- gives the average orbital occupation (det wf only)
-        punch_selection    - punches molpro selection input for a given weight threshold
+        punch_selection    - punches molpro selection input
         
     ''')
 
@@ -180,9 +181,11 @@ while i < len(sys.argv) - arguments:
     elif command == 'averaged_occupation':
         wf.averaged_occupation()
     elif command == 'punch_selection':
+        wf.punch_selection()
+    elif command == 'keep_weight':
         i += 1
-        threshold = float(sys.argv[i + arguments])
-        wf.punch_selection(threshold)
+        percentage = float(sys.argv[i + arguments])
+        wf.keep_weight(percentage)
     else:
         sys.exit('Error: command '+command+' unknown!')
     i += 1
