@@ -30,10 +30,11 @@ contains
       real(r8) step_size, delta_max, step_max, gradient, sing_thresh, corr_thresh, alpha, cc, rho, c1, c2, val
       real(r8) tmp
       real(r8), allocatable ::  distance(:)
-      integer iflag, iflag1, iflag2, nlines, max_iter, mode, latency, switch_step, i
+      integer iflag, iflag1, iflag2, iflag3, iflag4, nlines, max_iter, mode, latency, switch_step, i
       logical yn, scaling
       character(len=20) value, string, str
       integer, allocatable :: not_to_minimize(:)
+      integer, allocatable :: to_minimize(:)
       type(fire_parameters) :: params
       type(line_search_ws_simple)     :: lss
       type(line_search_weak_wolfe)    :: lsww
@@ -219,8 +220,18 @@ contains
             distance = HUGE(0._r8)
          end if
          call minimizer_p%set_max_electron_distance(distance)
-         call getintarra(lines, nlines, "not_to_minimize=", not_to_minimize, iflag)
-         if (iflag == 0) call minimizer_p%set_not_to_minimize(not_to_minimize)
+         call getintarra(lines, nlines, "not_to_minimize=", not_to_minimize, iflag3)
+         if (iflag3 == 0) then
+            call getintarra(lines, nlines, "minimize_this=", to_minimize, iflag4)
+            call minimizer_p%set_not_to_minimize(not_to_minimize)
+            call assert(iflag4 /= 0, "minimizer input: use either not_to_minimize or minimize_this!")
+         end if
+         call getintarra(lines, nlines, "minimize_this=", to_minimize, iflag4)
+         if (iflag4 == 0) then
+            call getintarra(lines, nlines, "not_to_minimize=", not_to_minimize, iflag3)
+            call minimizer_p%set_to_minimize(to_minimize)
+            call assert(iflag3 /= 0, "minimizer input: use either not_to_minimize or minimize_this!")
+         end if
       end if
 
       if (finda(lines, nlines, "minimize_grad_norm")) then

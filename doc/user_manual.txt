@@ -582,6 +582,7 @@ eigenvalue_threshold=1e-2 : only eigenvalues with absolute value larger than eig
                             counting the number of negative eigenvalues.
 not_to_minimize      : list of indices of coordinates, which should not be optimized (e.g. =3;6;9 in order to not
                        optimize the z coordinates of the 1st, 2nd, and 3rd electrons)
+minimize_this        : does the opposite of not_to_minimize
 minimize_grad_norm   : Instead of minimizing Phi, minimizes the magnitude of the gradient, in order to use the faster
                        steepest descent method to find saddle points. (Note: This option can be used with every
                        minimizer. However, it might not be sensible to use the Newton method.)

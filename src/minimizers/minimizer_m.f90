@@ -25,6 +25,7 @@ module minimizer_module
       real(r8)                        :: max_mean_gradient_ = 0.1d0
       real(r8)                        :: max_electron_distance_(3) = HUGE(1._r8)
       integer, allocatable            :: not_to_minimize_(:)
+      integer, allocatable            :: to_minimize_(:)
       logical                       :: converged_ = .false.
       logical                       :: value_convergence_ = .false.
       integer                       :: current_iterations_ = 0
@@ -42,6 +43,7 @@ module minimizer_module
       procedure                                :: set_convergence_value
       procedure                                :: set_max_electron_distance
       procedure                                :: set_not_to_minimize
+      procedure                                :: set_to_minimize
       procedure                                :: set_value_convergence
       procedure                                :: convergence_distance
       procedure                                :: value_convergence
@@ -146,6 +148,12 @@ contains
       this%not_to_minimize_ = not_to_minimize
    end subroutine set_not_to_minimize
 
+   subroutine set_to_minimize(this, to_minimize)
+      class(minimizer), intent(inout) :: this
+      integer, intent(in)             :: to_minimize(:)
+      this%to_minimize_ = to_minimize
+   end subroutine set_to_minimize
+
    subroutine restrict_gradient(this, gradient, hessian)
       class(minimizer), intent(inout)   :: this
       real(r8), intent(inout)           :: gradient(:)
@@ -160,6 +168,19 @@ contains
                hessian(j,:) = 0._r8
                hessian(:,j) = 0._r8
                hessian(j,j) = 1._r8
+            end if
+         end do
+      end if
+
+      if (ALLOCATED(this%to_minimize_)) then
+         do i=1, SIZE(gradient)
+            if (.not. (ANY(this%to_minimize_== i))) then
+               gradient(i) = 0._r8
+               if (PRESENT(hessian)) then
+                  hessian(i,:) = 0._r8
+                  hessian(:,i) = 0._r8
+                  hessian(i,i) = 1._r8
+               end if
             end if
          end do
       end if
@@ -321,6 +342,8 @@ contains
          write(iull, "(a,g13.5)") " convergence_gradnorm=", this%convergence_max_gradnorm_
       if (ALLOCATED(this%not_to_minimize_))  &
          write(iull, "(a,g13.5)") " not_to_minimize=", this%not_to_minimize_
+      if (ALLOCATED(this%to_minimize_))  &
+              write(iull, "(a,g13.5)") " to_minimize=", this%to_minimize_
    end subroutine write_params_minimizer
 
    subroutine write_opt_path(this, counter)
