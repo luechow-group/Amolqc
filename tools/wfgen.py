@@ -14,6 +14,7 @@ from Wfgen.xmvb2wf import xmvb_in
 from Wfgen.mol2wf import molpro_in
 from Wfgen.orca2wf import orca_in
 from Wfgen.amolqc2wf import amolqc_in
+from Wfgen.gamess2wf import gamess_in
 
 if len(sys.argv) == 1:
     sys.exit('''
@@ -29,8 +30,9 @@ if len(sys.argv) == 1:
     
     Detailled read input schemes:
         Molpro: wfgen.py molpro file.out file.molden basis wftype
-        orca:   wfgen.py orca file.mkl file.out basis wftype
+        Orca:   wfgen.py orca   file.mkl file.out    basis wftype
                 note: generate mkl file from gbw file with orca_2mkl
+        Gamess: wfgen.py gamess file.out file.dat    basis wftype
         XMVB:   wfgen.py xmvb   file.xmo INFO        basis wftype
         Amolqc: wfgen.py amolqc file.wf
     
@@ -102,6 +104,16 @@ elif program == 'orca':
     if wf_type not in ['sd', 'csf']:
         sys.exit("Error: wave function type '" + wf_type + "' is unknown!")
     wf = orca_in(mkl_name, orcaout_name, basis, wf_type)
+
+elif program == 'gamess':
+    arguments = 6
+    input_name = sys.argv[2]
+    dat_name = sys.argv[3]
+    basis = sys.argv[4]
+    wf_type = sys.argv[5]
+    if wf_type not in ['sd', 'csf']:
+        sys.exit("Error: wave function type '" + wf_type + "' is unknown!")
+    wf = gamess_in(input_name, dat_name, basis, wf_type)
     
 elif program == 'amolqc':
     arguments = 3
