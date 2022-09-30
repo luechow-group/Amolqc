@@ -9,6 +9,7 @@ option(MPI         "ON - compiling with MPI (-DMPI),        OFF - compiling the 
 option(MKL         "ON - using LAPACK from MKL,             OFF - using compiled LAPACK"             OFF)
 option(LINEINFO    "ON - compiling with line info (eg. -g), OFF - compiling without line info"       OFF)
 option(CHKNANUP    "ON - check invalid updates in muldiDet, OFF - do not check for invalid updates"  OFF)
+# ADDITIONAL_FLAGS sets additional compile flags                                          Default:
 # WFMAXLINES sets maximum number of lines for the wf file                                 Default: 50000
 # WFMAXCOLS sets maximum line length (# cols) for the wf file                             Default:   160
 # MAXDETSPERCSF sets maximum number of dets per csf                                       Default:   120
