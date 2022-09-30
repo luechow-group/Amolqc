@@ -437,7 +437,7 @@ contains
       do i=1,this%nElems
          call this%getRefPtr(i,rp)
          if (associated(this%excl)) then
-            call calcRefDifference(rp,r,ALLPERM,meandist,maxdist,exclist=this%excl,exclmode=this%exclMode)
+            call calcRefDifference(rp,r,ALLPERM,meandist,maxdist,this%excl,exclmode=this%exclMode)
          else
             call calcRefDifference(rp,r,ALLPERM,meandist,maxdist)
          end if

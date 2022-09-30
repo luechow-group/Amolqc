@@ -209,7 +209,7 @@ contains
    end subroutine calcEigenRef
 
 
-   subroutine calcRefDifference(r1,r2,mode,meanDist,maxDist,irev,exclist,exclmode,permidx)
+   subroutine calcRefDifference(r1,r2,mode,meanDist,maxDist,exclist,exclmode,permidx,irev)
    !-------------------------------------------------------------------------------------!
       ! calculate the difference between the two electron arrangements r1 and r2 possibly with permutations of r2
       ! return meanDist and maxDist, allowing to ignore certain distances as defined by the final args

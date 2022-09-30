@@ -324,7 +324,7 @@ contains
       real(r8), allocatable :: vox(:,:,:)
       integer :: i, ix, iy, iz, mo, verbose, xGridSize, yGridSize, zGridSize, iflag
       integer, parameter :: iu = 99
-      type(posVal_t) :: max
+      type(posVal_t) :: maxP
 
       verbose = 0
       call getinta(lines, nl, "verbose=", verbose, iflag)
@@ -386,8 +386,8 @@ contains
 
                      if (abs(vox(ix, iy, iz)) > mValueThreshold) then
                         r = [ xStart + ix * xStep, yStart + iy * yStep, zStart + iz * zStep ]
-                        max = posVal_t(r, vox(ix, iy, iz), 0)
-                        call posList(mo)%append(max)
+                        maxP = posVal_t(r, vox(ix, iy, iz), 0)
+                        call posList(mo)%append(maxP)
                      end if
                   end if
                end do
