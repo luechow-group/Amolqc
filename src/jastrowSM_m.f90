@@ -43,9 +43,6 @@ MODULE jastrowSM_m
     !     ----------------
 
       use kinds_m, only: r8
-#ifdef NAG
-      use, intrinsic :: f90_unix_io, only: flush
-#endif
       use error_m
       use atom_m
       use wfData_m
@@ -566,7 +563,7 @@ CONTAINS
             endif
         endif
 
-        call flush(iul)
+        flush(iul)
 
     end subroutine jasChangeType_sm
 

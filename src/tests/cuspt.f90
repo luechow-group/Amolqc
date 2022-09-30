@@ -19,16 +19,16 @@ program cusptest
 	integer :: argc, iflag, optmode = 1
 	real(r8) :: dummy
 
-	argc = iargc()
+	argc = COMMAND_ARGUMENT_COUNT()
 
 	if (argc < 1) then
 		print*, "jastype required"
 		stop
 	else if (argc > 1) then
-		call getarg(2, tmp)
+		call GET_COMMAND_ARGUMENT(2, tmp)
 		read(tmp,*) optmode
 	endif
-	call getarg(1, jt)
+	call GET_COMMAND_ARGUMENT(1, jt)
 
 	print*,"Testing cusp for ", jt, " with optmode ", optmode
 

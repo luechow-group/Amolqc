@@ -822,11 +822,11 @@ contains
             !!mystddev = 0.d0
             !!if (mynd > 1) mystddev = stdDevMean(mEPairStat(np,m))
             !!write(900+mytid,'(4i5,3f20.3)') mytid,i,j,np,mynd,mymean,mystddev
-            !!call flush(900+mytid)
+            !!flush(900+mytid)
             pairRatio = meanAllNodes(mEPairStat(np,m))
             stddev = stdDevMeanAllNodes(mEPairStat(np,m))
             !!write(900+mytid,'(4i5,3f20.3)') mytid,i,j,np,nd,mean,stddev
-            !!call flush(900+mytid)
+            !!flush(900+mytid)
             if (MASTER) then
               write(mIU2,'(3i4,2f8.3,3x)',advance='no') i,j,np,pairRatio,stddev
               if (pairRatio > PAIRTHRESH) then

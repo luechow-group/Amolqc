@@ -5,9 +5,6 @@
 module subloop_m
 
    use kinds_m, only: r8
-#ifdef NAG
-   use, intrinsic :: f90_unix_io, only: flush
-#endif
    use global_m
    use error_m
    use parsing_m, only: getNextBlock, getinta, finda
@@ -280,7 +277,7 @@ subroutine subloop(subname, smpl, exitSubLoop, psimax_obj)
             write(iul,'(3A,F18.2,A//)') ' cpu time (master) for ',trim(token),' : ', &
             endCPU-startCPU,' s'
          end if
-         call flush(iul)
+         flush(iul)
       end if
 
    end do

@@ -9,9 +9,6 @@
 
 MODULE waveFunction_m
   use kinds_m, only: r8
-#ifdef NAG
-  use, intrinsic :: f90_unix_io, only: flush
-#endif
   use error_m
   use parsing_m
   use atom_m
@@ -361,7 +358,7 @@ CONTAINS
        write(iul,*) ' geometry (in angstrom):'
        call atoms_write(atoms,iul)
        write(iul,*)
-       call flush(iul)
+       flush(iul)
     end if
 
     ! the actual eloc initialization has to happen after the $ecp block
@@ -417,7 +414,7 @@ CONTAINS
     endif
     if (logmode>=3 .or. (MASTER.and.printAOs>0)) call aooutput(iul)
     if (logmode>= 2) write(iul,'(A/)') ' basis read ...'
-    call flush(iul)
+    flush(iul)
 
 
     !! ---- $ecp block
@@ -434,7 +431,7 @@ CONTAINS
        if (ecp%isInitialised() .and. logmode >= 2) write(iul,*) ' ECPs read from ECP library ...'
     endif
     if (ecp%isInitialised() .and. logmode >= 2) call ecpoutput(iul,ecp)
-    call flush(iul)
+    flush(iul)
 
     ! now that the core electrons have potentially been removed, initialize
     ! the eloc part
@@ -466,7 +463,7 @@ CONTAINS
        write(iul,'(/3a)') ' Jastrow factor of type ',trim(jastype),' read with:'
        call jas_shortoutput(iul)
        write(iul,*) ' Jastrow factor read ...'
-       call flush(iul)
+       flush(iul)
     end if
 
     !! ---- $mos block
@@ -477,7 +474,7 @@ CONTAINS
     call moinput(lines)
     if (logmode>=3 .or. printMOs>0) call mooutput(iul)
     if (logmode >= 2) write(iul,*) ' MOs read ...'
-    call flush(iul)
+    flush(iul)
 
     ! CSF part
 
@@ -496,7 +493,7 @@ CONTAINS
     endif
     if (logmode >= 3 .or. printDet>0) call mdetoutput(iul)
     if (logmode >= 2) write(iul,*) ' CSFs read ...'
-    call flush(iul)
+    flush(iul)
 
     ! PROPERTIES
     !call getstra(lines,nl,'proptype=',mProptype,iflag)

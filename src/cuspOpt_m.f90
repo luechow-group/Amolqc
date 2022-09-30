@@ -23,9 +23,6 @@ MODULE cuspOpt_m
     !     --------------
 
     use kinds_m, only : i4, r8
-#ifdef NAG
-    use, intrinsic :: f90_unix_io, only : flush
-#endif
     use global_m
     use cspline_m, only: csplx, csnpmax, csalpha, csplnpnt
     use nl2sol_i, only: nl2sno
@@ -341,7 +338,7 @@ CONTAINS
         !      enddo
         !
         if (mytid == 0) then
-            call flush(iul)
+            flush(iul)
         endif
 
     END SUBROUTINE cuspcorrect

@@ -14,9 +14,6 @@ MODULE qmc_m
 
   use, intrinsic :: ieee_arithmetic, only: ieee_quiet_nan, ieee_value, ieee_is_normal
   use kinds_m, only: r8, i8
-#ifdef NAG
-  use, intrinsic :: f90_unix_io, only: flush
-#endif
   use OMP_LIB
   use global_m
   use wfData_m, only: do_epart, vpot0
@@ -1295,7 +1292,7 @@ contains
     if (logmode >= 3) then
        write(iul,'(A,2F15.4,I6,2F15.4,I15)') 'POP:',Sampleweight,getSampleWeight(sample),   &
              getSampleSize(sample),ERef,sERef,st
-       call flush(iul)
+       flush(iul)
     endif
     if (sampleWeight > 2*Samplesize) then
        write(iul + mytid,'(A,G13.3)') ' sample overflow: all weights=',Sampleweight
