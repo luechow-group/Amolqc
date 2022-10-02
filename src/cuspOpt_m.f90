@@ -105,6 +105,8 @@ CONTAINS
         real(r8) x11, x12, x13, y1, y1fd, x21, x22, x23, y2, y2fd
         real(r8) k1, k2, k3, k4, k5
 
+        logical opened
+
         save point1sav, point2sav
 
         if (np /= csplnpnt) then
@@ -338,7 +340,8 @@ CONTAINS
         !      enddo
         !
         if (mytid == 0) then
-            flush(iul)
+            inquire(iul, opened=opened)
+            if (opened) flush(iul)
         endif
 
     END SUBROUTINE cuspcorrect

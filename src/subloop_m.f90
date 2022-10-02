@@ -72,6 +72,8 @@ subroutine subloop(subname, smpl, exitSubLoop, psimax_obj)
    real(r8)                      :: tstart,tstartCPU,tendCPU,sendbuf(1),recvbuf(1),t
    logical                     :: wfRead,found,exitLoop,fileExists,wout
 
+   logical :: opened
+
    exitSubloop = .false.
    call getAmolqcPath(macropath)
    call assert(len(trim(macropath)) < 116,"amolqc: amolqc path exceeds definition")
@@ -277,7 +279,8 @@ subroutine subloop(subname, smpl, exitSubLoop, psimax_obj)
             write(iul,'(3A,F18.2,A//)') ' cpu time (master) for ',trim(token),' : ', &
             endCPU-startCPU,' s'
          end if
-         flush(iul)
+         inquire(iul, opened=opened)
+         if (opened) flush(iul)
       end if
 
    end do

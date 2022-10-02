@@ -278,6 +278,7 @@ CONTAINS
     logical form
     logical ltmp,findf,ang,found,withSA,ignoreHAtoms,withBasis
     logical absExists,simpleBasisExists
+    logical opened
 
     !! ---- Read Wavefunction file
 
@@ -414,7 +415,8 @@ CONTAINS
     endif
     if (logmode>=3 .or. (MASTER.and.printAOs>0)) call aooutput(iul)
     if (logmode>= 2) write(iul,'(A/)') ' basis read ...'
-    flush(iul)
+    inquire(iul, opened=opened)
+    if (opened) flush(iul)
 
 
     !! ---- $ecp block
@@ -431,7 +433,8 @@ CONTAINS
        if (ecp%isInitialised() .and. logmode >= 2) write(iul,*) ' ECPs read from ECP library ...'
     endif
     if (ecp%isInitialised() .and. logmode >= 2) call ecpoutput(iul,ecp)
-    flush(iul)
+    inquire(iul, opened=opened)
+    if (opened) flush(iul)
 
     ! now that the core electrons have potentially been removed, initialize
     ! the eloc part
@@ -474,7 +477,8 @@ CONTAINS
     call moinput(lines)
     if (logmode>=3 .or. printMOs>0) call mooutput(iul)
     if (logmode >= 2) write(iul,*) ' MOs read ...'
-    flush(iul)
+    inquire(iul, opened=opened)
+    if (opened) flush(iul)
 
     ! CSF part
 
@@ -493,7 +497,8 @@ CONTAINS
     endif
     if (logmode >= 3 .or. printDet>0) call mdetoutput(iul)
     if (logmode >= 2) write(iul,*) ' CSFs read ...'
-    flush(iul)
+    inquire(iul, opened=opened)
+    if (opened) flush(iul)
 
     ! PROPERTIES
     !call getstra(lines,nl,'proptype=',mProptype,iflag)

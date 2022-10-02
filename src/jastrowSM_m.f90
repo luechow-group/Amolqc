@@ -367,6 +367,8 @@ CONTAINS
         character(len = 9) :: oldJasType
         integer jasCenter
 
+        logical opened
+
         oldJasType = jastype
         jastype = jt
 
@@ -563,7 +565,8 @@ CONTAINS
             endif
         endif
 
-        flush(iul)
+        inquire(iul, opened=opened)
+        if (opened) flush(iul)
 
     end subroutine jasChangeType_sm
 
