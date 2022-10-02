@@ -752,6 +752,9 @@ CONTAINS
             !        ! call cubic spline routine. evaluate cubic splines for all
             !        ! three functions. Faster would be spline evaluation only of y0
             !        ! and using derivatives of spline polynomial.
+            y0(np) = 0
+            y1(np) = 0
+            y2(np) = 0
             call cspline(3 * ispl - 2, y0, np, y00(1), y00(2))
             call cspline(3 * ispl - 1, y1, np, y00(3), y00(4))
             call cspline(3 * ispl, y2, np, y00(5), y00(6))
