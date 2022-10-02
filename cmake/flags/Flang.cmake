@@ -4,5 +4,5 @@ set(PP_FLAGS "-cpp")
 set(OPENMP_FLAGS "-mp")
 set(LINEINFO_FLAGS "-g")
 
-set(DEBUG_FLAGS "-fcheck=all")
-set(RELEASE_FLAGS "-O3")
+set(DEBUG_FLAGS "-Mno-backslash -fcheck=all")
+set(RELEASE_FLAGS "-Mno-backslash -O3")
