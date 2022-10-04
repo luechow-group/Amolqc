@@ -33,7 +33,7 @@ module propagator_m
   logical     :: mRejCross=.false.    ! reject nodal crossing?
   logical     :: mNoExp = .false.
   logical     :: mTauIsSet = .false.
-  character*3 :: mMoveType='all'      ! 'all' or 'one' electron moves
+  character(len=3) :: mMoveType='all'      ! 'all' or 'one' electron moves
 
   real(r8)           :: mSqrtTau=0
 

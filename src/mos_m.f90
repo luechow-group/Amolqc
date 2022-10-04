@@ -104,7 +104,7 @@ CONTAINS
         !
         character(len = *), intent(in) :: lines(:)! input lines
         integer i, ii, j, jj, alstat, idx, nbas_check
-        character fmt*19
+        character(len=19) fmt
         character(len=:), allocatable :: words(:)
 
         !     // Read in number of MO's
@@ -335,7 +335,7 @@ CONTAINS
         !
         integer iu
         integer i, j, bidx, bidxmax, max, min
-        character fmt*19
+        character(len=19) fmt
 
         write(iu, '(i4)') norb
         write(iu, *)
@@ -393,7 +393,7 @@ CONTAINS
         ! variables:
         integer i, j, n
         real(r8)  zero, one
-        character*1 uplo1, uplo2
+        character(len=1) uplo1, uplo2
 
         !     ! Calculate all MO's and derivatives for all or one electron(s)
         !     ! for all electron configurations
@@ -477,7 +477,7 @@ CONTAINS
         ! variables:
         integer i, j
         real(r8)  zero, one
-        character*1 uplo1, uplo2
+        character(len=1) uplo1, uplo2
 
         mMOElecConfigs = 1
 

@@ -60,7 +60,7 @@ contains
     subroutine setulb(n, m, x, l, u, nbd, f, g, factr, pgtol, wa, iwa, &
             task, iprint, csave, lsave, isave, dsave)
 
-        character*60     task, csave
+        character(len=60)     task, csave
         logical          lsave(4)
         integer          n, m, iprint, &
                 nbd(n), iwa(3 * n), isave(44)
@@ -300,7 +300,7 @@ contains
             index, iwhere, indx2, task, &
             iprint, csave, lsave, isave, dsave)
         implicit none
-        character*60     task, csave
+        character(len=60)     task, csave
         logical          lsave(4)
         integer          n, m, iprint, nbd(n), index(n), &
                 iwhere(n), indx2(n), isave(23)
@@ -492,7 +492,7 @@ contains
         !     ************
 
         logical          prjctd, cnstnd, boxed, updatd, wrk
-        character*3      word
+        character(len=3)      word
         integer          i, k, nintol, itfile, iback, nskip, &
                 head, col, iter, itail, iupdat, &
                 nseg, nfgv, info, ifun, &
@@ -1796,7 +1796,7 @@ contains
 
     subroutine errclb(n, m, factr, l, u, nbd, task, info, k)
 
-        character*60     task
+        character(len=60)     task
         integer          n, m, info, k, nbd(n)
         double precision factr, l(n), u(n)
 
@@ -2463,7 +2463,7 @@ contains
             iback, nfgv, info, task, boxed, cnstnd, csave, &
             isave, dsave)
 
-        character*60     task, csave
+        character(len=60)     task, csave
         logical          boxed, cnstnd
         integer          n, iter, ifun, iback, nfgv, info, &
                 nbd(n), isave(2)
@@ -2750,7 +2750,7 @@ contains
     subroutine prn2lb(n, x, f, g, iprint, itfile, iter, nfgv, nact, &
             sbgnrm, nseg, word, iword, iback, stp, xstep)
 
-        character*3      word
+        character(len=3)      word
         integer          n, iprint, itfile, iter, nfgv, nact, nseg, &
                 iword, iback
         double precision f, sbgnrm, stp, xstep, x(n), g(n)
@@ -2820,8 +2820,8 @@ contains
             time, nseg, word, iback, stp, xstep, k, &
             cachyt, sbtime, lnscht)
 
-        character*60     task
-        character*3      word
+        character(len=60)     task
+        character(len=3)      word
         integer          n, iprint, info, itfile, iter, nfgv, nintol, &
                 nskip, nact, nseg, iback, k
         double precision f, sbgnrm, time, stp, xstep, cachyt, sbtime, &

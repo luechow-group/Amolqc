@@ -87,7 +87,7 @@ contains
 !     nmax  is the dimension of the largest problem to be solved.
 !     mmax  is the maximum number of limited memory corrections.
 !     lenwa is the corresponding real workspace required.
-   character*60     task, csave
+   character(len=60)     task, csave
    logical          lsave(4)
    integer          i,n,m,iprint
    integer          nbd(nmax), iwa(3*nmax), isave(44)

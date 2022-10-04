@@ -60,10 +60,10 @@ MODULE global_m
   real(r8)       :: currEnergy,currVar,currStdDev,currVarError
   real(r8)       :: saveResults(4,MAXSIZE)
   real(r8)       :: wtimer(8)=0
-  character*70 :: baseName=""  ! base name of .in file
-  character*60 :: version=""   ! version number of program
-  character*6 :: envvar="AMOLQC" ! environment variable pointing to installation
-  character*180:: amolqcpath="toset"   ! path returned from envvar
+  character(len=70) :: baseName=""  ! base name of .in file
+  character(len=60) :: version=""   ! version number of program
+  character(len=6) :: envvar="AMOLQC" ! environment variable pointing to installation
+  character(len=180):: amolqcpath="toset"   ! path returned from envvar
   character(len=MAXLEN)       :: subLines(MAXSUBLINES,MAXSUBS)=''
   character(len=120)          :: subNames(MAXSUBS)=''
   logical      :: maxDomainSampling = .false.

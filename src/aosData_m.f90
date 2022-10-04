@@ -184,7 +184,8 @@ CONTAINS
         character(len = MAXLEN) :: lines(MAXLINES) ! lines array
         integer :: nl      ! actual # of lines
         integer k, socounter, cha, io, iflag, idx, iu
-        character basislist*20, basispath*180, basisname*180
+        character(len=20) basislist
+        character(len=180) basispath, basisname
         logical fileExists
 
         nbas = 0                        ! counts AO's, individual basis functions
@@ -286,7 +287,7 @@ CONTAINS
         character(len = MAXLEN) :: lines(MAXLINES) ! lines array
         integer :: nl      ! actual # of lines
         integer k, socounter, cha, iflag, idx, iu
-        character basispath*180
+        character(len=180) basispath
         character(len = 150) basisFileName
         logical fileExists
 
@@ -387,7 +388,7 @@ CONTAINS
         character(len = MAXLEN) :: lines(MAXLINES) ! lines array
         integer :: nl      ! actual # of lines
         integer k, socounter, cha, io, iflag, idx, iu
-        character basispath*180, basisname*180
+        character(len=180) basispath, basisname
         logical fileExists
 
         nbas = 0                        ! counts AO's, individual basis functions

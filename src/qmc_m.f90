@@ -90,8 +90,8 @@ MODULE qmc_m
   logical     :: mLoadBalance = .false.       ! balance sample sizes in parallel runs
   logical     :: mAdaptTau = .false.          ! adapt tau at beginning of run to some AR
   logical     :: mAutoCorrelation = .false.   ! calc autocorrelation of E_L data (only VMC)
-  character*1 :: mStatType='c'
-  character*3 :: mMethod='VMC'        ! QMC method
+  character(len=1) :: mStatType='c'
+  character(len=3) :: mMethod='VMC'        ! QMC method
 
   !Future Walking
   logical    :: mFuture = .false.            ! switch for Future-Walking

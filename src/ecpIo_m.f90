@@ -180,7 +180,8 @@ CONTAINS
       integer                      :: nl      ! actual # of lines
       integer a,nPseudoAtoms,p
       logical fileExists
-      character basispath*180, ecpfname*180, ecpname*3
+      character(len=180) basispath, ecpfname
+      character(len=3) ecpname
       type(PseudoAtomData), allocatable :: pa(:)
 
       call getAmolqcPath(basispath)

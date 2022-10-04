@@ -62,7 +62,7 @@ subroutine getblk(iu, itoken, ftoken, ldim, lines, nl)
     character(len = *), intent(inout) :: lines(ldim)
     integer, intent(out) :: nl
     integer k, io
-    character*120 line
+    character(len=120) line
 
     nl = 0
     rewind(iu)
@@ -154,7 +154,8 @@ subroutine getdblf(iu, target, value, iflag)
     !
     integer i, iu, k, kf, io, iflag
     real(r8) value
-    character line*120, target*(*)
+    character(len=120) line
+    character(len=*) target
 
     rewind(iu)
     do i = 1, 1000
@@ -229,7 +230,7 @@ subroutine getdblarra(lines, nl, target, value, iflag)
     ! iflag: 0 if target found, 1 if not
     !
     integer i, k, kf, nl, iflag, n, io
-    character str*80
+    character(len=80) str
     character lines(nl)*(*), target*(*)
     character(len=:), allocatable :: token
     real(r8), allocatable :: value(:)
@@ -286,7 +287,8 @@ subroutine getintf(iu, target, value, iflag)
     ! iflag: 0 if target found, 1 if not
     !
     integer i, iu, k, kf, io, value, iflag
-    character line*120, target*(*)
+    character(len=120) line
+    character(len=*) target
 
     rewind(iu)
     do i = 1, 1000
@@ -325,8 +327,9 @@ subroutine getint8f(iu, target, value, iflag)
     !
     integer(i8) value
     integer i, iu, k, kf, io, iflag, n
-    character line*120, target*(*)
-    character str*80
+    character(len=120) line
+    character(len=*) target
+    character(len=80) str
 
     rewind(iu)
     do i = 1, 1000
@@ -379,7 +382,7 @@ subroutine getinta(lines, nl, target, value, iflag)
     !
     integer i, k, kf, nl, value, iflag, n, io
     character lines(nl)*(*), target*(*)
-    character str*80
+    character(len=80) str
 
     do i = 1, nl
         k = index(lines(i), target)
@@ -430,7 +433,7 @@ subroutine getintarra(lines, nl, target, value, iflag)
     !
     integer i, k, kf, nl, iflag, n, io
     character lines(nl)*(*), target*(*)
-    character str*80
+    character(len=80) str
     character(len=:), allocatable :: token
     integer, allocatable :: value(:)
 
@@ -488,7 +491,7 @@ subroutine getint8a(lines, nl, target, value, iflag)
     integer(i8) value
     integer i, k, kf, n, nl, iflag, io
     character lines(nl)*(*), target*(*)
-    character str*80
+    character(len=80) str
 
     do i = 1, nl
         k = index(lines(i), target)
@@ -538,7 +541,8 @@ subroutine getstrf(iu, target, str, iflag)
     ! iflag: 0 if target found, 1 if not
     !
     integer i, iu, k, kf, io, iflag
-    character line*120, target*(*), str*(*)
+    character(len=120) line
+    character(len=*) target, str
 
     rewind(iu)
     do i = 1, 1000
@@ -619,7 +623,8 @@ subroutine getlogf(iu, target, value, iflag)
     ! iflag: 0 if target found, 1 if not
     !
     integer i, iu, k, kf, io, iflag
-    character line*120, target*(*)
+    character(len=120) line
+    character(len=*) target
     logical value
 
     rewind(iu)
@@ -695,7 +700,8 @@ logical function findf(iu, target)
     ! with unit iu
     !
     integer iu, k, io
-    character line*120, target*(*)
+    character(len=120) line
+    character(len=*) target
 
     rewind(iu)
     !      do i=1,1000
@@ -789,7 +795,7 @@ subroutine replaceEntry(line, entryIdx, newEntry)
 
     integer entryIdx
     character line*(*), newEntry*(*)
-    character str*40
+    character(len=40) str
     integer nnew, io, nold, offset
 
     nnew = len_trim(newEntry)
@@ -814,7 +820,7 @@ subroutine shiftTail(line, idx, offset)
     !     ! offset > 0: insert 'offset' spaces at 'idx' position
     !     ! offset < 0: remove 'offset' characters starting from 'idx'
 
-    character line*120
+    character(len=120) line
     integer idx, offset
     integer newlen, oldlen, i, ii
 

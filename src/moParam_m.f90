@@ -978,7 +978,7 @@ do p=1,moParams
       real(r8) X(norb,norb), X2(norb,norb), W(norb,norb), R(norb,norb), W1(norb,norb)
       real(r8) lambda(norb), tau(norb), work(4*norb)
       real(r8) zero, one
-      character*1 uplo1,uplo2
+      character(len=1) uplo1,uplo2
       real(r8), parameter :: EPS = 1.d-8
 
       ! overwrite current MO matrix

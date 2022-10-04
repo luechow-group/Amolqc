@@ -274,7 +274,8 @@ CONTAINS
     character(len=MAXLEN)  :: allLines(MAXLINES)
     integer a,idx,i,ii,ii1,ii2,io,j,iflag,nl,nAllLines,idxsave
     real(r8) rr
-    character text*3,s*10
+    character(len=3) text
+    character(len=10) s
     logical form
     logical ltmp,findf,ang,found,withSA,ignoreHAtoms,withBasis
     logical absExists,simpleBasisExists
@@ -543,7 +544,8 @@ CONTAINS
     type(EcpType), intent(inout)     :: ecp
     integer a,i,ii,ii1,ii2,io,iu,j,iflag,nl,k
     real(r8) rr
-    character text*3,s*10
+    character(len=3) text
+    character(len=10) s
     character(len=120) lines(ldim),line
     logical form
     logical ltmp,findf,finda,ang,found

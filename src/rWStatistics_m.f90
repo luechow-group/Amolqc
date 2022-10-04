@@ -17,7 +17,7 @@ MODULE rWStatistics_m
   public  :: rwStatInit, rwStatReset, rwAddToStat, rwStatMean, rwStatStdDev, rwStatPrint
 
   type(vectorStat),save  :: mVStat                ! vector statistics object
-  character*1            :: mType='c'             ! type for rw statistics
+  character(len=1)            :: mType='c'             ! type for rw statistics
 
 
 CONTAINS
@@ -26,7 +26,7 @@ CONTAINS
   subroutine rwStatInit(type)
   !-------------------------!
 
-    character*1, intent(in) :: type
+    character(len=1), intent(in) :: type
 
     if (type == 's') then
        mType = 's'           ! statistics for spherical coordinates
