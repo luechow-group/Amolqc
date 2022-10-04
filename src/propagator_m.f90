@@ -262,8 +262,8 @@ contains
   real(r8) function propagator_getInitialTau(ar)
   !------------------------------------------!
      real(r8), intent(in) :: ar ! desired acceptance ratio
-     integer i
-     real(r8) Zmax,a
+     integer i,Zmax
+     real(r8) a
 
      call assert(ar > 0.d0,"propagator_getInitialTau: positive argument required")
      Zmax = 0

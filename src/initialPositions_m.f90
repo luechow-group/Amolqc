@@ -77,7 +77,7 @@ contains
     ii1 = 0                      ! electron counter ALPHA
     ii2 = nalpha                 ! electron counter BETA
     do a=1,ncenter
-       do i=1,nint(atoms(a)%za) - atoms(a)%pa  ! partial charges
+       do i=1,atoms(a)%za - atoms(a)%pa  ! partial charges
           ii = ii + 1            ! next electron
           if (mod(ii,2)==1) then ! alpha electron
              ii1    = ii1 + 1
@@ -180,7 +180,7 @@ contains
     do a=1,ncenter
        nCore = wf_getNCoreElecs(a)
        if (nCore > 0) then     ! we have a PP
-         zz = nint(atoms(a)%za) + nCore
+         zz = atoms(a)%za + nCore
          n = zz - atoms(a)%pa
          select case (nCore)
          case (2)            ! He core

@@ -662,7 +662,7 @@ CONTAINS
                 enddo
                 if (cuspcor) then                       ! Cusp-Korrektur
                     if (stoc(1, bf)/=(0d0)) then
-                        call cuspcorrect (ngto, cntrctn, bf, atoms(bc(bf))%za, &
+                        call cuspcorrect (ngto, cntrctn, bf, REAL(atoms(bc(bf))%za, r8), &
                                 stoc(1, bf), &
                                 stoc(2, bf), stoc(3, bf), stoc(4, bf), &
                                 y0, y1, y2, np, k0)

@@ -12,7 +12,7 @@ module atom_m
       real(r8)          :: cx = 0   ! x,y,z coordinates (in bohr)
       real(r8)          :: cy = 0
       real(r8)          :: cz = 0
-      real(r8)          :: za = 0   ! core charge. With ECPs, this may be unequal to elemIdx
+      integer           :: za = 0   ! core charge. With ECPs, this may be unequal to elemIdx
       integer           :: elemIdx = 0
       integer           :: pa = 0   ! charge/separated electrons for sampling
       integer           :: sa = 0   ! index for atoms that are "the same"
