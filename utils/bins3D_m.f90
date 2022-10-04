@@ -18,7 +18,7 @@ module bins3D_m
 
    type Bins3D_t
       private
-      real(r8), allocatable :: data(:, :, :)
+      integer, allocatable :: data(:, :, :)
       real(r8) :: binSize, offset(3)
       integer :: num = 0
       integer :: totNum = 0
