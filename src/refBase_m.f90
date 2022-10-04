@@ -165,7 +165,7 @@ contains
 
    subroutine refc_getInfoMessage(this,s)
       class(referenceContainer), intent(in) :: this
-      character(len=120), intent(out)        :: s
+      character(len=240), intent(out)        :: s
       s = this%infoMessage
    end subroutine refc_getInfoMessage
 

@@ -53,11 +53,11 @@ subroutine mainloop
 
    integer, parameter :: MAXLINES=1000
 
-   character(len=120)          :: token
+   character(len=120)          :: token,subName
    character(len=MAXLEN)       :: inLines(MAXLINES)=''
    character(len=MAXLEN)       :: blockLines(MAXLINES)=''
    character(len=MAXLEN)       :: macroLines(MAXLINES)=''
-   character(len=180)          :: macropath,macrofile,subName
+   character(len=180)          :: macropath,macrofile
    type(RWSample)              :: smpl
    type(psimax)                :: psimax_obj
    type(rhoMax_t)              :: rhoMax
