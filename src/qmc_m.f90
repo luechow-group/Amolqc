@@ -429,7 +429,7 @@ contains
     if (found) mShowDetails = 1
 
     call propagator_reset()
-    blockdiscard = mStepsDiscard / mBlockLen
+    blockdiscard = INT(mStepsDiscard / mBlockLen)
     call propagator_init(mWeight,move,tmove,blockdiscard,bgte,tau,ds,ar,rc,mt,mWalkerBlock)
 
     !Max Analysis - Check for consistent sample size on each core
@@ -776,7 +776,7 @@ contains
              end if
           end if
 
-          block = st/mBlockLen
+          block = INT(st/mBlockLen)
           call propagator_endOfBlock(block)  ! allow propagator to do stuff at end of block
 
           if (mWalkerStatistics) then
@@ -1030,8 +1030,7 @@ contains
 
       ! pre-allocate the new history to avoid expensive reallocation in the
       ! qmc loop
-      histSize = getSampleSize(history) + &
-        (mSteps / mStepStride) * mAccumulateSampleSize
+      histSize = getSampleSize(history) + INT(mSteps / mStepStride) * mAccumulateSampleSize
       call reallocateSample(history, histSize)
     end subroutine internal_accumulateInit
 
@@ -1096,16 +1095,16 @@ contains
          do i=1,idx
             AC(0,i) = Estep(i)*Estep(i)
             do k=1,mAutoCorrMax
-               j = mod(tStep-k-1,INT(mAutoCorrMax, i8)) + 1
+               j = INT(mod(tStep-k-1,INT(mAutoCorrMax, i8)) + 1)
                AC(k,i) = ACRingBuffer(j,i)*Estep(i)
             end do
-            j = mod(tStep-1,INT(mAutoCorrMax, i8)) + 1
+            j = INT(mod(tStep-1,INT(mAutoCorrMax, i8)) + 1)
             ACRingBuffer(j,i) = Estep(i)
             call autocorrStat%add(AC(:,i))
             call autocorrEStat%add(Estep(i))
          end do
        else ! fill ring buffer
-         j = mod(tStep-1,INT(mAutoCorrMax, i8)) + 1
+         j = INT(mod(tStep-1,INT(mAutoCorrMax, i8)) + 1)
          do i=1,idx
             ACRingBuffer(j,i) = Estep(i)
          end do
@@ -1203,7 +1202,7 @@ contains
     if (mSplit) then
 
        sampleSize = getSampleSize(sample)
-       maxSize    = SAMPLE_SIZE_FACTOR*getMaxSampleSize(sample)
+       maxSize    = INT(SAMPLE_SIZE_FACTOR*getMaxSampleSize(sample))
        rwp => getFirst(sample)
        ps = 0
        do

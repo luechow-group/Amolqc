@@ -62,7 +62,7 @@ contains
 
     v(y) = c
     y = iand(y, 7) + 1
-    mrg_intran = c
+    mrg_intran = INT(c)
   end function mrg_intran
 
   real(r8) function mrg_ran()

@@ -198,7 +198,7 @@ contains
     if (mDWGen /= 0) call setDescendentWeightingGenerations(mDWGen)
 
     call getinta(lines,nl,'size_max=',maxsize,iflag)
-    if (iflag /= 0) maxsize = 1.3 * mInitSampleSize
+    if (iflag /= 0) maxsize = INT(1.3_r8 * mInitSampleSize)
 
     call getinta(lines,nl,'print=',mPrint,iflag)
 

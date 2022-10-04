@@ -1059,7 +1059,7 @@ contains
 
                         else     !more then 1 GTO in contraction, splines used !
                             r2 = rr * rr
-                            j = (csplnpnt - 1) * rr / (csalpha + rr) + 1
+                            j = INT((csplnpnt - 1) * rr / (csalpha + rr) + 1)
                             df = rr - csplx(j)
 
                             !           // only primitive cartesian gaussians: 1s,2p,3d,4f
@@ -2225,7 +2225,7 @@ contains
 
                     else     !more then 1 GTO in contraction, splines used !
                         r2 = rr * rr
-                        j = (csplnpnt - 1) * rr / (csalpha + rr) + 1
+                        j = INT((csplnpnt - 1) * rr / (csalpha + rr) + 1)
                         df = rr - csplx(j)
 
                         !           // only primitive cartesian gaussians: 1s,2p,3d,4f

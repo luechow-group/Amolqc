@@ -147,7 +147,7 @@ CONTAINS
             !        ! first and last point in optimization
             if (a > 0d0) then
                 point1 = k0
-                point2 = (csplnpnt - 1) * p2 / (csalpha + p2) + 1
+                point2 = INT((csplnpnt - 1) * p2 / (csalpha + p2) + 1)
                 point1sav = point1  ! speichere Punkte fuer 2S-Funktion
                 point2sav = point2
             else
@@ -186,7 +186,7 @@ CONTAINS
 
             !        ! find optimal range for transition of 2nd derivative of function
             !        ! to 2nd derivative of STO
-            spoint = (csplnpnt - 1) * p1 / (csalpha + p1) + 1
+            spoint = INT((csplnpnt - 1) * p1 / (csalpha + p1) + 1)
             varlocmin = 1d100
             do l = 21, spoint
                 varloc = 0d0
@@ -212,7 +212,7 @@ CONTAINS
             p1 = p1 - transgap
             p2 = p1 + translen
             point1 = k0
-            point2 = (csplnpnt - 1) * p2 / (csalpha + p2)
+            point2 = INT((csplnpnt - 1) * p2 / (csalpha + p2))
 
             !        ! note: b is discarded!
             if (mytid==0 .and. logmode>1) then
@@ -233,8 +233,8 @@ CONTAINS
                 write(iul, '(4(G12.6,2X))') a, c, p1, p2
             endif
 
-            point1 = (csplnpnt - 1) * p1 / (csalpha + p1)
-            point2 = (csplnpnt - 1) * p2 / (csalpha + p2)
+            point1 = INT((csplnpnt - 1) * p1 / (csalpha + p1))
+            point2 = INT((csplnpnt - 1) * p2 / (csalpha + p2))
 
             if (mytid == 0 .and. logmode>2) then
                 write(iul, '(1X,A,1X,I5,1X,I5)')&

@@ -390,7 +390,7 @@ CONTAINS
     i=i+n; rw%zdrift=v(i:i+n-1)
     i=i+n; rw%persist=nint(v(i))
     i=i+1
-    if(dFathers>0) rw%fathers=v(i:i+dFathers-1)
+    if(dFathers>0) rw%fathers=INT(v(i:i+dFathers-1))
     if(dEpart)then
        i=i+dfathers; rw%Ekin_epart = v(i:i+n-1)
        i=i+n; rw%Vee_epart = reshape(v(i:i+dEE-1),(/dNElecs,dNElecs/))

@@ -1256,7 +1256,7 @@ CONTAINS
                 else ! CGTO (more than one primitive gaussian) --> use splines
 
                     !cc            r2 = rr*rr
-                    spl = (csplnpnt - 1) * rr / (csalpha + rr) + 1
+                    spl = INT((csplnpnt - 1) * rr / (csalpha + rr) + 1)
                     df = rr - csplx(spl)
 
                     if (bl(bf) == 'S') then                 ! 1s GTO
@@ -1898,7 +1898,7 @@ CONTAINS
                 else ! CGTO (more than one primitive gaussian) --> use splines
 
                     !cc            r2 = rr*rr
-                    spl = (csplnpnt - 1) * rr / (csalpha + rr) + 1
+                    spl = INT((csplnpnt - 1) * rr / (csalpha + rr) + 1)
                     df = rr - csplx(spl)
 
                     if (bl(bf) == 'S') then                 ! 1s GTO

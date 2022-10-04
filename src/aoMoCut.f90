@@ -1297,7 +1297,7 @@ subroutine aomocutspl_calc(ie, x, y, z, rai)
             else ! CGTO (more than one primitive gaussian) --> use splines
 
                 !cc            r2 = rr*rr
-                spl = (csplnpnt - 1) * rr / (csalpha + rr) + 1
+                spl = INT((csplnpnt - 1) * rr / (csalpha + rr) + 1)
                 df = rr - csplx(spl)
 
                 if (bl(bf) == 'S') then                 ! 1s GTO
@@ -1984,7 +1984,7 @@ subroutine aomocut1spl_calc(ie, x, y, z, rai)
             else ! CGTO (more than one primitive gaussian) --> use splines
 
                 !cc            r2 = rr*rr
-                spl = (csplnpnt - 1) * rr / (csalpha + rr) + 1
+                spl = INT((csplnpnt - 1) * rr / (csalpha + rr) + 1)
                 df = rr - csplx(spl)
 
                 if (bl(bf) == 'S') then                 ! 1s GTO

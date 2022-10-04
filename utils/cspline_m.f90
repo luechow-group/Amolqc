@@ -184,7 +184,7 @@ CONTAINS
       integer j
       real(r8) dx
 
-      j = (csplnpnt - 1) * x / (csalpha + x) + 1
+      j = INT((csplnpnt - 1) * x / (csalpha + x) + 1)
 
       dx = x - csplx(j)
       csplint = cspla(ispl, j) + dx * (csplb(ispl, j) + dx * (csplc(ispl, j)&
