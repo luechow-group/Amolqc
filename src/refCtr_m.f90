@@ -549,7 +549,8 @@ contains
       type(refl_vlist)                      :: rl
       type(refl_vlist), pointer             :: p
       integer                               :: naNuc, nbNuc    ! alpha, beta elecs at nucleus (not varied)
-      integer i,n,m,io,totalcnt
+      integer i,n,m,io
+      integer(i8) totalcnt
       integer, allocatable                  :: idx(:)
       real(r8) xx(ne,3),sg(ne,3)
       integer, parameter :: iu1 = 12

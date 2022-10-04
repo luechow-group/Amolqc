@@ -339,7 +339,7 @@ CONTAINS
    ! also generate the list of used virtual alpha and beta orbitals for each
    ! determinant
    integer spin,j,ii1,ii2,m,n,exc,alstat,i,k,l,mmm,nnn,jj
-   real(r8) tmp
+   integer tmp
 
    do j=1,ndet
       jj=j

@@ -530,8 +530,8 @@ contains
     type(psimax), intent(inout), optional :: psimax_obj
     type(rhoMax_t), intent(inout), optional :: rhoMax
 
-    integer                     :: block,ps,bs,i,j,k,idx,tauFoundStep
-    integer(i8)                   :: n,st,w
+    integer                     :: block,ps,bs,i,j,k,idx
+    integer(i8)                   :: n,st,w,tauFoundStep
     real(r8)                      :: elocCounter,ERef,varAllNodes
     real(r8)                      :: EMeanAllNodes,sampleSizeAllNodes,eTotal,vTotal
     real(r8)                      :: ElocalStat,E,var,stddev,stdDevAllNodes
