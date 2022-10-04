@@ -228,10 +228,10 @@ contains
                                                                ! j=permidx(i) means: r2(j) is close to r1(i)
       integer :: idxa(nalpha),idxb(nbeta),idx(ne)
       integer :: idxab(nalpha),idxba(nbeta)
-      real    :: dista,distb,distba,distab
-      real    :: dmata(nalpha,nalpha),dmatb(nbeta,nbeta)
+      real(r8)    :: dista,distb,distba,distab
+      real(r8)    :: dmata(nalpha,nalpha),dmatb(nbeta,nbeta)
       real    :: dmatab(nalpha,nbeta),dmatba(nbeta,nalpha)
-      real    :: dmat(ne,ne)                  !! alternative to dmata/b; save memory with allocate
+      real(r8)    :: dmat(ne,ne)                  !! alternative to dmata/b; save memory with allocate
       real(r8)  :: xtmp(ne),ytmp(ne),ztmp(ne),distmean,distmax
       integer :: i,j,nElec,ns
       integer :: excludeMode
@@ -369,10 +369,10 @@ contains
                                                               ! 1: list contains excluded atom indices
       integer :: idxa(nalpha),idxb(nbeta),idx(ne)
       integer :: idxab(nalpha),idxba(nbeta)
-      real    :: dista,distb,distba,distab
-      real    :: dmata(nalpha,nalpha),dmatb(nbeta,nbeta)
+      real(r8)    :: dista,distb,distba,distab
+      real(r8)    :: dmata(nalpha,nalpha),dmatb(nbeta,nbeta)
       real    :: dmatab(nalpha,nbeta),dmatba(nbeta,nalpha)
-      real    :: dmat(ne,ne)                  !! alternative to dmata/b; save memory with allocate
+      real(r8)    :: dmat(ne,ne)                  !! alternative to dmata/b; save memory with allocate
       real(r8)  :: xtmp(ne),ytmp(ne),ztmp(ne),distmean,distmax
       integer :: i,j,nElec,ns
       integer :: excludeMode

@@ -26,7 +26,7 @@ module assign_m
    integer              :: mRef2 = 0        ! 2nd reference
    real(r8),allocatable   :: mX(:), mY(:), mZ(:)
    real(r8),allocatable   :: mXRef(:), mYRef(:), mZRef(:)
-   real,allocatable     :: maData(:,:), mbData(:,:)
+   real(r8),allocatable     :: maData(:,:), mbData(:,:)
 
 contains
 
@@ -199,7 +199,7 @@ contains
       integer,intent(inout)                 :: asgn(:,:)
       real(r8), optional                      :: dist(:)
       real, allocatable                     :: dmata(:,:),dmatb(:,:)
-      real dista,distb
+      real(r8) dista,distb
       integer i,j,beta1,w
       integer idxa(nalpha-mCoreEl),idxb(nbeta-mCoreEl),idxc(ne)
 
