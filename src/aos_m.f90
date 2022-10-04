@@ -636,7 +636,7 @@ contains
                 gaussFOrder = .false.
             end if
 
-            if (ie .eq. 0) then                     ! AO's for all electrons
+            if (ie == 0) then                     ! AO's for all electrons
                 i1 = 1
                 i2 = ne
             else
@@ -1672,7 +1672,7 @@ contains
             gaussFOrder = .false.
         end if
 
-        if (ie .eq. 0) then                     ! AO's for all electrons
+        if (ie == 0) then                     ! AO's for all electrons
             i1 = 1
             i2 = ne
         else
@@ -2061,7 +2061,7 @@ contains
             gaussFOrder = .false.
         end if
 
-        if (ie .eq. 0) then                     ! AO's for all electrons
+        if (ie == 0) then                     ! AO's for all electrons
             i1 = 1
             i2 = ne
         else

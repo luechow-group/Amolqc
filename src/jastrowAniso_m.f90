@@ -1538,7 +1538,7 @@ contains
       enddo
     enddo
     if (MASTER) then
-      if (.not.( all(tidx.eq.tidx_temp) )) then
+      if (.not.( all(tidx==tidx_temp) )) then
         resorted = .true.
         do k=1 , (SIZE(tidx) / 10) +1
           tJasAOLines%n = k

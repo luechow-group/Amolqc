@@ -69,14 +69,14 @@ subroutine getblk(iu, itoken, ftoken, ldim, lines, nl)
     do
         read(iu, '(A)', iostat = io) line
         k = index(line, itoken)
-        if (k .gt. 0 .or. io .ne. 0) goto 101
+        if (k > 0 .or. io /= 0) goto 101
     enddo
     101  continue
-    if (io .eq. 0) then
+    if (io == 0) then
         do
             read(iu, '(A)', iostat = io) line
             k = index(line, ftoken)
-            if (k .gt. 0 .or. io .ne. 0) goto 201
+            if (k > 0 .or. io /= 0) goto 201
             if (nl == ldim)&
                     call error("parselib:getblk: ldim too small")
             nl = nl + 1
@@ -118,12 +118,12 @@ subroutine getNextBlock(allLines, nla, idx, itoken, ftoken, ctoken, &
     do i = idx, nla
         if (allLines(i)(1:1)==ctoken(1:1)) goto 100
         k = index(allLines(i), itoken)
-        if (k .gt. 0) goto 101
+        if (k > 0) goto 101
         100     continue
     enddo
     101  continue
 
-    if (k .gt. 0) then
+    if (k > 0) then
         n = i
         nl = 1
         do i = n, nla
@@ -131,7 +131,7 @@ subroutine getNextBlock(allLines, nla, idx, itoken, ftoken, ctoken, &
             if (nl > ldim) call error("getNextBlock: wrong dimension")
             lines(nl) = allLines(i)
             idx = i + 1
-            if (k .gt. 0) goto 201
+            if (k > 0) goto 201
             nl = nl + 1
         enddo
         nl = 0
@@ -160,11 +160,11 @@ subroutine getdblf(iu, target, value, iflag)
     do i = 1, 1000
         read(iu, '(A)', iostat = io) line
         k = index(line, target)
-        if (k .gt. 0 .or. io .ne. 0) goto 101
+        if (k > 0 .or. io /= 0) goto 101
     enddo
     101  continue
 
-    if (k .eq. 0) then
+    if (k == 0) then
         iflag = 1                      ! target not found
     else
         iflag = 0                      ! target found
@@ -197,11 +197,11 @@ subroutine getdbla(lines, nl, target, value, iflag)
 
     do i = 1, nl
         k = index(lines(i), target)
-        if (k .gt. 0) goto 101
+        if (k > 0) goto 101
     enddo
     101  continue
 
-    if (k .eq. 0) then
+    if (k == 0) then
         iflag = 1                          ! target not found
     else
         iflag = 0                          ! target found
@@ -236,11 +236,11 @@ subroutine getdblarra(lines, nl, target, value, iflag)
 
     do i = 1, nl
         k = index(lines(i), target)
-        if (k .gt. 0) goto 101
+        if (k > 0) goto 101
     enddo
     101  continue
 
-    if (k .eq. 0) then
+    if (k == 0) then
         iflag = 1                          ! target not found
     else
         iflag = 0                          ! target found
@@ -292,11 +292,11 @@ subroutine getintf(iu, target, value, iflag)
     do i = 1, 1000
         read(iu, '(A)', iostat = io) line
         k = index(line, target)
-        if (k .gt. 0 .or. io .ne. 0) goto 101
+        if (k > 0 .or. io /= 0) goto 101
     enddo
     101  continue
 
-    if (k .eq. 0) then
+    if (k == 0) then
         iflag = 1                      ! target not found
     else
         iflag = 0                      ! target found
@@ -332,11 +332,11 @@ subroutine getint8f(iu, target, value, iflag)
     do i = 1, 1000
         read(iu, '(A)', iostat = io) line
         k = index(line, target)
-        if (k .gt. 0 .or. io .ne. 0) goto 101
+        if (k > 0 .or. io /= 0) goto 101
     enddo
     101  continue
 
-    if (k .eq. 0) then
+    if (k == 0) then
         iflag = 1                      ! target not found
     else
         iflag = 0                      ! target found
@@ -383,11 +383,11 @@ subroutine getinta(lines, nl, target, value, iflag)
 
     do i = 1, nl
         k = index(lines(i), target)
-        if (k .gt. 0) goto 101
+        if (k > 0) goto 101
     enddo
     101  continue
 
-    if (k .eq. 0) then
+    if (k == 0) then
         iflag = 1                        ! target not found
     else
         iflag = 0                        ! target found
@@ -436,11 +436,11 @@ subroutine getintarra(lines, nl, target, value, iflag)
 
     do i = 1, nl
         k = index(lines(i), target)
-        if (k .gt. 0) goto 101
+        if (k > 0) goto 101
     enddo
     101  continue
 
-    if (k .eq. 0) then
+    if (k == 0) then
         iflag = 1                        ! target not found
     else
         iflag = 0                        ! target found
@@ -492,11 +492,11 @@ subroutine getint8a(lines, nl, target, value, iflag)
 
     do i = 1, nl
         k = index(lines(i), target)
-        if (k .gt. 0) goto 101
+        if (k > 0) goto 101
     enddo
     101  continue
 
-    if (k .eq. 0) then
+    if (k == 0) then
         iflag = 1                        ! target not found
     else
         iflag = 0                        ! target found
@@ -544,11 +544,11 @@ subroutine getstrf(iu, target, str, iflag)
     do i = 1, 1000
         read(iu, '(A)', iostat = io) line
         k = index(line, target)
-        if (k .gt. 0 .or. io .ne. 0) goto 101
+        if (k > 0 .or. io /= 0) goto 101
     enddo
     101  continue
 
-    if (k .eq. 0) then
+    if (k == 0) then
         iflag = 1                      ! target not found
     else
         iflag = 0                      ! target found
@@ -583,11 +583,11 @@ subroutine getstra(lines, nl, target, str, iflag)
 
     do i = 1, nl
         k = index(lines(i), target)
-        if (k .gt. 0) goto 101
+        if (k > 0) goto 101
     enddo
     101  continue
 
-    if (k .eq. 0) then
+    if (k == 0) then
         iflag = 1                        ! target not found
     else
         iflag = 0                        ! target found
@@ -626,11 +626,11 @@ subroutine getlogf(iu, target, value, iflag)
     do i = 1, 1000
         read(iu, '(A)', iostat = io) line
         k = index(line, target)
-        if (k .gt. 0 .or. io .ne. 0) goto 101
+        if (k > 0 .or. io /= 0) goto 101
     enddo
     101  continue
 
-    if (k .eq. 0) then
+    if (k == 0) then
         iflag = 1                      ! target not found
     else
         iflag = 0                      ! target found
@@ -663,11 +663,11 @@ subroutine getloga(lines, nl, target, value, iflag)
 
     do i = 1, nl
         k = index(lines(i), target)
-        if (k .gt. 0) goto 101
+        if (k > 0) goto 101
     enddo
     101  continue
 
-    if (k .eq. 0) then
+    if (k == 0) then
         iflag = 1                        ! target not found
     else
         iflag = 0                        ! target found
@@ -701,22 +701,22 @@ logical function findf(iu, target)
     !      do i=1,1000
     !        read(iu,'(A)',iostat=io) line
     !        k = index(line,target)
-    !        if ( k .gt. 0 .or. io .ne. 0) goto 101
+    !        if ( k > 0 .or. io /= 0) goto 101
     !      enddo
     ! 101  continue
 
     !cc modified 24.02.03 by CD
 
     io = 0
-    do while (io.eq.0)
+    do while (io==0)
         read(iu, '(A)', iostat = io) line
         k = index(line, target)
-        if (k .gt. 0) io = 1
+        if (k > 0) io = 1
     enddo
 
     !cc end CD
 
-    if (k .eq. 0) then
+    if (k == 0) then
         findf = .false.                ! target not found
     else
         findf = .true.                 ! target found
@@ -739,11 +739,11 @@ logical function finda(lines, nl, target)
 
     do i = 1, nl
         k = index(lines(i), target)
-        if (k .gt. 0) goto 101
+        if (k > 0) goto 101
     enddo
     101  continue
 
-    if (k .eq. 0) then
+    if (k == 0) then
         finda = .false.                ! target not found
     else
         finda = .true.                 ! target found
@@ -767,11 +767,11 @@ integer function ifinda(lines, nl, target)
 
     do i = 1, nl
         k = index(lines(i), target)
-        if (k .gt. 0) goto 101
+        if (k > 0) goto 101
     enddo
     101  continue
 
-    if (k .eq. 0) then
+    if (k == 0) then
         ifinda = 0                ! target not found
     else
         ifinda = i                 ! target found

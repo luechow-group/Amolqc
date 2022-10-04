@@ -497,11 +497,11 @@ contains
        !mytid = 0
        !!MPI call mpi_comm_rank(MPI_COMM_WORLD, mytid, ierr)
        !seed = seed0
-       !if (seed .lt. 0) call abortp (' seed must greater than 0')
+       !if (seed < 0) call abortp (' seed must greater than 0')
        !seed = seed + mytid ! add task ID for parallel runs
        !seed = -seed        ! i.e. initialize at first call
        !dummy = init_mrg(seed)  ! initizalize mrg
-       !if (discd1.ne.0) then
+       !if (discd1/=0) then
        !   taueff = -1.d0
        !endif
     end select

@@ -141,7 +141,7 @@ CONTAINS
 
       counter = counter + 1
       do j = 1,dprops 
-         if (counter.gt.bufoffset(j)) then
+         if (counter>bufoffset(j)) then
             bufcounter(j) = bufcounter(j) + 1
             if (bufcounter(j) == 1) then
                mtopsave(j) = getSampleSize(mSample)
@@ -378,10 +378,10 @@ CONTAINS
    write(iul,'(/A)') ' with descended weighting'
 
    do k = 1,10
-   if ((k.eq.10).or.(k.le.notau2)) then
+   if ((k==10).or.(k<=notau2)) then
    write(iul,*) ''
    write(iul,*) ''
-   if(k.eq.10) then 
+   if(k==10) then
    write(iul,'(A20,I8)') 'number of steps:',stprops*dprops  
    else   
    write(iul,'(A20,I8)') 'number of steps:',k*tau2  

@@ -849,7 +849,7 @@ contains
 
          v2  = v2 * (0.5d0*(1d0 + vxz) + tmp/((4d0 + tmp)*10d0))
          vf  = (-1d0 + sqrt(1d0 + 2d0*v2*mTau))/(v2*mTau)
-         if (logmode .ge. 5) write(iul,'(A6,2G12.5)') &
+         if (logmode >= 5) write(iul,'(A6,2G12.5)') &
              'vf,a=',vf,tmp/(4d0+tmp)
          vv1x = vf*driftx(i)                     ! modified velocity
          vv1y = vf*drifty(i)
@@ -926,7 +926,7 @@ contains
               + (y(i)-atoms(nnu0)%cy)**2 + (z(i)-atoms(nnu0)%cz)**2)
          tmp1 = zeta**3/pi*exp(-2d0*zeta*tmp1)
          gf = gf * (p1*tmp + q1*tmp1)
-         if (logmode .ge. 5) write(iul,'(A8,5G24.16)') 'g,g1,g2', &
+         if (logmode >= 5) write(iul,'(A8,5G24.16)') 'g,g1,g2', &
               p1*tmp + q1*tmp1,tmp,tmp1,p1,q1
          vv1 = vv1 + vf*v20
       enddo

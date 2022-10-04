@@ -210,7 +210,7 @@ subroutine jasinput_ic(lines,nl)
           endif
           a = a+1
           offset = offset+1
-        else if (ncdiff-a .ge. 2) then
+        else if (ncdiff-a >= 2) then
           read(lines(idx+offset), *, iostat=stat) scaleEN(a+1),scaleEN(a+2)
           if (stat /= 0) then
             ! use same parameter for all nuclei types if read fails
@@ -243,7 +243,7 @@ subroutine jasinput_ic(lines,nl)
           endif
           a = a+1
           offset = offset+1
-        else if (ncdiff-a .ge. 2) then
+        else if (ncdiff-a >= 2) then
           read(lines(idx+offset), *, iostat=stat) scaleEN(a+1),scaleEN(a+2)
           if (stat /= 0) then
             ! use same parameter for all nuclei types if read fails
@@ -271,7 +271,7 @@ subroutine jasinput_ic(lines,nl)
           endif
           a = a+1
           offset = offset+1
-        else if (ncdiff-a .ge. 2) then
+        else if (ncdiff-a >= 2) then
           read(lines(idx+offset), *, iostat=stat) powerEN(a+1),powerEN(a+2)
           if (stat /= 0) then
             ! use same parameter for all nuclei types if read fails
@@ -3788,7 +3788,7 @@ subroutine eenGeneric(fTerm, fDeriv, fLapli, deriveLinParams, calcDerivs)
             l = p - k
             !   g = params + k - 2
 
-            !   if (p .ge. 6 .and. k .gt. 2) then
+            !   if (p >= 6 .and. k > 2) then
             !     do x = 2, k - 1
             !       g = g + (p - x) / 2 - 1;
             !     enddo

@@ -625,7 +625,7 @@ CONTAINS
 
             if (bf==0) cycle             ! not found
 
-            if (typ(bf) .ne. 'GTO') cycle   ! only GTO's are splined
+            if (typ(bf) /= 'GTO') cycle   ! only GTO's are splined
             !        // only primitive cartesian gaussians: 1s,2p,3d,4f
             !        // i.e. no r factor. Thus nn is not used here.
 
@@ -636,7 +636,7 @@ CONTAINS
             y00(5) = 0d0
             y00(6) = 0d0
 
-            if (bl(bf) .eq. 'S') then               ! 1s GTO
+            if (bl(bf) == 'S') then               ! 1s GTO
                 do ic = 1, ngto(bf)                     ! loop over contraction
                     y00(1) = y00(1) + 0d0
                     y00(2) = y00(2) - 2d0 * cntrctn(1, ic, bf) * cntrctn(2, ic, bf)
@@ -660,7 +660,7 @@ CONTAINS
                     enddo
                 enddo
                 if (cuspcor) then                       ! Cusp-Korrektur
-                    if (stoc(1, bf).ne.(0d0)) then
+                    if (stoc(1, bf)/=(0d0)) then
                         call cuspcorrect (ngto, cntrctn, bf, atoms(bc(bf))%za, &
                                 stoc(1, bf), &
                                 stoc(2, bf), stoc(3, bf), stoc(4, bf), &
@@ -676,7 +676,7 @@ CONTAINS
                     endif
                 endif
 
-            else if (bl(bf) .eq. 'P') then          ! 2p GTO's
+            else if (bl(bf) == 'P') then          ! 2p GTO's
                 do ic = 1, ngto(bf)                     ! loop over contraction
                     y00(1) = y00(1) + 0d0
                     y00(2) = y00(2) - 2d0 * cntrctn(1, ic, bf) * cntrctn(2, ic, bf)
@@ -699,7 +699,7 @@ CONTAINS
                         y2(i) = y2(i) + ux * (5d0 - 2d0 * alp * r2)
                     enddo
                 enddo
-            else if (bl(bf) .eq. 'D') then         ! 3d GTO
+            else if (bl(bf) == 'D') then         ! 3d GTO
                 do ic = 1, ngto(bf)                     ! loop over contraction
                     y00(1) = y00(1) + 0d0
                     y00(2) = y00(2) - 2d0 * cntrctn(1, ic, bf) * cntrctn(2, ic, bf)
@@ -722,7 +722,7 @@ CONTAINS
                         y2(i) = y2(i) + ux * (7d0 - 2d0 * alp * r2)
                     enddo
                 enddo
-            else if (bl(bf) .eq. 'F') then         ! 4f GTO
+            else if (bl(bf) == 'F') then         ! 4f GTO
                 do ic = 1, ngto(bf)                     ! loop over contraction
                     y00(1) = y00(1) + 0d0
                     y00(2) = y00(2) - 2d0 * cntrctn(1, ic, bf) * cntrctn(2, ic, bf)
@@ -1095,13 +1095,13 @@ CONTAINS
 
         if (ngto(i) == 1) then
             so(i) = 0
-        else if (ngto(i) .gt. 1) then
+        else if (ngto(i) > 1) then
             if (k == 1) then
                 socounter = socounter + 1
                 sonew = sonew + 1
                 so(i) = socounter
                 k_now = k
-            else if (k .gt. 1) then
+            else if (k > 1) then
                 if (basis == 'diff' .or. basis == 'default') then
                     if (k /= k_now .and. atoms(k)%elemIdx==atoms(k_now)%elemIdx&
                             .and. atoms(k)%ba == atoms(k_now)%ba) then

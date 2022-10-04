@@ -72,7 +72,7 @@ contains
     bf_cutoff = .false.
 
     if (cutao) then
-      if (rai .gt. bf%aocut) bf_cutoff = .true.
+      if (rai > bf%aocut) bf_cutoff = .true.
     endif
   end function
 
@@ -421,7 +421,7 @@ contains
       elec: do i = i1, i2
         if(cutao) then
           rr = rai(a, i)
-          if (rr .gt. bf%aocut) then
+          if (rr > bf%aocut) then
             cycle elec
           endif
         endif
@@ -431,7 +431,7 @@ contains
           ! the check below is equivalent to
           ! ers = exp(-alp_min * rr*rr)
           ! if(moc_max * ers < prodcutoff) then
-          if(rr .gt. crit) then
+          if(rr > crit) then
             cycle elec
           endif
         endif

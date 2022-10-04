@@ -50,15 +50,15 @@ subroutine ao_cut(aocut)
     character(len = 1) :: l
 
     allocate(aocuts(nbasf), stat = alstat)
-    if (alstat.ne.0) call abortp('(ao_cut): allocation error')
+    if (alstat/=0) call abortp('(ao_cut): allocation error')
 
     do bf = 1, nbasf
 
         l = bl(bf)
 
-        if ((l.eq.'S').or.(l.eq.'P')) ntypes = 1
-        if (l.eq.'D') ntypes = 2
-        if (l.eq.'F') ntypes = 3
+        if ((l=='S').or.(l=='P')) ntypes = 1
+        if (l=='D') ntypes = 2
+        if (l=='F') ntypes = 3
 
         maxr = 0d0
         !        maxrp = 0d0
@@ -69,7 +69,7 @@ subroutine ao_cut(aocut)
             alpha = cntrctn(1, 1, bf)
             do ic = 2, ngto(bf)
                 tmp = cntrctn(1, ic, bf)
-                if (abs(tmp).lt.abs(alpha)) then
+                if (abs(tmp)<abs(alpha)) then
                     alpha = tmp
                     coef = cntrctn(2, ic, bf)
                 endif
@@ -82,10 +82,10 @@ subroutine ao_cut(aocut)
             niter = 0
 
             ! inverse interpolation
-            do while (abs(abs(y) - aocut).gt.conv)
+            do while (abs(abs(y) - aocut)>conv)
                 niter = niter + 1
-                if (niter.gt.itermax) then
-                    call abortp('ao_cut: niter.gt.maxiter')
+                if (niter>itermax) then
+                    call abortp('ao_cut: niter>maxiter')
                 endif
 
                 m = 0d0
@@ -101,7 +101,7 @@ subroutine ao_cut(aocut)
 
                 r_new = (aocut - y) / m + r
 
-                if (abs(r - r_new).le.trustr) then
+                if (abs(r - r_new)<=trustr) then
                     r = r_new
                 else
                     r = sign(trustr, r_new - r) + r
@@ -109,7 +109,7 @@ subroutine ao_cut(aocut)
 
             enddo  !iterations
 
-            if (r.gt.maxr) maxr = r
+            if (r>maxr) maxr = r
 
             !cc end of laplacian
             !cc inverse interpolation for orbitals
@@ -120,9 +120,9 @@ subroutine ao_cut(aocut)
             !
             !            niter=0
             !
-            !            do while (abs(abs(yp) - aocut).gt.conv)
+            !            do while (abs(abs(yp) - aocut)>conv)
             !              niter=niter+1
-            !              if (niter.gt.itermax) then
+            !              if (niter>itermax) then
             !                call abortp('something wrong in ao_cut')
             !              endif
             !
@@ -130,7 +130,7 @@ subroutine ao_cut(aocut)
             !              yp = coef * evalphi(1,l,tp,alpha,rp)
             !              rp_new = (aocut - yp)/mp + rp
             !
-            !              if (abs(rp-rp_new).le.trustr) then
+            !              if (abs(rp-rp_new)<=trustr) then
             !                rp = rp_new
             !              else
             !                rp = sign(trustr,rp_new-rp) + rp
@@ -138,7 +138,7 @@ subroutine ao_cut(aocut)
             !
             !            enddo  !iterations
             !
-            !            if (rp.gt.maxrp) maxrp=rp
+            !            if (rp>maxrp) maxrp=rp
 
         enddo ! types
 
@@ -155,14 +155,14 @@ subroutine ao_cut(aocut)
     !        write(*,'(2f20.14,2x,a,2f14.8)')
     !     .    cntrctn(1,ic,bf),cntrctn(2,ic,bf),bl(bf),aocuts(bf),
     !     .    aocuts(bf)*0.52918
-    !          if (bl(bf).eq.'S') then
+    !          if (bl(bf)=='S') then
     !            write(*,*) s(1,cntrctn(1,ic,bf),aocuts(bf))*cntrctn(2,ic,bf)
-    !          elseif (bl(bf).eq.'P') then
+    !          elseif (bl(bf)=='P') then
     !           write(*,*) px(1,cntrctn(1,ic,bf),aocuts(bf))*cntrctn(2,ic,bf)
-    !          elseif (bl(bf).eq.'D') then
+    !          elseif (bl(bf)=='D') then
     !          write(*,*) dxx(1,cntrctn(1,ic,bf),aocuts(bf))*cntrctn(2,ic,bf)
     !          write(*,*) dxy(1,cntrctn(1,ic,bf),aocuts(bf))*cntrctn(2,ic,bf)
-    !          elseif (bl(bf).eq.'F') then
+    !          elseif (bl(bf)=='F') then
     !         write(*,*) fxxx(1,cntrctn(1,ic,bf),aocuts(bf))*cntrctn(2,ic,bf)
     !         write(*,*) fxxy(1,cntrctn(1,ic,bf),aocuts(bf))*cntrctn(2,ic,bf)
     !         write(*,*) fxyz(1,cntrctn(1,ic,bf),aocuts(bf))*cntrctn(2,ic,bf)
@@ -185,21 +185,21 @@ contains
         integer :: mode, type
         character(len = 1) :: l
 
-        if (l.eq.'S') then
+        if (l=='S') then
 
-            if (type.ne.1) call abortp('error in evallapl in ao_cut')
+            if (type/=1) call abortp('error in evallapl in ao_cut')
             evalphi = s(mode, a, x)
 
-        elseif (l.eq.'P') then
+        elseif (l=='P') then
 
-            if (type.ne.1) call abortp('error in evallapl in ao_cut')
+            if (type/=1) call abortp('error in evallapl in ao_cut')
             evalphi = px(mode, a, x)
 
-        elseif (l.eq.'D') then
+        elseif (l=='D') then
 
-            if (type.eq.1) evalphi = dxx(mode, a, x)
-            if (type.eq.2) then
-                if (mode.eq.3) then
+            if (type==1) evalphi = dxx(mode, a, x)
+            if (type==2) then
+                if (mode==3) then
                     normc = 1.0d0
                 else
                     normc = sqr3
@@ -207,21 +207,21 @@ contains
                 evalphi = normc * dxy(mode, a, x)
             endif
 
-        elseif (l.eq.'F') then
+        elseif (l=='F') then
 
-            if (type.eq.1) evalphi = fxxx(mode, a, x)
-            if (type.eq.2) then
+            if (type==1) evalphi = fxxx(mode, a, x)
+            if (type==2) then
 
-                if (mode.eq.3) then
+                if (mode==3) then
                     normc = 1.0d0
                 else
                     normc = sqr5
                 endif
                 evalphi = normc * fxxy(mode, a, x)
 
-            elseif (type.eq.3) then
+            elseif (type==3) then
 
-                if (mode.eq.3) then
+                if (mode==3) then
                     normc = 0.0d0
                 else
                     normc = sqr3 * sqr5
@@ -255,21 +255,21 @@ contains
         ! type:2 dxy,fxxy
         ! type:3 fxyz
 
-        if (l.eq.'S') then
+        if (l=='S') then
 
-            if (type.ne.1) call abortp('error in evallapl in ao_cut')
+            if (type/=1) call abortp('error in evallapl in ao_cut')
             evallapl = lapl_sx(mode, a, x)
 
-        elseif (l.eq.'P') then
+        elseif (l=='P') then
 
-            if (type.ne.1) call abortp('error in evallapl in ao_cut')
+            if (type/=1) call abortp('error in evallapl in ao_cut')
             evallapl = lapl_px(mode, a, x)
 
-        elseif (l.eq.'D') then
+        elseif (l=='D') then
 
-            if (type.eq.1) evallapl = lapl_dxx(mode, a, x)
-            if (type.eq.2) then
-                if (mode.eq.3) then
+            if (type==1) evallapl = lapl_dxx(mode, a, x)
+            if (type==2) then
+                if (mode==3) then
                     normc = 1.0d0
                 else
                     normc = sqr3
@@ -277,27 +277,27 @@ contains
                 evallapl = normc * lapl_dxy(mode, a, x)      !correction of norm with respect
             endif                                        !to dxx
 
-        elseif (l.eq.'F') then
+        elseif (l=='F') then
 
-            if (type.eq.1) then
+            if (type==1) then
 
-                if (mode.eq.3) then
+                if (mode==3) then
                     evallapl = startguess(type, a, x)
                 else
                     evallapl = lapl_fxxx(mode, a, x)
                 endif
 
-            elseif (type.eq.2) then
+            elseif (type==2) then
 
-                if (mode.eq.3) then
+                if (mode==3) then
                     evallapl = startguess(type, a, x)
                 else
                     evallapl = sqr5 * lapl_fxxy(mode, a, x)     !correction of norm with respect
                 endif                                       !to fxxx
 
-            elseif (type.eq.3) then
+            elseif (type==3) then
 
-                if (mode.eq.3) then
+                if (mode==3) then
                     normc = 1.0d0
                 else
                     normc = sqr3 * sqr5
@@ -323,11 +323,11 @@ contains
 
         real(r8) :: tmp
 
-        if (type.eq.1) then
+        if (type==1) then
             tmp = log(0.5 * aocut / a)
             tmp = abs(tmp)
             startguess = sqrt(tmp)
-        elseif (type.eq.2) then
+        elseif (type==2) then
             tmp = log(9.0d0 / (2.0d0 * sqrt(3.0d0)) * aocut / a)
             tmp = abs(tmp)
             startguess = sqrt(tmp)
@@ -343,13 +343,13 @@ contains
         real(r8) :: r, a
         integer :: mode
 
-        if (mode.eq.1) then
+        if (mode==1) then
             s = exp(-a * r**2)
-        elseif (mode.eq.2) then
+        elseif (mode==2) then
             call abortp('function s in ao_cut:This should never happen!')
             !          ! Because we are feeding in the analytical value for the cutoff radius
             !          ! Therefore no iteration should be necessary
-        elseif (mode.eq.3) then
+        elseif (mode==3) then
             s = sqrt(-log(r / coef) / a)  !Analytical inverse function
         endif
 
@@ -361,11 +361,11 @@ contains
         real(r8) :: r, a
         integer :: mode
 
-        if (mode.eq.1) then
+        if (mode==1) then
             px = r * exp(-a * r**2)
-        elseif (mode.eq.2) then
+        elseif (mode==2) then
             px = (-1.0d0 + 2.0d0 * a * r**2) * (-exp(-a * r**2))
-        elseif (mode.eq.3) then
+        elseif (mode==3) then
             px = 0.5 * sqrt(2.0d0) / sqrt(a) + trustr
             !           !Start guess: largest root of 1st derivative + trust radius
         endif
@@ -378,11 +378,11 @@ contains
         real(r8) :: r, a
         integer :: mode
 
-        if (mode.eq.1) then
+        if (mode==1) then
             dxx = r**2 * exp(-a * r**2)
-        elseif (mode.eq.2) then
+        elseif (mode==2) then
             dxx = (-1.0d0 + a * r**2) * (-2.d0) * r * exp(-a * r**2)
-        elseif (mode.eq.3) then
+        elseif (mode==3) then
             dxx = 1 / sqrt(a) + trustr
         endif
 
@@ -394,12 +394,12 @@ contains
         real(r8) :: r, a
         integer :: mode
 
-        if (mode.eq.1) then
+        if (mode==1) then
             dxy = 0.5 * r**2 * exp(-a * r**2) * sqrt(3.0d0)
-        elseif (mode.eq.2) then
+        elseif (mode==2) then
             dxy = (-1.0d0 + a * r**2) * (-r) * exp(-a * r**2) * &
                     sqrt(3.0d0)
-        elseif (mode.eq.3) then
+        elseif (mode==3) then
             dxy = 1 / sqrt(a) + trustr
         endif
 
@@ -411,11 +411,11 @@ contains
         real(r8) :: r, a
         integer :: mode
 
-        if (mode.eq.1) then
+        if (mode==1) then
             fxxx = r**3 * exp(-a * r**2)
-        elseif (mode.eq.2) then
+        elseif (mode==2) then
             fxxx = ((-3.0d0) + 2.0d0 * a * r**2) * (-r)**2 * exp(-a * r**2)
-        elseif (mode.eq.3) then
+        elseif (mode==3) then
             fxxx = 0.5 * sqrt(6.0d0 / a) + trustr
         endif
 
@@ -427,14 +427,14 @@ contains
         real(r8) :: r, a
         integer :: mode
 
-        if (mode.eq.1) then
+        if (mode==1) then
             fxxy = 2.0d0 * sqrt(3.0d0) / 9.0d0 * r**3 * exp(-a * r**2) * &
                     sqrt(5.0d0)
-        elseif (mode.eq.2) then
+        elseif (mode==2) then
             fxxy = (-3.0d0 + 2.0d0 * a * r**2) * &
                     (-2.0d0) * sqrt(3.0d0) / 9.0d0 * r**2 * exp(-a * r**2) * &
                     sqrt(5.0d0)
-        elseif (mode.eq.3) then
+        elseif (mode==3) then
             fxxy = 0.5 * sqrt(6.0d0 / a) + trustr
         endif
 
@@ -446,14 +446,14 @@ contains
         real(r8) :: r, a
         integer :: mode
 
-        if (mode.eq.1) then
+        if (mode==1) then
             fxyz = sqrt(3.0d0) / 9.0d0 * r**3 * exp(-a * r**2) * &
                     sqrt(15.0d0)
-        elseif (mode.eq.2) then
+        elseif (mode==2) then
             fxyz = (-3.0D0 + 2.0D0 * a * r**2) * &
                     (-sqrt(3.0d0)) / 9 * r**2 * exp(-a * r**2) * &
                     sqrt(15.0d0)
-        elseif (mode.eq.3) then
+        elseif (mode==3) then
             fxyz = 0.5 * sqrt(6.0d0 / a) + trustr
         endif
 
@@ -467,13 +467,13 @@ contains
         !                         !mode=2: derivative of laplacian in x-direction
         !                         !mode=3: position of largest extreme value (root of derivative)
 
-        if (mode.eq.1) then
+        if (mode==1) then
             lapl_sx = (2.0d0 * a * x**2 - 3.0d0) * 2.0d0 * a * &
                     exp(-a * x**2)
-        elseif (mode.eq.2) then
+        elseif (mode==2) then
             lapl_sx = (-0.5D1 + 0.2D1 * x**2 * a) * &
                     (-0.4D1 * a**2 * x * exp(-x**2 * a))
-        elseif (mode.eq.3) then
+        elseif (mode==3) then
             lapl_sx = sqrt(0.10D2) * a**(-0.1D1 / 0.2D1) / 0.2D1 + trustr
         endif
 
@@ -487,13 +487,13 @@ contains
         !                         !mode=2: derivative of laplacian in x-direction
         !                         !mode=3: position of largest extreme value (root of derivative)
 
-        if (mode.eq.1) then
+        if (mode==1) then
             lapl_px = (-5.0d0 + 2.0d0 * x**2 * a) * &
                     2.0d0 * a * x * exp(-a * x**2)
-        elseif (mode.eq.2) then
+        elseif (mode==2) then
             lapl_px = (-16.0d0 * x**2 * a + 5.0d0 + 4 * x**4 * a**2) * &
                     (-2.0d0 * a * exp(-x**2 * a))
-        elseif (mode.eq.3) then
+        elseif (mode==3) then
             lapl_px = (16.0d0 + 4.0d0 * sqrt(11.0d0)) * sqrt(2.0d0) * &
                     (a * (4.0d0 + sqrt(11.0d0))) ** (-1.0d0 / 2.0d0) / 8.0d0 + &
                     trustr
@@ -509,13 +509,13 @@ contains
         !                         !mode=2: derivative of laplacian in x-direction
         !                         !mode=3: position of largest extreme value (root of derivative)
 
-        if (mode.eq.1) then
+        if (mode==1) then
             lapl_dxx = (1.0d0 - 7.0d0 * x**2 * a + 2.0d0 * x**4 * a**2) * &
                     2 * exp(-a * x**2)
-        elseif (mode.eq.2) then
+        elseif (mode==2) then
             lapl_dxx = (8.0d0 - 11.0d0 * a * x**2 + 2.0d0 * x**4 * a**2) * &
                     (-4.0d0) * a * x * exp(-a * x**2)
-        elseif (mode.eq.3) then
+        elseif (mode==3) then
             lapl_dxx = (0.44D2 + 0.4D1 * sqrt(0.57D2)) * &
                     (a * (0.11D2 + sqrt(0.57D2))) ** (-0.1D1 / 0.2D1) / 0.8D1 + &
                     trustr
@@ -531,13 +531,13 @@ contains
         !                         !mode=2: derivative of laplacian in xy-direction
         !                         !mode=3: position of largest extreme value (root of derivative)
 
-        if (mode.eq.1) then
+        if (mode==1) then
             lapl_dxy = (-7.0d0 + 2.0d0 * a * r**2) * &
                     r**2 * a * exp(-a * r**2)
-        elseif (mode.eq.2) then
+        elseif (mode==2) then
             lapl_dxy = (7.0d0 - 11.0d0 * a * r**2 + 2 * r**4 * a**2) * &
                     (-2.0d0) * a * r * exp(-a * r**2)
-        elseif (mode.eq.3) then
+        elseif (mode==3) then
             lapl_dxy = (0.44D2 + 0.4D1 * sqrt(0.65D2)) * &
                     (a * (0.11D2 + sqrt(0.65D2))) ** (-0.1D1 / 0.2D1) / 0.8D1 + &
                     trustr
@@ -553,14 +553,14 @@ contains
         !                         !mode=2: derivative of laplacian in x-direction
         !                         !mode=3: position of largest extreme value (root of derivative)
 
-        if (mode.eq.1) then
+        if (mode==1) then
             lapl_fxxx = (3.0d0 - 9.0d0 * a * x**2 + 2 * x**4 * a**2) * &
                     2.0d0 * x * exp(-a * x**2)
-        elseif (mode.eq.2) then
+        elseif (mode==2) then
             lapl_fxxx = (-3.0d0 + 33.0d0 * a * x**2 - 28.0d0 * x**4 * &
                     a**2 + 4.0d0 * x**6 * a**3) * &
                     (-2.0d0) * exp(-a * x**2)
-        elseif (mode.eq.3) then
+        elseif (mode==3) then
             !          ! this one is too hard for maple...
             call abortp('error in function fxxx')
         endif
@@ -576,15 +576,15 @@ contains
         !                         !mode=2: derivative of laplacian in x-direction
         !                         !mode=3: position of largest extreme value (root of derivative)
 
-        if (mode.eq.1) then
+        if (mode==1) then
             lapl_fxxy = (0.3D1 - 0.18D2 * a * r**2 + &
                     0.4D1 * r**4 * a**2) * &
                     0.2D1 / 0.9D1 * sqrt(0.3D1) * r * exp(-a * r**2)
-        elseif (mode.eq.2) then
+        elseif (mode==2) then
             lapl_fxxy = (-0.3D1 + 0.60D2 * a * r**2 - 0.56D2 * r**4 * &
                     a**2 + 0.8D1 * a**3 * r**6) * &
                     (-0.2D1) / 0.9D1 * sqrt(0.3D1) * exp(-a * r ** 2)
-        elseif (mode.eq.3) then
+        elseif (mode==3) then
             !          ! this one is too hard for maple...
             call abortp('error in function fxxy')
         endif
@@ -600,14 +600,14 @@ contains
         !                         !mode=2: derivative of laplacian in x-direction
         !                         !mode=3: position of largest extreme value (root of derivative)
 
-        if (mode.eq.1) then
+        if (mode==1) then
             lapl_fxyz = (-0.9D1 + 0.2D1 * a * r**2) * &
                     0.2D1 / 0.9D1 * r**3 * sqrt(0.3D1) * a * exp(-a * r**2)
-        elseif (mode.eq.2) then
+        elseif (mode==2) then
             lapl_fxyz = (0.27D2 - 0.28D2 * a * r**2 + &
                     0.4D1 * r**4 * a**2) * &
                     (-0.2D1) / 0.9D1 * r**2 * sqrt(0.3D1) * a * exp(-a * r**2)
-        elseif (mode.eq.3) then
+        elseif (mode==3) then
             lapl_fxyz = (0.28D2 + 0.4D1 * sqrt(0.22D2)) * sqrt(0.2D1) * &
                     (a * (0.7D1 + sqrt(0.22D2))) ** (-0.1D1 / 0.2D1) / 0.8D1 + &
                     trustr

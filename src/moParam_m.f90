@@ -859,7 +859,7 @@ do p=1,moParams
          if (detsRepLst(n,1)==0) then
             darr(n) = deter(1,n)
             excitedMO(1:na) = mat(newmo,1:na,1)
-            if(ie .le. nalpha) then
+            if(ie <= nalpha) then
                call invdetcalc(excitedMO,na,na,detiaOne(1:na,pos,nn),darr(n))
                 else
                call invdetcalc(excitedMO,na,na,detia(1:na,pos,nn),darr(n))

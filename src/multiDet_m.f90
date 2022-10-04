@@ -982,7 +982,7 @@ CONTAINS
    if (ie == 0) then
       ii1  = 1
       ii2  = nalpha
-   else if(ie .le. nalpha) then
+   else if(ie <= nalpha) then
       ii1 = ie
       ii2 = ie
    endif
@@ -1158,7 +1158,7 @@ CONTAINS
    if (ie == 0) then
       ii1  = 1
       ii2  = nbeta
-   else if(ie .gt. nalpha) then
+   else if(ie > nalpha) then
       ii1 = ie - offset
       ii2 = ie - offset
    endif
@@ -1407,7 +1407,7 @@ CONTAINS
    if (ie == 0) then
       ii1  = 1
       ii2  = nalpha
-   else if(ie .le. nalpha) then
+   else if(ie <= nalpha) then
       ii1 = ie
       ii2 = ie
    endif
@@ -1473,7 +1473,7 @@ CONTAINS
    if (ie == 0) then
       ii1  = 1
       ii2  = nbeta
-   else if(ie .gt. nalpha) then
+   else if(ie > nalpha) then
       ii1 = ie - offset
       ii2 = ie - offset
    endif
@@ -1618,7 +1618,7 @@ CONTAINS
    endif
     contains
       subroutine internal_update_det() ! only updates determinant
-           if(ie .le. nalpha) then
+           if(ie <= nalpha) then
                olddet(1:ndet) = deter(1,:)
                ! CI loop over products of determinants
                CILOOPA: do nci=1,ndet
@@ -1673,7 +1673,7 @@ CONTAINS
 
      subroutine internal_update_det_and_inv() !updates determinant and inv matrix
 
-           if(ie .le. nalpha) then
+           if(ie <= nalpha) then
                olddet(1:ndet) = deter(1,:)
                detiaOne=detia
                !detibOne=detib
@@ -1727,7 +1727,7 @@ CONTAINS
 
    subroutine resetToOld(ie)
       integer, intent(in) :: ie
-      if(ie .le. nalpha) then
+      if(ie <= nalpha) then
          deter(1,1:ndet) = olddet(:)
       else
          deter(2,1:ndet) = olddet(:)

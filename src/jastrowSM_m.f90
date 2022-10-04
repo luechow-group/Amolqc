@@ -626,7 +626,7 @@ CONTAINS
         if (diffeecusp) then
             write(iu, '(L1)') diffeecusp
         endif
-        if (k0.ne.0) then
+        if (k0/=0) then
             write(iu, '(5F10.5)') bpg, (apg(a), a = 1, atoms(nclast)%sa)
             write(iu, '(5F10.5)') (cjas(k), k = 1, k0)
         endif
@@ -1952,8 +1952,8 @@ CONTAINS
 
                     !---------Electron-Nucleus-Correlation-Terms----------------------------------
 
-                    !      if (tcontrol(k,1).eq.3) then
-                    if (tcontrol(k, 1).eq.2) then
+                    !      if (tcontrol(k,1)==3) then
+                    if (tcontrol(k, 1)==2) then
                         s = tcontrol(k, 6)
                         do a = tcontrol(k, 3), tcontrol(k, 4)
                             uu2(i) = uu2(i) + cjas(k) * t * raibar(s, a, i) !\sum_i^{ne}\sum_{i<j}^{ne}{r_i + r_j} =
@@ -1966,15 +1966,15 @@ CONTAINS
                         !        ijuu(i,j)    = 0d0
 
                         !---------Electron-Electron-Correlation-Terms---------------------------
-                        !        if (tcontrol(k,1).eq.2) then
-                        if (tcontrol(k, 1).eq.1) then
+                        !        if (tcontrol(k,1)==2) then
+                        if (tcontrol(k, 1)==1) then
                             v = tcontrol(k, 5)
                             ijuu(i, j) = ijuu(i, j) + cjas(k) * rijbar(v, i, j)
                         endif
 
                         !---------Electron-Electron-Nucleus-Correlation-Terms----------------------
-                        !        if (tcontrol(k,1).eq.4) then
-                        if (tcontrol(k, 1).eq.3) then
+                        !        if (tcontrol(k,1)==4) then
+                        if (tcontrol(k, 1)==3) then
                             s = tcontrol(k, 6)
                             do a = tcontrol(k, 3), tcontrol(k, 4)
                                 !            ijuu(i,j) = ijuu(i,j)+2*cjas(k)*raibar(s,a,i)*raibar(s,a,j)
@@ -1983,8 +1983,8 @@ CONTAINS
                         endif
                         !-----------------------------------------------------------------------
 
-                        !        if (tcontrol(k,1).eq.5) then
-                        if (tcontrol(k, 1).eq.4) then
+                        !        if (tcontrol(k,1)==5) then
+                        if (tcontrol(k, 1)==4) then
                             v = tcontrol(k, 5)
                             s = tcontrol(k, 6)
                             do a = tcontrol(k, 3), tcontrol(k, 4)
@@ -2122,8 +2122,8 @@ CONTAINS
                     kuu = 0d0
 
                     !---------Electron-Electron-Correlation-Terms---------------------------
-                    !           if (tcontrol(k,1).eq.2) then
-                    if (tcontrol(k, 1).eq.1) then
+                    !           if (tcontrol(k,1)==2) then
+                    if (tcontrol(k, 1)==1) then
                         v = tcontrol(k, 5)
                         kuu = rijbar(v, i, j)
                         !            !!!write(iul,'(a,2i3,g20.10)') 'DBG--->',i,ie,rijbar(v,i,j)
@@ -2131,8 +2131,8 @@ CONTAINS
 
 
                     !---------Electron-Electron-Nucleus-Correlation-Terms--------------------
-                    !           if (tcontrol(k,1).eq.4) then
-                    if (tcontrol(k, 1).eq.3) then
+                    !           if (tcontrol(k,1)==4) then
+                    if (tcontrol(k, 1)==3) then
                         s = tcontrol(k, 6)
                         do a = tcontrol(k, 3), tcontrol(k, 4)
                             !               kuu = kuu + 2*raibar(s,a,i)*raibar(s,a,j)
@@ -2142,8 +2142,8 @@ CONTAINS
                     endif
                     !-----------------------------------------------------------------------
 
-                    !           if (tcontrol(k,1).eq.5) then
-                    if (tcontrol(k, 1).eq.4) then
+                    !           if (tcontrol(k,1)==5) then
+                    if (tcontrol(k, 1)==4) then
                         v = tcontrol(k, 5)
                         s = tcontrol(k, 6)
                         do a = tcontrol(k, 3), tcontrol(k, 4)
@@ -2169,8 +2169,8 @@ CONTAINS
 
             !---------Electron-Nucleus-Correlation-Terms---------------------------
             do k = 1, k0
-                !        if (tcontrol(k,1).eq.3) then
-                if (tcontrol(k, 1).eq.2) then
+                !        if (tcontrol(k,1)==3) then
+                if (tcontrol(k, 1)==2) then
                     s = tcontrol(k, 6)
                     tmp1 = 0d0
                     do a = tcontrol(k, 3), tcontrol(k, 4)
@@ -2188,15 +2188,15 @@ CONTAINS
                     kuu = 0d0
 
                     !---------Electron-Electron-Correlation-Terms------------------------------
-                    !           if (tcontrol(k,1).eq.2) then
-                    if (tcontrol(k, 1).eq.1) then
+                    !           if (tcontrol(k,1)==2) then
+                    if (tcontrol(k, 1)==1) then
                         v = tcontrol(k, 5)
                         kuu = rijbar(v, i, j)
                     endif
 
                     !---------Electron-Electron-Nucleus-Correlation-Terms----------------------
-                    !           if (tcontrol(k,1).eq.4) then
-                    if (tcontrol(k, 1).eq.3) then
+                    !           if (tcontrol(k,1)==4) then
+                    if (tcontrol(k, 1)==3) then
                         s = tcontrol(k, 6)
                         do a = tcontrol(k, 3), tcontrol(k, 4)
                             !               kuu = kuu + 2*raibar(s,a,i)*raibar(s,a,j)
@@ -2205,8 +2205,8 @@ CONTAINS
                     endif
                     !-----------------------------------------------------------------------
 
-                    !           if (tcontrol(k,1).eq.5) then
-                    if (tcontrol(k, 1).eq.4) then
+                    !           if (tcontrol(k,1)==5) then
+                    if (tcontrol(k, 1)==4) then
                         v = tcontrol(k, 5)
                         s = tcontrol(k, 6)
                         do a = tcontrol(k, 3), tcontrol(k, 4)

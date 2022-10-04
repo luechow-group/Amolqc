@@ -187,7 +187,7 @@ contains
 
       else if (res(1)==2) then ! task(1:5)=='NEW_X'
          if (MASTER) then
-            if (dsave(13) .le. 1.d-10*(1.0d0 + abs(ff))) then
+            if (dsave(13) <= 1.d-10*(1.0d0 + abs(ff))) then
                task='STOP: THE PROJECTED GRADIENT IS SUFFICIENTLY SMALL'
             else if (isave(34) >= mOptMaxIter) then
                task='STOP: TOTAL NO. of f AND g EVALUATIONS EXCEEDS LIMIT'
@@ -198,7 +198,7 @@ contains
             endif
             write (998,'(2(a,i5,4x),a,1p,d12.5,4x,a,1p,d12.5)') 'Iterate', &
                    isave(30),'nfg =',isave(34),'e0 =',e0,'|proj g| =',dsave(13)
-            if (task(1:4) .eq. 'STOP') then
+            if (task(1:4) == 'STOP') then
                write (iul,*) 'L-BFGS: task=',task
                write (iul,*) 'Final parameters p='
                write (iul,'(10G13.5)') (p(i), i = 1, np)

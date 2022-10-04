@@ -56,7 +56,7 @@ subroutine invcupd(col, i, n, nmax, a1, det)
 
         !       // update all other columns
         do j = 1, n
-            if (j.eq.i) goto 202
+            if (j==i) goto 202
             alpha = -f(j)
             call DAXPY(n, alpha, a1(i, 1), nmax, a1(j, 1), nmax)
             202       continue
@@ -74,7 +74,7 @@ subroutine invcupd(col, i, n, nmax, a1, det)
 
         !       // update all other rows
         do j = 1, n
-            if (j.eq.i) goto 102
+            if (j==i) goto 102
             tmp = 0d0
             do l = 1, n
                 tmp = tmp + col(l) * a1(j, l)
@@ -149,7 +149,7 @@ subroutine invrupd(row, i, n, nmax, a1, det)
 
         !       // update all other columns
         do j = 1, n
-            if (j.eq.i) goto 202
+            if (j==i) goto 202
             alpha = -f(j)
             call DAXPY(n, alpha, a1(1, i), 1, a1(1, j), 1)
             202      continue
@@ -169,7 +169,7 @@ subroutine invrupd(row, i, n, nmax, a1, det)
 
         !       // update all other columns
         do j = 1, n
-            if (j.eq.i) goto 302
+            if (j==i) goto 302
             tmp = 0d0
             do l = 1, n
                 tmp = tmp + row(l) * a1(l, j)
@@ -232,7 +232,7 @@ subroutine inv1(a, n, nmax, a1, det)
 
         !        // update all other rows
         do j = 1, n
-            if (j.eq.i) goto 102
+            if (j==i) goto 102
             tmp = 0d0
             do l = 1, n
                 tmp = tmp + a(l, i) * a1(j, l)

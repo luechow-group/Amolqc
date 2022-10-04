@@ -106,8 +106,8 @@ DO  mti=1,n-1
    temp=69069.D0*DBLE(mt(mti-1))
    itemp=mod(temp,two31)
    itemp2=temp/two31
-   if (mod(itemp2,2).ne.0) then
-     if (itemp.gt.0) then
+   if (mod(itemp2,2)/=0) then
+     if (itemp>0) then
        itemp=itemp-two31
      else
        itemp=itemp+two31

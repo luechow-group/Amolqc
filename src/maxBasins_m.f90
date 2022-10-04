@@ -521,7 +521,7 @@ contains
                            call mLRStat(m,k)%add(temp1)
                            call mLRStat(m,k)%add(temp2)
 
-                           if (((temp1(3) .gt. 0) .and. (temp2(3) .gt. 0)) .or. ((temp1(3) .lt. 0) .and. (temp2(3) .lt. 0))) then
+                           if (((temp1(3) > 0) .and. (temp2(3) > 0)) .or. ((temp1(3) < 0) .and. (temp2(3) < 0))) then
                               mLRResult(k,2) = mLRResult(k,2) + 1
                            else
                               mLRResult(k,3) = mLRResult(k,3) + 1
@@ -943,7 +943,7 @@ contains
             endif
          enddo
       enddo
-      if (diff .le. lraconv) then
+      if (diff <= lraconv) then
          allocate(itensor(mLRPairCount,3,3),ev(ne,3),stat=alstat)
          itensor = 0d0
          ! construct covariance matrix / inertia tensor

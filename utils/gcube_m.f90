@@ -323,7 +323,7 @@ contains
             end do
         end do
 
-        if(Sum .eq. 0) Sum=1
+        if(Sum == 0) Sum=1
 
         ref(1)=NINT(Sumi/Sum)
         ref(2)=NINT(Sumj/Sum)

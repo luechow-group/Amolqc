@@ -335,7 +335,7 @@ CONTAINS
         !        dx = csplx(l) - csplx(j)
         !        yfd(l)=  csplb(k,j)+2*dx*csplc(k,j) + 3*dx*dx*cspld(k,j)
         !        ysd(l)=             2   *csplc(k,j) + 6*dx   *cspld(k,j)
-        !        if (logmode .ge. 3) write(iul,'(I5,2X,7(ES16.8,2X))')
+        !        if (logmode >= 3) write(iul,'(I5,2X,7(ES16.8,2X))')
         !     .          l,csplx(l),yold(l),y(l),yfdold(l),yfd(l),ysdold(l),ysd(l)
         !      enddo
         !
@@ -355,13 +355,12 @@ CONTAINS
         ! func1a calculates the sum of squared deviations for
         ! an exponential function (parameters x0) from the stored
         ! data points
-
-        real(r8) x0(n0), a, b, c, func
         integer n0, k
+        real(r8) x0(n0), a, b, c, func
 
         a = x0(1)
         c = x0(2)
-        if (n0.eq.3) then
+        if (n0==3) then
             b = x0(3)
         else
             b = 0d0

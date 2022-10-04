@@ -225,7 +225,7 @@ contains
    type(WFParamDef), intent(in) :: this
    real(r8)                     :: cicoeffs_get(this%nParams+1)
    real(r8)                     :: p(this%nParams+1)
-   if (this%optType .ne. 'ci') call abortp('cicoeffs_get: this function is only for pure ci optimization')
+   if (this%optType /= 'ci') call abortp('cicoeffs_get: this function is only for pure ci optimization')
    if (this%optMode==3) call abortp('cicoeffs_get: this function can not be used for optmod=2 ')
    call getCIParamsVector(3,p)
    cicoeffs_get = p

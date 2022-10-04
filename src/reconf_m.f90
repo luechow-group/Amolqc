@@ -291,7 +291,7 @@ contains
 !  Copy Np Walkers randomly and seperately
 !-- aber dasselbe Feld soll nicht zweimal gelöscht/kopiert werden
  
-if (Nrp.ge.1) then
+if (Nrp>=1) then
 
     tmp=0
     k=1
@@ -337,7 +337,7 @@ if (Nrp.ge.1) then
      enddo   
    enddo
 
-endif ! Nrp.ge.1
+endif ! Nrp>=1
 
 if (count3 /= count4) call abortp("qmc_reconf: No. of deleted rwps /= copied rwps")
 
