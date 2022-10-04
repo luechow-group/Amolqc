@@ -1389,7 +1389,8 @@ CONTAINS
    integer offset
    integer i,j,k,orb,ii,ii1,ii2
    integer nci,nnci,n,na
-   integer tmp,ierr
+   real(r8) tmp
+   integer ierr
    real(r8) d
 
    ! Note on algorithm:
