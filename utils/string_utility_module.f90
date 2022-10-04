@@ -208,7 +208,7 @@ contains
   pure subroutine str_convert_to_lowercase( str )
     character(kind=CK,len=*), intent(inout) :: str
     ! local variables:
-    integer :: i, ic
+    integer :: i
 
     do i = 1, len_trim(str)
       call ch_convert_to_lowercase(str(i:i))
@@ -225,7 +225,7 @@ contains
   pure subroutine str_convert_to_uppercase( str )
     character(kind=CK,len=*), intent(inout) :: str
     ! local variables:
-    integer :: i, ic
+    integer :: i
 
     do i = 1, len_trim(str)
       call ch_convert_to_uppercase(str(i:i))
