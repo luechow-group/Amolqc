@@ -63,7 +63,7 @@ module decorrelation_m
             type(StatisticData_t), target         :: statAD, statBD, newStatD
             real(r8)                            :: carry, wSampleA, wSampleB
             logical                             :: carryEx, wSampleAEx, wSampleBEx
-            integer                             :: i
+            integer(i8)                             :: i
 
             call A%Create(AD)
             call B%Create(BD)
@@ -153,7 +153,7 @@ module decorrelation_m
         function Decorrelation_t_is_similar(this, other) result(bool)
             type(Decorrelation_t), intent(in) :: this, other
             logical                         :: bool
-            integer                         :: i
+            integer(i8)                         :: i
 
             bool = .true.
             if (.not. this%size == other%size) then
@@ -186,7 +186,7 @@ module decorrelation_m
         function Decorrelation_t_is_equal(this, other) result(bool)
             type(Decorrelation_t), intent(in) :: this, other
             logical                         :: bool
-            integer                         :: i
+            integer(i8)                         :: i
 
             bool = .true.
             if (.not. this%size == other%size) then
@@ -218,7 +218,7 @@ module decorrelation_m
         subroutine Decorrelation_t_write(this, iu)
             class(Decorrelation_t), intent(in) :: this
             integer,              intent(in) :: iu
-            integer                          :: i
+            integer(i8)                          :: i
 
             write(iu,*) this%size, this%nSamp
             do i = 1, this%size
@@ -310,7 +310,7 @@ module decorrelation_m
             class(Decorrelation_t), intent(inout) :: this
             real(r8),         intent(in)    :: newSample
             real(r8)                        :: carry
-            integer                             :: i
+            integer(i8)                             :: i
 
             call assert(associated(this%nSamp), "Decorrelation_t_add_data: not associated") 
             this%nSamp = this%nSamp + 1
@@ -347,7 +347,7 @@ module decorrelation_m
             logical, intent(out) :: converged
 
             logical :: plateau(this%size - 1)
-            integer :: i
+            integer(i8) :: i
             real(r8) :: errorEstimates(this%size - 1), errorsErrors(this%size - 1)
 
             converged = .false.
