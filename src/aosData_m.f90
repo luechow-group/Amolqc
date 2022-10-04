@@ -760,8 +760,6 @@ CONTAINS
             call cspline(3 * ispl - 1, y1, np, y00(3), y00(4))
             call cspline(3 * ispl, y2, np, y00(5), y00(6))
 
-            101     continue
-
         enddo  ! ispl-loop over spline-functions
 
         if (logmode >=2) write(iul, *)
