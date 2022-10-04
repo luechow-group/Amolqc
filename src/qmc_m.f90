@@ -1096,16 +1096,16 @@ contains
          do i=1,idx
             AC(0,i) = Estep(i)*Estep(i)
             do k=1,mAutoCorrMax
-               j = mod(tStep-k-1,mAutoCorrMax) + 1
+               j = mod(tStep-k-1,INT(mAutoCorrMax, i8)) + 1
                AC(k,i) = ACRingBuffer(j,i)*Estep(i)
             end do
-            j = mod(tStep-1,mAutoCorrMax) + 1
+            j = mod(tStep-1,INT(mAutoCorrMax, i8)) + 1
             ACRingBuffer(j,i) = Estep(i)
             call autocorrStat%add(AC(:,i))
             call autocorrEStat%add(Estep(i))
          end do
        else ! fill ring buffer
-         j = mod(tStep-1,mAutoCorrMax) + 1
+         j = mod(tStep-1,INT(mAutoCorrMax, i8)) + 1
          do i=1,idx
             ACRingBuffer(j,i) = Estep(i)
          end do

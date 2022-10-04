@@ -367,9 +367,9 @@ module decorrelation_m
                     if (plateau(i)) blockLength = 2 ** (i - 1)
                 end do
             else
-                error = errorEstimates(MAX(this%size - 1,1))
-                errorsError = errorsErrors(MAX(this%size - 1,1))
-                blockLength = 2 ** (MAX(this%size - 2,0))
+                error = errorEstimates(MAX(this%size - 1,1_c_int64_t))
+                errorsError = errorsErrors(MAX(this%size - 1,1_c_int64_t))
+                blockLength = 2 ** (MAX(this%size - 2,0_c_int64_t))
             end if
         end subroutine Decorrelation_t_get_error
 
