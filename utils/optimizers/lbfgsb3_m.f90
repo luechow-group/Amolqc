@@ -3354,7 +3354,7 @@ contains
 
     subroutine dcsrch(f, g, stp, ftol, gtol, xtol, stpmin, stpmax, &
             task, isave, dsave)
-        character*(*) task
+        character(len=*) task
         integer isave(2)
         double precision f, g, stp, ftol, gtol, xtol, stpmin, stpmax
         double precision dsave(13)

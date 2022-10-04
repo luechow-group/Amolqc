@@ -95,7 +95,7 @@ end subroutine myMPIBarrier
 
 subroutine myMPIBcastString(string,n)
   integer :: n, ierr
-  character*(*) :: string
+  character(len=*) :: string
 
 #ifdef MPI
   call mpi_bcast(string,n,MPI_CHARACTER,0,MPI_COMM_WORLD,ierr)
