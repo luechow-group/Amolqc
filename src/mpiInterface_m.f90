@@ -94,58 +94,70 @@ end subroutine myMPIBarrier
 
 
 subroutine myMPIBcastString(string,n)
-  integer :: n, ierr
+  integer :: n
   character(len=*) :: string
 
 #ifdef MPI
+  integer ierr
+
   call mpi_bcast(string,n,MPI_CHARACTER,0,MPI_COMM_WORLD,ierr)
 #endif
 end subroutine myMPIBcastString
 
 
 subroutine myMPIBcastIntegerArray(array,n)
-  integer n,ierr
+  integer n
   integer array(n)
 
 #ifdef MPI
+  integer ierr
+
   call mpi_bcast(array,n,MPI_INTEGER,0,MPI_COMM_WORLD,ierr)
 #endif
 end subroutine myMPIBcastIntegerArray
 
 subroutine myMPIBcastIntegerScalar(array,n)
-  integer n,ierr
+  integer n
   integer array
 
 #ifdef MPI
+  integer ierr
+
   call mpi_bcast(array,n,MPI_INTEGER,0,MPI_COMM_WORLD,ierr)
 #endif
 end subroutine myMPIBcastIntegerScalar
 
 
 subroutine myMPIBcastDoubleArray(array,n)
-  integer n,ierr
+  integer n
   double precision array(n)
 
 #ifdef MPI
+  integer ierr
+
   call mpi_bcast(array,n,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
 #endif
 end subroutine myMPIBcastDoubleArray
 
 subroutine myMPIBcastDoubleScalar(array,n)
-  integer n,ierr
+  integer n
   double precision array
 
 #ifdef MPI
+  integer ierr
+
   call mpi_bcast(array,n,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
 #endif
 end subroutine myMPIBcastDoubleScalar
 
 
 subroutine myMPIReduceSumDoubleArray(sendbuf,recvbuf,n)
-  integer n,ierr
+  integer n
   real(r8) sendbuf(n),recvbuf(n)
 
 #ifdef MPI
+  integer ierr
+
   call mpi_reduce(sendbuf,recvbuf,n,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
 #else
   recvbuf = sendbuf
@@ -153,10 +165,12 @@ subroutine myMPIReduceSumDoubleArray(sendbuf,recvbuf,n)
 end subroutine myMPIReduceSumDoubleArray
 
 subroutine myMPIReduceSumDoubleScalar(sendbuf,recvbuf,n)
-  integer n,ierr
+  integer n
   real(r8) sendbuf,recvbuf
 
 #ifdef MPI
+  integer ierr
+
   call mpi_reduce(sendbuf,recvbuf,n,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
 #else
   recvbuf = sendbuf
@@ -165,10 +179,12 @@ end subroutine myMPIReduceSumDoubleScalar
 
 
 subroutine myMPIReduceSumIntegerArray(sendbuf,recvbuf,n)
-  integer n,ierr
+  integer n
   integer sendbuf(n),recvbuf(n)
 
 #ifdef MPI
+  integer ierr
+
   call mpi_reduce(sendbuf,recvbuf,n,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,ierr)
 #else
   recvbuf = sendbuf
@@ -176,10 +192,12 @@ subroutine myMPIReduceSumIntegerArray(sendbuf,recvbuf,n)
 end subroutine myMPIReduceSumIntegerArray
 
 subroutine myMPIReduceSumIntegerScalar(sendbuf,recvbuf,n)
-  integer n,ierr
+  integer n
   integer sendbuf,recvbuf
 
 #ifdef MPI
+  integer ierr
+
   call mpi_reduce(sendbuf,recvbuf,n,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,ierr)
 #else
   recvbuf = sendbuf
@@ -188,10 +206,12 @@ end subroutine myMPIReduceSumIntegerScalar
 
 
 subroutine myMPIAllReduceSumDoubleArray(sendbuf,recvbuf,n)
-  integer n,ierr
+  integer n
   real(r8) sendbuf(n),recvbuf(n)
 
 #ifdef MPI
+  integer ierr
+
   call mpi_allreduce(sendbuf,recvbuf,n,MPI_DOUBLE_PRECISION,MPI_SUM,MPI_COMM_WORLD,ierr)
 #else
   recvbuf = sendbuf
@@ -199,10 +219,12 @@ subroutine myMPIAllReduceSumDoubleArray(sendbuf,recvbuf,n)
 end subroutine myMPIAllReduceSumDoubleArray
 
 subroutine myMPIAllReduceSumDoubleScalar(sendbuf,recvbuf,n)
-  integer n,ierr
+  integer n
   real(r8) sendbuf,recvbuf
 
 #ifdef MPI
+  integer ierr
+
   call mpi_allreduce(sendbuf,recvbuf,n,MPI_DOUBLE_PRECISION,MPI_SUM,MPI_COMM_WORLD,ierr)
 #else
   recvbuf = sendbuf
@@ -211,10 +233,12 @@ end subroutine myMPIAllReduceSumDoubleScalar
 
 
 subroutine myMPIAllReduceSumIntegerArray(sendbuf,recvbuf,n)
-  integer n,ierr
+  integer n
   integer sendbuf(n),recvbuf(n)
 
 #ifdef MPI
+  integer ierr
+
   call mpi_allreduce(sendbuf,recvbuf,n,MPI_INTEGER,MPI_SUM,MPI_COMM_WORLD,ierr)
 #else
   recvbuf = sendbuf
@@ -222,10 +246,12 @@ subroutine myMPIAllReduceSumIntegerArray(sendbuf,recvbuf,n)
 end subroutine myMPIAllReduceSumIntegerArray
 
 subroutine myMPIAllReduceSumIntegerScalar(sendbuf,recvbuf,n)
-  integer n,ierr
+  integer n
   integer sendbuf,recvbuf
 
 #ifdef MPI
+  integer ierr
+
   call mpi_allreduce(sendbuf,recvbuf,n,MPI_INTEGER,MPI_SUM,MPI_COMM_WORLD,ierr)
 #else
   recvbuf = sendbuf
@@ -290,8 +316,10 @@ end subroutine myMPIGatherDouble
 subroutine myMPIGatherDoubleV(sendbuf,n,recvbuf,recvcnt,ierr)
   integer n,ierr
   real(r8) sendbuf(n),recvbuf(nproc*n)
-  integer displacements(nproc), recvcnt(nproc), displ, i
+  integer recvcnt(nproc)
 #ifdef MPI
+  integer displacements(nproc), displ, i
+
   displ = 0
   do i = 1, nproc
     displacements(i) = displ
@@ -335,9 +363,10 @@ subroutine myMPISendDouble(mpiV,n,id,tag)
   real(r8)                 :: mpiV(n)
   integer                :: id       ! id of receiving node
   integer                :: tag      ! message tag
-  integer ierr
 
 #ifdef MPI
+  integer ierr
+
   call MPI_SEND(mpiV,n,MPI_DOUBLE_PRECISION,id,tag,MPI_COMM_WORLD,ierr)
 #endif
 end subroutine myMPISendDouble
