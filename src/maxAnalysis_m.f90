@@ -215,7 +215,7 @@ contains
       integer, intent(in) :: iu
       character(len=5)    :: s
       character(len=10)   :: s1
-      character(len=120)   :: s2
+      character(len=240)   :: s2
 
       write(iu,'(A/)') '    maximum analysis parameters:'
 
