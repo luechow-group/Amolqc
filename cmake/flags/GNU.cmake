@@ -1,4 +1,4 @@
-# https://gcc.gnu.org/onlinedocs/gfortran/Option-Summary.html
+# https://gcc.gnu.org/onlinedocs/gcc/Invoking-GCC.html
 
 set(WARN_FLAGS "-Wall")
 set(NOWARN_FLAGS "-w")
