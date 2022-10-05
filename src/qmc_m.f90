@@ -146,9 +146,9 @@ contains
     character(len=12)          :: s1
     logical                    :: found,found1,found2
     real(r8) tau,ds,cf
-    integer wgt,bgte,move,tauFlag,iflag1,vb,blockdiscard
+    integer bgte,move,tauFlag,iflag1,vb,blockdiscard
     integer(i8) accSize
-    logical join,kill,split,ar,rc,eLocalCutOff,changed
+    logical ar,rc,eLocalCutOff
     integer :: int_rcv(nproc), ierr
 
 
@@ -530,15 +530,15 @@ contains
     type(psimax), intent(inout), optional :: psimax_obj
     type(rhoMax_t), intent(inout), optional :: rhoMax
 
-    integer                     :: block,ps,bs,i,j,k,idx
-    integer(i8)                   :: n,st,w,tauFoundStep
+    integer                     :: block,bs,i,j,k,idx
+    integer(i8)                   :: n,st,tauFoundStep
     real(r8)                      :: elocCounter,ERef,varAllNodes
     real(r8)                      :: EMeanAllNodes,sampleSizeAllNodes,eTotal,vTotal
-    real(r8)                      :: ElocalStat,E,var,stddev,stdDevAllNodes
+    real(r8)                      :: E,var,stddev,stdDevAllNodes
     real(r8)                      :: EMeanlocal
     real(r8)                      :: VenMeanAllNodes, VeeMeanAllNodes, TMeanAllNodes
-    real(r8)                      :: sampleWeightAllNodes,sampleWeight
-    real(r8)                      :: Samplesize, EL,EECPL,EECPNL
+    real(r8)                      :: sampleWeightAllNodes
+    real(r8)                      :: EL,EECPL,EECPNL
     real(r8)                      :: tcorr,ACvar,ACNcorr
     real(r8)                      :: accepted ! 0.0 for (all) rejected, 1.0 for (all) accepted
 #ifdef WTIMER
@@ -561,12 +561,9 @@ contains
     type(simpleStat) :: blockStatlocal    ! for local (Procs) BlockStat
     type(stat)       :: autocorrEStat
     type(vectorstat) :: autocorrStat
-    logical          :: converged
-    logical          :: t, cutoff
     type(RWSample) :: history ! used to accumulate samples
-    integer :: histSize, tmove
+    integer :: histSize
     integer(i8) :: dataAllNodes,tStep
-    character(len=17)  :: s
 
     type(DecorrelationData_t), target :: decorrDtot, decorrD
     type(Decorrelation_t) :: decorr
@@ -1240,7 +1237,7 @@ contains
   ! reconfiguration of sample
 
   type(RWSample), intent(inout) :: sample
-  type(RandomWalker), pointer :: rwp,rwpJoin
+  type(RandomWalker), pointer :: rwp
 
   select case (mRcf)
     case (1)
@@ -1375,9 +1372,6 @@ contains
 
   integer                     :: nl
   character(len=120)          :: lines(nl)
-  integer                     :: iflag
-  integer                     :: blockStride
-  integer                     :: stepStride
   character(len=1)            :: statType
 
   if (nproc > 1) call abortp('walkerstat only in serial runs')
@@ -1401,9 +1395,6 @@ contains
   use global_m
   integer                     :: nl
   character(len=120)          :: lines(nl)
-  integer                     :: iflag
-  integer                     :: blockStart,stepStride
-  logical                     :: trajectory
 
   if (nproc > 1) call abortp('trajectory only in serial runs')
   open(43,file=trim(baseName)//'.trj')

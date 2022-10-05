@@ -128,7 +128,7 @@ contains
       class(rhoData_t), intent(inout) :: this
       integer, intent(in) :: basins(:)
       integer :: electronsPerFragment(MAXVAL(this%fragments) + 1)
-      integer :: i, basin, len
+      integer :: i
 
       electronsPerFragment = 0
       do i=1,SIZE(basins)

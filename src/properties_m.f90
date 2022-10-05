@@ -59,7 +59,6 @@ CONTAINS
    subroutine propInit(lines,nl)
       character(len=120), intent(in) :: lines(:)
       integer, intent(in)           :: nl
-      integer                       :: iflag
 
       !gegen select case austauschen
       if(mProptype == 'dma'.or.mProptype == 'totals') then
@@ -103,7 +102,7 @@ CONTAINS
    subroutine future_init(sample,mStprops,mTau2,mNotau2)
       type(RWSample), intent(in),target :: sample
       integer, intent(in)               :: mStprops, mTau2, mNotau2  
-      integer :: j, alstat, mDprops    
+      integer :: j, mDprops
 
       mSample => sample
 
@@ -170,10 +169,10 @@ CONTAINS
    !     input parameter:
    integer  ix
    type(randomWalker), pointer       :: rwp  => null()
-   integer  ps,a,i,j,wi,idx,ierr,m
+   integer  ps,a,i,idx,m
    real(r8)   xx,x0,yy,y0,zz,z0,rr2,r02
    real(r8)   x(nmax),y(nmax),z(nmax)  ! x,y,z coord of walker
-   real(r8)   w,twgt ! walker weight(s)
+   real(r8)   w ! walker weight(s)
    real(r8)   dsuma(0:mPropcount,0:mNcenter),dsum(0:mPropcount,0:mNcenter)
 
    ! distributed dipole and quadrupole moments
@@ -291,7 +290,7 @@ CONTAINS
    subroutine propCollectw(lastW,ix,ntau2)
    !     input parameter:
    integer  ix,ntau2,alstat
-   integer  wi,j
+   integer  wi
    integer  lastW                      ! last walker
    real(r8),allocatable  ::  ws(:)       ! weight-sum of sons
 
@@ -312,8 +311,7 @@ CONTAINS
 
 
    subroutine propCalculate
-   integer :: i,ierr,j
-   integer :: nr1,nr2,nr3,nr4
+   integer :: i
    real(r8)  ::sumttwgt,sumttwgt2(10)
 
    ! the following two lines are using sequence association
@@ -340,7 +338,7 @@ CONTAINS
    end subroutine propCalculate
 
    subroutine propPrint
-   integer :: i,j,k,nd
+   integer :: k,nd
    !    real(r8)  :: tmp1,tmp2,tmp3
 
    if (mytid == 0) then
@@ -473,7 +471,7 @@ CONTAINS
 
 
    subroutine allocArrays()
-      integer :: iflag,alstat
+      integer :: alstat
       allocate(mtopsave(dprops),stat=alstat)
       if (alstat /= 0) call error("Properties:future_init: allocate topsave failed") 
       allocate(bufcounter(dprops),stat=alstat)
@@ -494,7 +492,6 @@ CONTAINS
 
 
    subroutine deallocFWArrays()
-      integer :: iflag,alstat
       deallocate(mtopsave)      
       deallocate(bufcounter)
       deallocate(bufoffset)
@@ -529,7 +526,7 @@ subroutine propInput(proptype,ncenters,iu)
    integer, intent(in)          :: iu       ! open file unit for reading input
    integer, intent(in)          :: ncenters
    character(len=6), intent(in) :: proptype
-   integer                      :: i,j,alstat
+   integer                      :: j,alstat
 
    if(proptype == 'dma') then
       allocate(mRegpoint(3,ncenters),mRegradius(ncenters),stat=alstat)

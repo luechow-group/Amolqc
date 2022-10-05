@@ -125,7 +125,7 @@ CONTAINS
       real(r8) y(n)       ! y(x_i), function values at spline points
       real(r8) y1_x1, y11_x1  ! y'(x_1) and y''(x_1)
       integer i, k
-      real(r8) denom, qn, tmp, un
+      real(r8) denom, tmp
       real(r8) deltax, deltay, deltay2
       real(r8) y2(n), work(n)
 

@@ -239,9 +239,9 @@ contains
       character(len=120), intent(in) :: lines(:)
       integer, intent(in) :: nl
       type(pos_VList_t), allocatable, intent(inout) :: posList(:)
-      real(r8) :: centroidScale, r(3), distThreshold, valueThreshold
+      real(r8) :: centroidScale, r(3), distThreshold
       integer :: i, iflag, m, gridSize, sampleSize, verbose, mo
-      logical :: converged, found
+      logical :: found
       class(minimizer_w_sing), pointer :: minimizer_p => null()
       type(fctn_mo)  :: fg
       type(posVal_t) :: pv
@@ -319,10 +319,10 @@ contains
       character(len=120), intent(in) :: lines(:)
       integer, intent(in) :: nl
       type(pos_VList_t), allocatable, intent(inout) :: posList(:) 
-      real(r8) :: r(3), maxPos(3), value 
+      real(r8) :: r(3), value
       real(r8) :: xStart, yStart, zStart, xStep, yStep, zStep, gridStep
       real(r8), allocatable :: vox(:,:,:)
-      integer :: i, ix, iy, iz, mo, verbose, xGridSize, yGridSize, zGridSize, iflag
+      integer :: ix, iy, iz, mo, verbose, xGridSize, yGridSize, zGridSize, iflag
       integer, parameter :: iu = 99
       type(posVal_t) :: maxP
 
@@ -404,9 +404,9 @@ contains
       ! write MO function values for plotting
       character(len=120), intent(in) :: lines(:)
       integer, intent(in) :: nl
-      real(r8) :: r(3), maxPos(3), value 
+      real(r8) :: r(3), value
       real(r8) :: xStart, yStart, zStart, xStep, yStep, zStep, gridStep
-      integer :: i, io, ix, iy, iz, mo, verbose, xGridSize, yGridSize, zGridSize, iflag
+      integer :: io, ix, iy, iz, mo, xGridSize, yGridSize, zGridSize, iflag
       integer, parameter :: iu = 99
 
       xGridSize = 100
@@ -460,12 +460,12 @@ contains
       ! write MO function values for plotting a given plane
       character(len=120), intent(in) :: lines(:)
       integer, intent(in) :: nl
-      real(r8) :: r(3), maxPos(3), value 
+      real(r8) :: r(3), value
       real(r8) :: xStart, yStart, xStep, yStep, gridStep, nucInPlaneThresh
       real(r8) :: ex(3), ey(3), ex0(3), ey0(3), rStart(3), normalOfPlane(3), A(3,3)
       real(r8) :: origin(3), point1(3), point2(3)
       real(r8), allocatable :: B(:, :), extraPoints(:,:)
-      integer :: i, io, idx, ix, iy, mo, verbose, xGridSize, yGridSize, iflag, nExtraPoints
+      integer :: io, idx, ix, iy, mo, xGridSize, yGridSize, iflag, nExtraPoints
       integer :: nRHS, ipiv(getNNuc()), info, countInPlane, ndim, n, n0
       integer, parameter :: iu = 99
 

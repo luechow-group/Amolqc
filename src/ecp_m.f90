@@ -218,7 +218,7 @@ contains
       integer, optional, intent(in) :: atom         ! idx of atom in geometry
       integer, optional, intent(in) :: pseudoatom   ! idx of pseudo atom
       integer                       :: nGridPoints  ! number of grid points
-      integer p, r, rule
+      integer p
 
       if (present(pseudoatom)) then
          nGridPoints = this%pAtom(pseudoatom)%nGridPoints
@@ -354,7 +354,7 @@ contains
       ! this version is based on the original version by Christian Diedrich
       class(EcpType), intent(inout)  :: this
       real(r8), intent(in)             :: cutoffThreshold
-      integer :: ll,a,niter,p
+      integer :: ll,niter,p
       real(r8) :: tmp,curr_y,y1,y2,dydx
       real(r8), allocatable :: x(:)
 
@@ -496,7 +496,7 @@ contains
 
       real(r8), allocatable              :: Vkk1(:,:)    ! V_k,k' discretised nonlocal potential (see Casula JCP 132, 154113)
       real(r8), allocatable  ::  ints(:), vl(:)
-      real(r8)  rrai, tmp, ecpLocalNew, ecpNonlocalNew, ecpLocalI, ecpNonlocalI
+      real(r8)  rrai, tmp, ecpLocalI, ecpNonlocalI
       integer i, ll, lmax, pa, a, nParams, ngp, idx0, tngp
 
       type(uparr) :: tmscupdate(size(Rdu%x))
@@ -655,7 +655,7 @@ contains
       real(r8) :: TNLpsum(size(Vkk1,1),size(Vkk1,2))        ! transition probabilities (partial sums)
       integer i, j, nElecs, nGridPoints, lb, ub, right, left
       real(r8) xi, vecElecs(-1:size(Vkk1,2)), vecGridPoints(0:size(Vkk1,1))
-      real(r8) psum, noMoveProbability, ecpLocalTM, ecpNonlocalTM, norm
+      real(r8) psum, noMoveProbability, norm
 
       nGridPoints = size(Vkk1,1)
       nElecs = size(Vkk1,2)

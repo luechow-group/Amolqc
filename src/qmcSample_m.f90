@@ -52,7 +52,7 @@ contains
     integer, intent(in)           :: nl
     character(len=120), intent(in) :: lines(nl)
     type(RWSample), intent(inout) :: smpl
-    integer iflag,iflag1,i,ii1,ii2,newSize,nNew,nOld,oldLogmode,v,n,ierr
+    integer iflag,newSize,nNew,nOld,oldLogmode,v,n,ierr
     integer riter,nbins,gsize,removeMode,maxsize
     real(r8)  :: mpiV1(5),mpiV2(5*MaxMPINodes)
     real(r8)  :: Emean,EmeanAll,var,varAll,sigma,sigmaAll,fac,rfac,tol,varscale
@@ -559,7 +559,7 @@ contains
     type(RandomWalker) :: rw
     type(RandomWalker),pointer :: rwpp
     type(RandomWalker),pointer :: rwp(:)
-    integer :: idx,step,bufStep,block,mode,ierr,n,bs,iull
+    integer :: step,bufStep,block,mode,n,bs,iull
     real(r8)  :: accbuf(BufSize)      ! ring buffer for recent acceptance ratio
     real(r8)  :: blockTime            ! actual total time in a block
     real(r8)  :: targetBlockTime      ! desired blockTime
@@ -725,8 +725,7 @@ contains
     type(RWSample), intent(inout) :: sample
     real(r8), allocatable :: x(:), y(:), z(:)
     type(RandomWalker) :: rw
-    type(RandomWalker),pointer :: rwp
-    integer n,mode
+    integer mode
 
     allocate(x(ne),y(ne),z(ne))
 
@@ -781,7 +780,6 @@ contains
     real(r8)              :: E
     type(simpleStat)    :: stat
     type(RandomWalker)  :: rw
-    type(RandomWalker),pointer :: rwp
 
     allocate(x(ne),y(ne),z(ne))
     call reset(stat)
@@ -831,9 +829,7 @@ contains
 
     type(RWSample), intent(inout) :: sample
     integer             :: i,mode
-    real(r8), allocatable :: x(:), y(:), z(:)
     type(RandomWalker)  :: rw
-    type(RandomWalker),pointer :: rwp
 
     ! use electron position of init_walker section if available
     mode = mWalkerGenMode

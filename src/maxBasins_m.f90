@@ -78,12 +78,11 @@ contains
    subroutine maxbas_init(lines,nl)
       integer, intent(in)             :: nl
       character(len=120), intent(in)  :: lines(:)
-      integer                         :: i,iflag,iflag1,iflag2,iflag3,j,a,sbin
+      integer                         :: i,iflag,iflag1,iflag2,iflag3,j,sbin
       real(r8)                          :: ax,bx,ay,by,az,bz
       real(r8)                          :: cx(ncenter),cy(ncenter),cz(ncenter)
       real(r8)                          :: tolSim
       integer                         :: elemIdx(ncenter)
-      logical                         :: found
       character(len=3) ic1,ic2
       character(len=80) line1,line2
       character(len=40)               :: reffile,exclfile,lralist
@@ -407,7 +406,7 @@ contains
       integer             :: allidx1(nproc*ne)
       real(r8)              :: vec(6*ne+2)
       real(r8)              :: vec_rcv((6*ne+2)*nproc)
-      integer             :: ierr,i,n,m,l,k,j
+      integer             :: ierr,i,n,m,l,k
       integer             :: idx2(ne),idx(ne),int_rcv(nproc)
       type(reference)     :: r
       real(r8), parameter   :: EPS = 1.d-4
@@ -623,11 +622,10 @@ contains
       integer             :: allidx1(nproc*ne)
       real(r8)              :: vec(6*ne+2)
       real(r8)              :: vec_rcv((6*ne+2)*nproc)
-      integer             :: ierr,i,n,m,l,k,j
+      integer             :: ierr,i,n,m,l,k
       integer             :: idx2(ne), idx(ne), int_rcv(nproc)
       type(reference)     :: r
       real(r8), parameter   :: EPS = 1.d-4
-      real(r8)              :: temp1(3),temp2(3),tempMat(2,2)
 
       vec(1:ne) = x(1:ne)
       vec(ne+1:2*ne) = y(1:ne)
@@ -855,7 +853,7 @@ contains
    subroutine maxbas_collectEPairs(m,idx)
        integer, intent(in)    :: m                ! maximum
        integer, intent(in)    :: idx(:)           ! permutation
-       integer i,j,ii,jj,itmp,np
+       integer i,j,ii,jj,np
        logical spinPair
 
        !!!write(998,'(a,i4)') 'new max ',m

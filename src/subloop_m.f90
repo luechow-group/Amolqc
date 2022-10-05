@@ -65,12 +65,11 @@ subroutine subloop(subname, smpl, exitSubLoop, psimax_obj)
    character(len=MAXLEN)       :: blockLines(MAXLINES)=''
    character(len=MAXLEN)       :: macroLines(MAXLINES)=''
    character(len=180)          :: macropath,macrofile
-   integer                     :: idx,nbl,nil,i,iuf,io,nnew,iflag,fileExistsInt,exitLoopInt,exitLoopSum
+   integer                     :: idx,nbl,nil,i,iflag,fileExistsInt,exitLoopInt,exitLoopSum
    integer                     :: loopIdx,loopIter,currentLoopIter,subIdx
    integer                     :: mLines
    real(r8)                      :: start,startCPU,endCPU
-   real(r8)                      :: tstart,tstartCPU,tendCPU,sendbuf(1),recvbuf(1),t
-   logical                     :: wfRead,found,exitLoop,fileExists,wout
+   logical                     :: found,exitLoop,fileExists,wout
 
    logical :: opened
 

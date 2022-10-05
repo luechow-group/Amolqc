@@ -381,7 +381,7 @@ contains
      real(r8) ax,bx,ay,by,az,bz,hx,hy,hz
      real(r8) value, r(3)
      integer, allocatable:: MOIdxList(:)       ! MO index list
-     integer a, i, ii, j, k, maxMOIdx, MOIdxLen, mo, lwork, ierr
+     integer i, ii, maxMOIdx, MOIdxLen, mo, lwork, ierr
      character(len=40)    :: str
 
      call assert(n>0 .and. moScale>0,'initLMOSampling: illegal argument')

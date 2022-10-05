@@ -38,11 +38,10 @@ contains
 
       character(len=120), intent(in) :: lines(:)
       integer, intent(in)            :: nl
-      character(len=10)              :: s
-      integer                        :: iflag,it,maxFull,iflag1,iflag2,iflag3,idx,nre,nrefs,i,j
+      integer                        :: iflag,maxFull,iflag1,iflag2,iflag3,idx,nre,nrefs,i,j
       integer                        :: initSuccess
       integer, pointer               :: ire(:,:) => null()
-      real(r8)                         :: st,distThr,tolDist2,tolMeanDist,tolSim,tolSame
+      real(r8)                         :: tolDist2,tolSim,tolSame
       real(r8)                         :: nucThresh,coreThresh,bondThresh
       logical                        :: doSortFreq
       character(len=3)               :: maxMode
@@ -213,8 +212,6 @@ contains
 
    subroutine maxana_writeParams(iu)
       integer, intent(in) :: iu
-      character(len=5)    :: s
-      character(len=10)   :: s1
       character(len=240)   :: s2
 
       write(iu,'(A/)') '    maximum analysis parameters:'

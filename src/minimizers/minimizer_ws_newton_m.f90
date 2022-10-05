@@ -49,7 +49,7 @@ contains
       class(Function_t), intent(in)                  :: fn
       real(r8), intent(inout)                         :: x(:)
       real(r8)                   :: f, f_old
-      real(r8)                   :: g(SIZE(x)), g_new(SIZE(x)), x_new(SIZE(x))
+      real(r8)                   :: g(SIZE(x))
       real(r8)                   :: delta_x(SIZE(x)), H(SIZE(x),SIZE(x)), work(SIZE(x)**2)
       real(r8)                   :: ipiv(SIZE(x)), lambda(SIZE(X)), work2(3*SIZE(x)-1)
       real(r8)                   :: gmax, delta_x_scale

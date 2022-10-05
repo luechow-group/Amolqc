@@ -35,7 +35,6 @@ contains
    character(len=120), intent(in)       :: lines(nl)
    type(WFParamDef), pointer              :: wfp
    integer iflag
-   logical                       :: found,finda
    real(r8)                        :: eRef
 
    mOptMode = 1
@@ -77,7 +76,7 @@ contains
    real(r8), allocatable                  :: p(:),p1(:),p2(:)       ! parameter vector
    real(r8), allocatable                  :: delta_p(:) ! change of parameter vector
    real(r8), allocatable                  :: g(:)       ! gradient
-   real(r8) e0,var
+   real(r8) e0
    real(r8), allocatable                  :: fi(:),ELi(:),fiEL(:)
 
    integer, parameter :: nmax=1024
@@ -89,10 +88,10 @@ contains
 !     lenwa is the corresponding real workspace required.
    character(len=60)     task, csave
    logical          lsave(4)
-   integer          i,n,m,iprint
+   integer          i,m,iprint
    integer          nbd(nmax), iwa(3*nmax), isave(44)
    real(r8)           ff, factr, pgtol
-   real(r8)           xx(nmax), l(nmax), u(nmax), gg(nmax), dsave(29)
+   real(r8)           l(nmax), u(nmax), dsave(29)
    real(r8)           wa(lenwa)
    np = ElocAndPsiTermsEBFGS_nParams(mEPsiTEBFGS)
    WFP => ElocAndPsiTermsEBFGS_getWFP(mEPsiTEBFGS)

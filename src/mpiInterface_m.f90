@@ -55,7 +55,7 @@ module mpiInterface_m
 contains
 
 subroutine myMPIInitialize(ierr)
-  integer :: ierr, nn
+  integer :: ierr
 
 #ifdef MPI
   call mpi_init(ierr)

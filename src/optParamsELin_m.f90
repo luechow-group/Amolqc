@@ -36,18 +36,15 @@ contains
    type(WFParamDef), pointer            :: WFP
    type(RWSample), intent(inout)        :: sample  ! (fixed) sample for optimization
    logical, intent(out)                 :: converged
-   integer                              :: nParams, np, subSampleSize, npCI,npJ,npMO
+   integer                              :: np, subSampleSize, npCI,npJ,npMO
    real(r8), allocatable                  :: p(:),p0(:)       ! parameter vector
    real(r8), allocatable                  :: delta_p(:,:) ! change of parameter vector (allow several)
    real(r8), allocatable                  :: H(:,:),S(:,:)  ! gradient and Hessian
    real(r8)                               :: e0, var, minVar, minE, lambda(6), lambdaOpt
    real(r8), allocatable                  :: fi(:),ELi(:),fiEL(:),fifj(:,:),fifjEL(:,:),fiELj(:,:)
-   integer                              :: lwork,iter,i,j,info,idxMin,maxDP, iflag, eqIter, eqStep, optIter
+   integer                              :: i,j,idxMin,maxDP, iflag, eqIter, eqStep, optIter
    integer                              :: nSize,root
-   integer, allocatable                 :: ipiv(:)
-   real(r8), allocatable                  :: work(:)
    type(ElocAndPsiTermsLin)             :: EPsiTLin
-   type(ElocAndPsiTermsLin),pointer     :: EPsiTLinptr
    real(r8)                               :: targetE, targetVar,cffac,dmax,maxVar,lambdaMax
    character(len=80)                    :: subName, fname
    logical                              :: doWriteWF,subSample,manualEv,proJ,manualLambda,max_prj
@@ -688,7 +685,7 @@ contains
    real(r8)             :: alphar(n),alphai(n),beta(n),work(1,8*n),vr(n,n),vl(n,n)
    real(r8)             :: ev(n),evi(n),mav
    integer            :: info
-   integer            :: i,j,iOpt,idx(n)
+   integer            :: i,idx(n)
 
    call assert(size(H,1) == n,'rightEigenvector: wrong dimension 1')
 

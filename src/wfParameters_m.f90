@@ -239,7 +239,7 @@ contains
       character(len=120), intent(in) :: lines(nl)
       character(len=40)              :: token(MAXL)
       real(r8),allocatable             :: p(:)
-      integer optMode,iflag,np,io,i,ii,ntokens
+      integer optMode,iflag,np,i,ii,ntokens
       real(r8) pp
       character(len=9)      :: optType      ! 'jastrow'|'ci'
       type(WFParamDef)        :: WFP

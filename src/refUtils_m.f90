@@ -92,10 +92,8 @@ contains
       real(r8), intent(in), optional      :: nucThresh
       real(r8)                         :: f,EL,vpot,thresh,h
       real(r8)                         :: fgrad(getNElec(),3)
-      real(r8)                         :: x(getNElec()), y(getNElec()), z(getNElec())
       real(r8), allocatable            :: hesse(:,:), hesseabs(:,:), hesseloss(:,:), work(:)
       real(r8)                         :: hmean, fac, maxloss, minloss
-      integer                        :: aNucElec(getNNuc()), bNucElec(getNNuc()) ! nuc a -> elec i (at nuc)
       integer i, j, n, ierr, lwork
       type(reference)           :: r1
 
@@ -227,13 +225,11 @@ contains
       integer, intent(out), optional             :: permidx(:)  ! permutation as index-array
                                                                ! j=permidx(i) means: r2(j) is close to r1(i)
       integer :: idxa(nalpha),idxb(nbeta),idx(ne)
-      integer :: idxab(nalpha),idxba(nbeta)
-      real(r8)    :: dista,distb,distba,distab
+      real(r8)    :: dista,distb
       real(r8)    :: dmata(nalpha,nalpha),dmatb(nbeta,nbeta)
-      real    :: dmatab(nalpha,nbeta),dmatba(nbeta,nalpha)
       real(r8)    :: dmat(ne,ne)                  !! alternative to dmata/b; save memory with allocate
-      real(r8)  :: xtmp(ne),ytmp(ne),ztmp(ne),distmean,distmax
-      integer :: i,j,nElec,ns
+      real(r8)  :: distmean,distmax
+      integer :: i,j
       integer :: excludeMode
 
       if (present(exclist)) then
@@ -368,13 +364,11 @@ contains
       integer, intent(in), optional              :: exclmode  ! 0: list contains excluded atom pairs
                                                               ! 1: list contains excluded atom indices
       integer :: idxa(nalpha),idxb(nbeta),idx(ne)
-      integer :: idxab(nalpha),idxba(nbeta)
-      real(r8)    :: dista,distb,distba,distab
+      real(r8)    :: dista,distb
       real(r8)    :: dmata(nalpha,nalpha),dmatb(nbeta,nbeta)
-      real    :: dmatab(nalpha,nbeta),dmatba(nbeta,nalpha)
       real(r8)    :: dmat(ne,ne)                  !! alternative to dmata/b; save memory with allocate
       real(r8)  :: xtmp(ne),ytmp(ne),ztmp(ne),distmean,distmax
-      integer :: i,j,nElec,ns
+      integer :: i,j
       integer :: excludeMode
 
       if (present(exclist)) then

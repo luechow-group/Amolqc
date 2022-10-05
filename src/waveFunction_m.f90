@@ -38,9 +38,8 @@ CONTAINS
 
     integer                       :: iflag,i,LAmode,r
     character(len=40)             :: wfFile
-    character(len=3)              :: s
     character(len=26)             :: s26
-    logical                       :: found,ltmp,readMode,writeMode,writeBasis
+    logical                       :: found,readMode,writeMode,writeBasis
     real(r8)                      :: value
 
     call getinta(lines,nl,"jas_init=",i,iflag)
@@ -272,12 +271,10 @@ CONTAINS
 #endif
     character(len=MAXLEN)  :: lines(MAXBLOCK)
     character(len=MAXLEN)  :: allLines(MAXLINES)
-    integer a,idx,i,ii,ii1,ii2,io,j,iflag,nl,nAllLines,idxsave
+    integer a,idx,i,j,iflag,nl,nAllLines,idxsave
     real(r8) rr
-    character(len=3) text
     character(len=10) s
-    logical form
-    logical ltmp,findf,ang,found,withSA,ignoreHAtoms,withBasis
+    logical ltmp,ang,found,withSA,ignoreHAtoms,withBasis
     logical absExists,simpleBasisExists
     logical opened
 
@@ -536,19 +533,12 @@ CONTAINS
   !---------------------------------------
 
   ! writeWF writes the current wave function to the file wfFile
-
-    integer, parameter :: ldim=500
     character(len=*), intent(inout) :: wfFile
     logical, intent(in)             :: writeBasis
     !!!!type(EcpType), intent(in)     :: ecp       ! in prevented by ecpwriteWF
     type(EcpType), intent(inout)     :: ecp
-    integer a,i,ii,ii1,ii2,io,iu,j,iflag,nl,k
-    real(r8) rr
-    character(len=3) text
-    character(len=10) s
-    character(len=120) lines(ldim),line
-    logical form
-    logical ltmp,findf,finda,ang,found
+    integer io,iu
+    character(len=120) line
 
     if(.not. MASTER) return
     iu = 20

@@ -83,7 +83,7 @@ contains
    real(r8), intent(in)            :: tol          ! tolorence for comparing num and analytical drivatives
    logical, intent(in)           :: printRep
 
-   integer                       :: np,pnt,i,k
+   integer                       :: np,pnt,i
    real(r8)                        :: x(ne),y(ne),z(ne),u0, EL0, phi0
    real(r8)                        :: ELknum, Uk, phik
    real(r8), allocatable           :: p(:),p0(:),f(:),g(:),uk0(:),ukgrad0(:,:),uklapl0(:)

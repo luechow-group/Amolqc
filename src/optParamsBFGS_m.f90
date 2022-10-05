@@ -31,7 +31,6 @@ contains
    character(len=120), intent(in)       :: lines(nl)
    type(WFParamDef), pointer              :: wfp
    integer iflag
-   logical                       :: found,finda
    real(r8)                        :: eRef
 
    mOptMode = 1
@@ -65,19 +64,19 @@ contains
    type(RWSample), intent(inout)        :: sample  ! (fixed) sample for optimization
 
    type(WFParamDef), pointer              :: WFP
-   integer                              :: nParams, np
+   integer                              :: np
    real(r8), allocatable                  :: p(:),p1(:),p2(:)       ! parameter vector
    real(r8), allocatable                  :: delta_p(:) ! change of parameter vector
    real(r8), allocatable                  :: g(:),g1(:),bb(:),H(:,:)  ! gradient and Hessian
-   real(r8) e0,var
+   real(r8) e0
    real(r8), allocatable                  :: fi(:),ELi(:),fiEL(:)
    real(r8), allocatable                  :: fifj(:,:),fifjEL(:,:),fiELj(:,:),fij(:,:),fijEL(:,:)
    real(r8), allocatable                  :: A(:,:),B(:,:),D(:,:)
    real(r8), allocatable                  :: s(:),y(:),bs(:),HB(:,:)
-   integer lwork,i,j,info,n,iter,liter,maxiter
+   integer lwork,i,j,info,iter,liter,maxiter
    integer, allocatable                 :: ipiv(:)
    real(r8), allocatable                  :: work(:)
-   real(r8) x0,x1,x2,e1,e2,alpha,tmp1,tmp2,xmin,emin,hh
+   real(r8) x0,x1,x2,e1,e2,alpha,tmp1,tmp2,xmin,emin
 
    np = ElocAndPsiTermsENR_nParams(mEPsiTENR)
    WFP => ElocAndPsiTermsENR_getWFP(mEPsiTENR)

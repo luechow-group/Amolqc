@@ -80,9 +80,8 @@ CONTAINS
 
    character(len=*), intent(in) :: lines(:)! lines array
    integer, intent(in)          :: nl      ! actual # of lines
-   integer i,j,m,n,k,alstat,ios,mmm,nnn
-   integer ii1,ii2,nw,na
-   integer spin,tmp
+   integer i,n,alstat,ios
+   integer nw,na
    character(len=40) :: words(5)
 
    call assert(.not. allocated(cci) .and. .not. allocated(deta),'mdetinput: data already allocated')
@@ -158,9 +157,8 @@ CONTAINS
    ! from 'lines' and bring them in maximal coincidence
    character(len=*), intent(in) :: lines(:)! lines array
    integer, intent(in)          :: nl      ! actual # of lines
-   integer i,j,m,n,k,ios,alstat,idx
-   integer ii1,ii2,nw,na,nnn,mmm
-   integer spin,tmp
+   integer i,j,n,k,ios,alstat,idx
+   integer nw,na
    integer, allocatable :: mclist0(:,:)
    character(len=40) :: words(5)
 
@@ -244,7 +242,7 @@ CONTAINS
    subroutine build_replst()
    !-----------------------!
    !build list of repeated determinants in csfs
-   integer :: detscnt,elcnt ! determinants and electrons counter
+   integer :: detscnt ! determinants and electrons counter
    integer :: jj,uniqalpha=0,uniqbeta=0
    logical :: repeated
    detsRepLst(1,:)=(0)
@@ -549,8 +547,8 @@ CONTAINS
    real(r8), intent(inout) :: flapl(:),fgrad(:,:),flapli(:,:)
    integer, intent(in) :: w
 
-   integer :: i, ii, j, jj, k, n, na, nci, orb, ierr
-   real(r8) :: d, tmp, f, g
+   integer :: i, ii, j, jj, k, n, na, nci, orb
+   real(r8) :: d, tmp
    real(r8) :: dxa(nalpha), dya(nalpha), dza(nalpha), d2a(nalpha)
    real(r8) :: dxb(nbeta), dyb(nbeta), dzb(nbeta), d2b(nbeta)
 
@@ -947,15 +945,14 @@ CONTAINS
    real(r8), intent(inout)  :: flapl(:),fgrad(:,:),flapli(:,:)  ! derivatives of phi: laplacian and gradient
    integer, intent(in)          :: w     ! deprecated electron config index
    integer, intent(out)         :: error_code 
-   integer i,j,k,l,orb,ii,ii1,ii2
+   integer i,j,k,orb,ii,ii1,ii2
    integer nci,nnci,n,na,offset,ierr, error_this_det
-   real(r8) tmp,tmp1,tmp2,tmp3,tmp4, rerr
+   real(r8) tmp,tmp1,tmp2,tmp3,tmp4
    real(r8) :: cola(size(deta,1)), colb(size(detb,1))
    real(r8) d
-   logical :: update 
 #ifdef CHKNANUP
    real(r8) :: switchDirectThreshold, absDetFirst, detInverseThreshold
-   logical :: checkMDetError
+   logical :: checkMDetError, update
 #endif
 
    error_code = MDET_NONE
@@ -1751,7 +1748,7 @@ CONTAINS
       real(r8)  work(N*nb)            ! workspace!
       integer ipiv(N)               ! pivot indices
       integer info1,info2
-      integer i,j
+      integer i
 
       error_code = MDET_NONE
 

@@ -308,7 +308,6 @@ CONTAINS
   !---------------------------------------------------!
     type(RWSample), intent(in)      :: s
     real(r8)                          :: getMeanWeight
-       real(r8)                       :: var,stdDev
 
     integer                         :: i
     type(SimpleStat)                :: stat
@@ -437,7 +436,7 @@ CONTAINS
     type(IntList)                   :: leftList,rightList
     type(IntNode), pointer          :: p
     real(r8)                          :: leftProb,rightProb,sigma
-    integer                         :: i,j,k,it,maxData,idx,keepLeft,keepRight,removeLeft,removeRight,start
+    integer                         :: i,j,k,it,maxData,keepLeft,keepRight,removeLeft,removeRight
     type(IndexedHistogram)          :: stat
 
     maxData = s%sampleSize
@@ -547,12 +546,12 @@ CONTAINS
      integer            :: idlemax   ! the highest "active" tid may be "idle"
      integer            :: tag1, nmax, nmax0, count, nSize
 #ifdef MPI
-     integer            :: ierr,maxsize
+     integer            :: ierr,maxsize,sizes(maxMPINodes)
      type(MPI_STATUS)   :: status
 #endif
      real               :: starttime, endtime
      real(r8), pointer    :: vec(:),vecrecv(:),vecjoin(:)
-     integer            :: thissize(1),sizes(maxMPINodes)
+     integer            :: thissize(1)
 
      call assert(s%sampleSize * nproc >= 10,"remove_outliers with trimmed mean requires at least 10 walkers")
 
@@ -1133,7 +1132,7 @@ CONTAINS
     ! receive n walkers from 'node' and append to sample
     type(RWSample), intent(inout)      :: s
     integer, intent(in)                :: n, node
-    integer i,idx
+    integer i
     type(RandomWalker), pointer            :: newRW
 
     allocate(newRW)
@@ -1157,7 +1156,7 @@ CONTAINS
       integer, intent(in)           :: i
       type(RWSample),intent(inout)  :: s
 !     internal parameters:
-      integer             :: n,f
+      integer             :: n
 
       call assert(i<= nDWGen(),"(SaveFathers): invalid index i")
 
@@ -1179,7 +1178,7 @@ CONTAINS
 !     in/output parameter:
       real(r8), intent(inout) :: wsons(:)   ! w.sum of sons
 
-      integer :: n,f
+      integer :: n
 
       call assert(i<= nDWGen(),"(SaveFathers): invalid index i")
 
@@ -1199,7 +1198,7 @@ CONTAINS
     integer                            :: senders(2*nproc)
     integer                            :: receivers(2*nproc)
     integer                            :: idx(nproc)
-    integer i,ierr,sender(2),receiver(2),n,targetSize,sdr,rcv
+    integer i,ierr,sender(2),receiver(2),targetSize,sdr,rcv
     integer walkers,walkersToSend,walkersToReceive,walkersMax
     real(r8)                             :: sizeMean,sizeStdDev
     type(simpleStat)                   :: sizeStat

@@ -47,8 +47,8 @@ contains
    logical          lsave(4)
    integer          i,m,iprint
    integer          nbd(nmax), iwa(3*nmax), isave(44)
-   real(r8)           ff, factr, pgtol
-   real(r8)           xx(nmax), l(nmax), u(nmax), gg(nmax), dsave(29)
+   real(r8)           factr, pgtol
+   real(r8)           l(nmax), u(nmax), dsave(29)
    real(r8)           wa(lenwa)
 
    ! LBFGS-B settings

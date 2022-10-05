@@ -41,7 +41,7 @@ contains
    character(len=9)      :: optType      ! 'jastrow'|'ci'
    character(len=20)     :: optMethod    ! 'varmin1' ...
    integer               :: optMode      ! code for different parameter sets for same optType
-   integer iter,oldlogmode,newlogmode,thislogmode,iflag
+   integer oldlogmode,thislogmode,iflag
    logical energyMin, varMin
 
    converged = .true.

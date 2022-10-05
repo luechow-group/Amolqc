@@ -62,12 +62,12 @@ subroutine mainloop
    type(psimax)                :: psimax_obj
    type(rhoMax_t)              :: rhoMax
    type(RhoGrid_t)             :: rhoGrid
-   integer                     :: bs,idx,nbl,nil,i,iuf,io,nnew,iflag,fileExistsInt
+   integer                     :: idx,nbl,nil,i,iflag,fileExistsInt
    integer                     :: loopIdx,loopIter,currentLoopIter,subIdx,subLine
    integer                     :: mLines
    real(r8)                    :: start,startCPU,endCPU
    real(r8)                    :: tstart,tstartCPU,tendCPU,sendbuf(1),recvbuf(1),t
-   logical                     :: wfRead,found,exitLoop,fileExists,subMode,converged,wout, is_converged
+   logical                     :: wfRead,found,exitLoop,fileExists,converged,wout
 
    logical :: opened
 

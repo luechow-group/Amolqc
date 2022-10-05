@@ -150,7 +150,7 @@ contains
    ! better solution: how to transfer arrays (contiguous memory) with MPI?
    type(ElocAndPsiTermsWEBFGS), intent(inout) :: this
    real(r8), intent(out) :: w,wEL,wk(:),wkEL(:),wELk(:)  ! for notation see type def.
-   integer nData(1),nTotalData(1),np,n,i,j
+   integer nData(1),nTotalData(1),np,n
    real(r8) vsum(this%EPTB%wfp%nParams)
    np = this%EPTB%wfp%nParams
    nData(1) = this%EPTB%nData
@@ -184,7 +184,7 @@ contains
    !-------------------------------------------------------------!
    type(ElocAndPsiTermsWEBFGS), intent(in) :: this
    real(r8), intent(out) :: w,wEL,wk(:),wkEL(:),wELk(:)  ! for notation see type def.
-   integer n,np,i,j
+   integer n
    n = this%EPTB%nData
 
    w   = this%w / n

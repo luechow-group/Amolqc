@@ -44,7 +44,7 @@ subroutine ao_cut(aocut)
     real(r8) :: rp, rp_new, yp, mp !variables for orbital itsself
 
     integer :: niter
-    integer :: bf, ic, mod, tp, ntypes
+    integer :: bf, ic, tp, ntypes
     integer :: alstat
 
     character(len = 1) :: l

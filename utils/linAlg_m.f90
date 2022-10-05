@@ -95,7 +95,7 @@ subroutine invdetcalc(col, n, nmax, a1, det)
     ! matrix determinant lemma). note that no matrices are modified by this,
     ! only the new determinant is calculated
 
-    integer n, nmax, i
+    integer n, nmax
     real(r8) col(nmax), a1(nmax), det
     real(r8) ddot
     !

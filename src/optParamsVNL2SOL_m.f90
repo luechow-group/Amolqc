@@ -43,7 +43,7 @@ contains
    type(WFParamDef), pointer           :: WFP
    type(RWSample), intent(inout)     :: sample  ! (fixed) sample for optimization
    logical, intent(out)              :: converged
-   integer                           :: nParam,i,ierr,iter,sSize,rSize
+   integer                           :: nParam,i,ierr,sSize,rSize
    real(r8), allocatable               :: x(:)       ! parameter vector
    real(r8)                            :: eOld, varOld, varRefOld,emean
    real(r8)                            :: var,varRef, optERef, eRef
@@ -51,8 +51,7 @@ contains
    integer, parameter  ::  nfgcal = 7, r = 50, toobig = 2 ! NL2SOL parameters
    logical             :: strted                          ! NL2SOL
    integer,allocatable ::   iv(:)
-   integer             :: convreq,covprt,ivsend,ivrec     ! NL2SOL
-   integer             :: nf,d1, r1, j1,ncallf=0,ncalljac=0           ! NL2SOL
+   integer             :: nf,d1, r1, j1,ncallf=0           ! NL2SOL
    real(r8),allocatable  :: v(:)
    integer             :: sampleSizes(nproc)
    integer             :: eqIter, eqStep, max_iter, iv16, npJ, npCI, npMO,optIter
@@ -319,7 +318,6 @@ contains
       !-----------------------------!
 
       integer                           :: iflag
-      logical                           :: found
       character(len=3)                  :: s
 
       eRef=0.0
@@ -421,8 +419,6 @@ contains
     integer,intent(in)             :: sSize, rSize
     integer,intent(in)             :: rCnts(:)
     integer, intent(in)            :: npJ,npCI,npMO ! # of Jastrow, CI and MO parameters
-    real(r8)                         :: x(ne),y(ne),z(ne)
-    type(RandomWalker), pointer    :: rwp
     integer,intent(in)             :: nppp
     real(r8),intent(inout)           :: j(rSize,nppp)
     real(r8), allocatable            :: blockSend(:,:)
@@ -487,10 +483,9 @@ contains
    integer,intent(in)             :: sSize
    integer, intent(in)            :: npJ,npCI,npMO     ! # of Jastrow and CI parameters
    real(r8),intent(inout)           :: blk(sSize,nppp)
-   integer                        :: i,k,ii
+   integer                        :: i
    type(RandomWalker), pointer    :: rwp
-   real(r8)                         :: x(ne),y(ne),z(ne),EL0
-   real(r8)                         :: tmp,ELi(nppp)
+   real(r8)                         :: x(ne),y(ne),z(ne)
    type(eConfigArray)  :: ec
    i=0
 

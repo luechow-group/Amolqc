@@ -29,9 +29,9 @@ subroutine aomocut_calc(ie, x, y, z, rai)
     real(r8) :: sqr3, sqr5
     parameter (sqr3 = 1.73205080756887729d0, sqr5 = 2.236067977499789696d0)
     ! local variables
-    integer :: bf, a, i, i1, i2, ii, ic, al
+    integer :: bf, a, i, i1, i2, ic, al
     integer :: j, d, moc, n
-    real(r8) :: xx, yy, zz, rr, r2, alp, nrm, u, ux, dx, dy, dz, tmp, &
+    real(r8) :: xx, yy, zz, rr, r2, alp, u, ux, dx, dy, dz, tmp, &
             dx2, dy2, dz2, dxyz, dxdy, dxdz, dydz
     real(r8) :: dy2dx, dx2dy, dx2dz, dz2dx, dy2dz, dz2dy, dxdydz
     !cc
@@ -538,11 +538,10 @@ subroutine aomocut1_calc(ie, x, y, z, rai)
     real(r8) :: sqr3, sqr5
     parameter (sqr3 = 1.73205080756887729d0, sqr5 = 2.236067977499789696d0)
     ! variables
-    integer :: bf, a, i, ii, i1, i2, ic, al
+    integer :: bf, a, i, i1, i2, ic, al
     integer :: j, d, moc, n
-    real(r8) :: xx, yy, zz, rr, alp, nrm, u, dx, dy, dz, r2, dx2, dy2, dz2
+    real(r8) :: xx, yy, zz, rr, alp, u, dx, dy, dz, r2, dx2, dy2, dz2
     real(r8) :: dxdy, dxdz, dydz
-    real(r8) :: tmp
 
     !cc
     real(r8) :: tmps
@@ -833,10 +832,10 @@ subroutine aomocutspl_calc(ie, x, y, z, rai)
     real(r8) :: sqr3, sqr5
     parameter (sqr3 = 1.73205080756887729d0, sqr5 = 2.236067977499789696d0)
     ! local variables
-    integer :: bf, a, i, i1, i2, ii, ic, al
+    integer :: bf, a, i, i1, i2, al
     integer :: j, d, moc, n
     integer :: spl, ispl
-    real(r8) :: xx, yy, zz, rr, r2, alp, nrm, u, ux, uxx, u2, dx, dy, dz, tmp, &
+    real(r8) :: xx, yy, zz, rr, r2, alp, u, ux, uxx, u2, dx, dy, dz, tmp, &
             dx2, dy2, dz2, dxyz, dxdy, dxdz, dydz
     real(r8) :: df
     !cc
@@ -1722,11 +1721,10 @@ subroutine aomocut1spl_calc(ie, x, y, z, rai)
     real(r8) :: sqr3, sqr5
     parameter (sqr3 = 1.73205080756887729d0, sqr5 = 2.236067977499789696d0)
     ! local variables
-    integer :: bf, a, i, i1, i2, ii, ic, al
+    integer :: bf, a, i, i1, i2, al
     integer :: j, d, moc, n
     integer :: spl, ispl
-    real(r8) :: xx, yy, zz, rr, r2, alp, nrm, u, ux, uxx, u2, dx, dy, dz, tmp, &
-            dx2, dy2, dz2, dxdy, dxdz, dydz
+    real(r8) :: xx, yy, zz, rr, r2, alp, u, dx, dy, dz, dx2, dy2, dz2
     real(r8) :: df
     !cc
     real(r8) :: tmps

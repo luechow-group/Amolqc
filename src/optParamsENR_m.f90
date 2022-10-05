@@ -35,7 +35,7 @@ contains
    type(WFParamDef), pointer            :: WFP              !
    type(RWSample), intent(inout)        :: sample           ! (fixed) sample for optimization
    logical, intent(out)                 :: converged
-   integer                              :: nParams, np,npCI
+   integer                              :: np,npCI
    real(r8), allocatable                  :: p(:),p0(:)       ! parameter vector
    real(r8), allocatable                  :: delta_p(:)       ! change of parameter vector
    real(r8), allocatable                  :: g(:),bb(:),H(:,:),H0(:,:)  ! gradient and Hessian
@@ -44,7 +44,7 @@ contains
    real(r8), allocatable                  :: fifj(:,:),fifjEL(:,:),fiELj(:,:),fij(:,:),fijEL(:,:)
    real(r8), allocatable                  :: A(:,:),B(:,:),D(:,:),Imat(:,:)
    !!!real(r8), allocatable                  :: eval(:),evec(:,:)
-   integer lwork,i,j,info,n,ierr,eqIter, eqStep, nSize, NRMode, iflag, iter,optIter
+   integer lwork,i,j,info,eqIter, eqStep, nSize, NRMode, iflag, iter,optIter
    integer, allocatable                 :: ipiv(:)
    real(r8), allocatable                  :: work(:)
    real(r8)                               :: targetE, targetVar,cffac,dmax,maxVar, lambda(6), lambdaOpt, eRef, gfac
@@ -437,8 +437,7 @@ contains
       subroutine internal_chooseStepLength(lambdaOpt)
       !---------------------------------------------------------!
          ! choose the optimal step length based on a trust radius and a cost function
-         integer :: idx       ! selected eigenvector
-         real(r8)  :: e0,var0   ! E and Var for unit step length
+         real(r8)  :: e0   ! E and Var for unit step length
          real(r8)  :: lambdaOpt ! calculated optimal step length
          integer n,cfIdx
          real(r8) d,cfmin,cf,var,cf1,cfs(6),x1,x2,x3,y1,y2,y3,r1,r2,r3

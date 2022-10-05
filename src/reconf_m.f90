@@ -132,17 +132,11 @@ contains
     type(Weighta),allocatable :: recfW(:)
 
     integer       :: count,count1,count2
-    integer       :: Nrn,Nrp
-    integer       :: i,j,k
+    integer       :: i,j
     integer       :: siza,count3,count4
 
-    logical       :: mCheck
-
     real(r8)        :: wgtsum1,wgtsum2
-    real(r8)        :: twgtsum1,twgtsum2
-    real(r8)        :: tmp1,tmp2,xi
-    real(r8)        :: tmp
-    real(r8)        :: allWgt
+    real(r8)        :: tmp2,xi
     real(r8)        :: W
     real(r8),allocatable        :: tmpWgt(:)
 
@@ -220,17 +214,13 @@ contains
     type(Weighta),allocatable :: recfW(:)
 
     integer       :: count,count1,count2
-    integer       :: Nrn,Nrp
+    integer       :: Nrp
     integer       :: i,j,k
     integer       :: siza,count3,count4
 
-    logical       :: mCheck
-
     real(r8)        :: wgtsum1,wgtsum2
-    real(r8)        :: twgtsum1,twgtsum2
     real(r8)        :: tmp1,tmp2,xi
     real(r8)        :: tmp
-    real(r8)        :: allWgt
     real(r8)        :: W
     real(r8),allocatable        :: tmpWgt(:)
 

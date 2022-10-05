@@ -60,7 +60,7 @@ contains
                                            !         optArray(0:,4) = |len, m'1, m'2, .. m'_len]
                                            ! meaning: all rotations \kappa_lm and all \kappa_l'm', ...
    integer, allocatable :: MOSymmetriseList(:,:)
-   integer np,i,j1,j2,k,l,l0,m,nClass,len,p,orb,iflag, nSym, counter
+   integer np,i,j1,j2,k,l,l0,m,nClass,len,orb,iflag, nSym, counter
    integer p1, e1, e2
    integer entryVec(0:mMaxPairs)
    logical found
@@ -246,7 +246,7 @@ contains
 
    logical, optional, intent(in) :: doElecDerivs    ! if true calculate mokgrad/moklapl in addition to mok
    integer i,ii,j,jj,k,ll,mm,n,na,nb,p,lpos,mpos,orb,ierr,detssize
-   real(r8) tmp,tmp0,tmp1,tmp2,tmp3,tmp4,tmp5,coeff,d,darr(size(detsRepLst,1))
+   real(r8) tmp0,tmp1,tmp2,tmp3,tmp4,tmp5,coeff,d,darr(size(detsRepLst,1))
    real(r8) ,allocatable ::  tmparr1(:,:),tmparr2(:,:),tmparr3(:,:),tmparr4(:,:)!keep results to avoid unnecessary calculations
    real(r8), allocatable :: excitedMO(:), tmpdet(:,:), tmpdeti(:,:), tmpdetx(:,:),tmpdety(:,:),tmpdetz(:,:),tmpdet2(:,:)
    integer, allocatable :: mclistexcit(:)
@@ -1125,7 +1125,6 @@ do p=1,moParams
   !-------------------------------------!
      integer, intent(in)   :: optMode       ! optimization mode  ! ignored !
      real(r8), intent(inout) :: p(:)         ! parameter vector
-     integer k,k0
 
      call assert(size(p) == size(p_save),"orbital optimization: illegal parameter vector length")
      p = p_save

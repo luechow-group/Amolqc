@@ -52,13 +52,12 @@ contains
       real(r8), optional, intent(in)                 :: sameThreshold
       character(len=40), optional, intent(in)      :: exclFile
       real(r8) x(ne),y(ne),z(ne),xx(ne,3)
-      integer l,i,j,k,n,nWords,io,nlen
+      integer l,i,j,n,nWords,io,nlen
       character(len=120) line
       character(len=20) words(12)
       character(len=1) emode
       character(len=4) suffix
       type(reference) :: r,r0
-      logical found
       real(r8) nucThresh,coreThresh,bondDiff
       integer, parameter :: iu = 12
 
@@ -116,7 +115,7 @@ contains
    contains
 
       subroutine read_refFile()
-         integer ref,ref2,nref,count,nomax,noel,io,outIdx,tCount,elemLength,idx
+         integer ref,ref2,count,nomax,noel,io,outIdx,tCount,elemLength,idx
          real(r8) wgt,f,meanDist,maxDist
          type(reference), pointer                 :: rp
          type(refl_vlist), pointer                :: p
@@ -259,7 +258,7 @@ contains
 
    subroutine refcc_destroy(this)
       class(refContainerCtr), intent(inout) :: this
-      integer l,i
+      integer l
       do l=1,this%getSize()
          call this%ctrPos(l)%destroy()
       end do
@@ -290,10 +289,10 @@ contains
       type(reference), pointer                 :: rp
       type(refl_vlist)                         :: rl
       type(refl_vlist), pointer                :: p
-      real(r8)                                   :: x(ne,3),xx(3),rr(3)
-      real(r8)                                   :: f,f0,wgt,dist,d,thr,maxdist,meandist,smallestDist
+      real(r8)                                   :: x(ne,3)
+      real(r8)                                   :: f,maxdist,meandist,smallestDist
       logical foundSpin, inserted
-      integer i,j,k,ns,smallestIdx,cnt,io
+      integer i,j,smallestIdx,cnt
 
       !!write(999,*) '*** s insert value=',r%f
       call r%setCount(1)
@@ -454,9 +453,8 @@ contains
       integer, intent(in)                   :: iu     ! unit to write to
       character(len=*), intent(in)          :: str    ! output string "Ref" or "Max"
       type(reference), pointer              :: rp
-      type(refl_vlist)                      :: rl
       type(refl_vlist), pointer             :: p
-      integer i,j,io,totalCount,outIdx
+      integer i,j,totalCount,outIdx
       integer, allocatable                  :: idx(:)
       real(r8) f,meanDist,maxDist
       integer, parameter :: MAXSHOW = 15
@@ -546,7 +544,6 @@ contains
       character(len=*), intent(in)          :: fname  ! file to write to (without .ref!!!)
       character(len=*), intent(in)          :: str    ! output string "Ref" or "Max"
       type(reference), pointer              :: rp
-      type(refl_vlist)                      :: rl
       type(refl_vlist), pointer             :: p
       integer                               :: naNuc, nbNuc    ! alpha, beta elecs at nucleus (not varied)
       integer i,n,m,io

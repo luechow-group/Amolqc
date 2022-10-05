@@ -356,7 +356,7 @@ CONTAINS
 
     type(RandomWalker),intent(inout)   :: rw
     real(r8), intent(inout)              :: v(:)
-    integer n,i,j,alstat,m
+    integer n,i,alstat,m
 
     call assert(size(v)==sizeOfRandomWalker(),"RandomWalker: vector has wrong size")
 

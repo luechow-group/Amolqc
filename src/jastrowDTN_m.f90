@@ -257,7 +257,6 @@ end subroutine jasoutput_dtn_new
 
 subroutine jas_shortoutput_dtn(iu)
   integer, intent(in) :: iu
-  integer :: i, j, k, m, s
 
   write(iu, "(4(a,I4))") ' umax=',umax, ' xmax=',xmax,' fenmax=',fenmax,' feemax=',feemax
 end subroutine jas_shortoutput_dtn
@@ -338,7 +337,7 @@ subroutine jasdtnall(x, y, z, rai, rij, optType, ju, jud, julapl, julapli)
   ! for parameter derivatives
   real(r8) :: fsump(8), fsumpl(2)
   ! position of parameter for param derivatives
-  integer :: pos, offset, coOffset
+  integer :: pos, offset
   ! array index for parameters of spin dependent functions
   integer :: spin
 
@@ -1102,17 +1101,14 @@ subroutine jasdtnall_naiv(x, y, z, rai, rij, optType, ju, jud, julapl, julapli)
   ! for parameter derivatives
   real(r8) :: fsump(8), fsumpl(2)
   ! position of parameter for param derivatives
-  integer :: pos, offset, coOffset
+  integer :: pos, offset
   integer :: spin
 
   ! commonly used terms
   real(r8) :: g, p, q, r, s, u, v, w, tmp, tmpa(3)
 
   ! loop variables
-  integer :: a, i, j, l, m, n, t, ll, mm, nn, xx, yy, zz, np1, np2, npnl
-
-  ! alloc stat
-  integer :: error
+  integer :: a, i, j, l, m, n, t, np1, np2, npnl
 
   !write(iul, *) "start"
 
@@ -1842,9 +1838,8 @@ subroutine checkCusp()
   real(r8) :: cuspMatrix(0:3 * fenmax + feemax + 1, fnum)
   real(r8) :: paramVector(fnum)
   real(r8) :: resVector(3 * fenmax + feemax + 2)
-  real(r8) :: ipiv(fnum)
   integer :: conditions
-  integer :: k, l, m, n, a, r, s, info
+  integer :: k, l, m, n, a, r, s
 
   if(mytid /= 0) return
   cuspMatrix = 0
@@ -2057,17 +2052,14 @@ subroutine jasgeneric_naiv(x, y, z, rai, rij, optType, ju, jud, julapl, julapli)
   ! for parameter derivatives
   real(r8) :: fsump(8), fsumpl(2)
   ! position of parameter for param derivatives
-  integer :: pos, offset, coOffset
+  integer :: pos, offset
   integer :: spin
 
   ! commonly used terms
-  real(r8) :: g, p, q, r, s, u, v, w, tmp, tmp2, tmpa(3)
+  real(r8) :: g, p, q, r, s, u, v, w, tmp
 
   ! loop variables
-  integer :: a, i, j, l, m, n, t, ll, mm, nn, xx, yy, zz, np1, np2, npnl
-
-  ! alloc stat
-  integer :: error
+  integer :: a, i, j, l, m, n, t, np1, np2, npnl
 
   !write(iul, *) "start"
 

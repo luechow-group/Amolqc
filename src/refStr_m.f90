@@ -237,10 +237,9 @@ contains
       integer, intent(in)                   :: iu     ! unit to write to
       character(len=*), intent(in)          :: str    ! output string "Ref" or "Max"
       type(reference), pointer              :: rp
-      type(refl_vlist)                      :: rl
       type(refl_vlist), pointer             :: p
       integer, allocatable                  :: idx(:)
-      integer i,j,io,totalCount,outIdx
+      integer i,j,totalCount,outIdx
       real(r8) f,meanDist,maxDist
       integer, parameter :: MAXSHOW = 15
 

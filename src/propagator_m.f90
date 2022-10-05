@@ -110,7 +110,7 @@ contains
     real(r8), intent(in)             :: tau,ds
     logical, intent(in)            :: ar,rc
     character(len=3), intent(in)   :: mt
-    integer :: alstat,i
+    integer :: i
 
     mWeight         = wgt
     mMove           = move
@@ -359,7 +359,7 @@ contains
     real(r8) xi,mp,s1,sn1, tau
     real(r8) r2(size(rwb))
     real(r8) vvr(size(rwb)),vvnr(size(rwb)),accRatio(size(rwb))
-    real(r8) uold(size(rwb)), x(ne), y(ne), z(ne)
+    real(r8) x(ne), y(ne), z(ne)
     real(r8) dw
     logical isAccepted(size(rwb)), isMoved(size(rwb)), noTmove(size(rwb))
     type(eConfigArray) :: ec
@@ -548,13 +548,10 @@ contains
     real(r8), intent(out) :: r2(:)
 
     integer i,w
-    real(r8) :: u
     real(r8) :: phiOld(size(rwb)), uOld(size(rwb))
     logical :: calcjs(size(rwb))
     real(r8) :: diffx(ne),diffy(ne),diffz(ne)
     real(r8) :: x(ne),y(ne),z(ne),x1(ne),y1(ne),z1(ne)
-    real(r8) :: xNew(ne),yNew(ne),zNew(ne)
-    real(r8) :: driftx(ne),drifty(ne),driftz(ne)
     type(eConfigArray) :: ecOld,ecNew
 
     call eConfigArray_new(ecOld,ne,size(rwb))
@@ -609,13 +606,10 @@ contains
     real(r8), intent(out) :: r2(:)
 
     integer i,w,tmove
-    real(r8) :: u,tau
+    real(r8) :: tau
     real(r8) :: phiOld(size(rwb)), uOld(size(rwb))
-    logical :: calcjs(size(rwb))
     real(r8) :: diffx(ne),diffy(ne),diffz(ne)
     real(r8) :: x(ne),y(ne),z(ne),x1(ne),y1(ne),z1(ne)
-    real(r8) :: xNew(ne),yNew(ne),zNew(ne)
-    real(r8) :: driftx(ne),drifty(ne),driftz(ne)
     type(eConfigArray) :: ecOld,ecNew
     logical :: isMoved(size(rwb))
 
@@ -674,7 +668,7 @@ contains
     logical,intent(out)               :: noTmove(:)
 
     integer i,w,tmove
-    real(r8) :: mp,u,tau
+    real(r8) :: mp,tau
     real(r8) :: phiOld(size(rwb)),uOld(size(rwb))
     real(r8) :: diffx(ne),diffy(ne),diffz(ne)
     real(r8) :: x(ne),y(ne),z(ne),x1(ne),y1(ne),z1(ne)

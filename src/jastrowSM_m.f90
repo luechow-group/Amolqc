@@ -117,7 +117,7 @@ CONTAINS
 
         character(len = *), intent(in) :: lines(:)! lines array
         integer, intent(in) :: nl      ! actual # of lines
-        integer a, k, tpar, alstat, io
+        integer a, k, tpar, io
 
         read(lines(2), *) k0
         if (k0 /= 0) then
@@ -158,8 +158,8 @@ CONTAINS
 
         character(len = *), intent(in) :: lines(:)! lines array
         integer, intent(in) :: nl      ! actual # of lines
-        integer a, k, alstat, io, idx, kk
-        integer idxStart, idxEnd, i, j, line, pwr, enStart, enEnd
+        integer a, k, io, idx, kk
+        integer idxStart, idxEnd, i, line, pwr, enStart, enEnd
         integer jasCenter
         character(len = 10) :: word(20)
         integer :: nWords
@@ -362,8 +362,8 @@ CONTAINS
 
         character(len = *), intent(in) :: jt
 
-        integer a, iu, k
-        integer idxStart, idxEnd, i, j, line, pwr, enStart, enEnd
+        integer a, k
+        integer idxStart, idxEnd, i, line, pwr, enStart, enEnd
         character(len = 9) :: oldJasType
         integer jasCenter
 
@@ -602,7 +602,7 @@ CONTAINS
     subroutine jas_shortoutput_sm(iu)
         !     ---------------------------------
 
-        integer k, iu
+        integer iu
 
         if (k0 /= 0) then
             write(iu, '(i5,a)') k0, " generic Schmidt-Moskowitz terms"
@@ -641,7 +641,6 @@ CONTAINS
 
         integer, intent(in) :: iu
 
-        integer a, k
         if (k0 /= 0) then
             write(iu, '(i5,2a)') k0, " generic Schmidt-Moskowitz terms of type ", trim(jastype)
         endif
@@ -678,7 +677,7 @@ CONTAINS
         real(r8)  xij(nmax, nmax), yij(nmax, nmax), zij(nmax, nmax)
         real(r8)  xai(amax, nmax), yai(amax, nmax), zai(amax, nmax)
         real(r8)  xyzi, xyzj
-        real(r8)  tmp, tmp1, tmp2, t
+        real(r8)  tmp1, tmp2, t
 
 #ifdef NEWINIT
         mFij = 0.d0
@@ -1894,7 +1893,7 @@ CONTAINS
 
         integer i, j, a, k, line
         integer s, v
-        real(r8)  tmp, tmp1, tmp2, t, jexp
+        real(r8)  tmp1, tmp2, t, jexp
         real(r8)  huu
         real(r8)  kuu
 
@@ -2303,7 +2302,7 @@ CONTAINS
         real(r8)  uu(kmax)
         real(r8)  xij(nmax, nmax), yij(nmax, nmax), zij(nmax, nmax)
         real(r8)  xai(amax, nmax), yai(amax, nmax), zai(amax, nmax)
-        real(r8)  tmp, tmp1, tmp2, t
+        real(r8)  tmp1, tmp2, t
 
         real(r8) Fijk(ne, ne, 0:k0 - 1), Gki(0:k0 - 1, ne)
 
