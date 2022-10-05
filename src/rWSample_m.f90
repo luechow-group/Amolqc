@@ -547,12 +547,12 @@ CONTAINS
      integer            :: idlemax   ! the highest "active" tid may be "idle"
      integer            :: tag1, nmax, nmax0, count, nSize
 #ifdef MPI
-     integer            :: ierr
+     integer            :: ierr,maxsize
      type(MPI_STATUS)   :: status
 #endif
      real               :: starttime, endtime
      real(r8), pointer    :: vec(:),vecrecv(:),vecjoin(:)
-     integer            :: thissize(1),sizes(maxMPINodes),maxsize
+     integer            :: thissize(1),sizes(maxMPINodes)
 
      call assert(s%sampleSize * nproc >= 10,"remove_outliers with trimmed mean requires at least 10 walkers")
 
@@ -1320,9 +1320,9 @@ CONTAINS
      integer, intent(in)             :: iu
      integer, intent(out)            :: tsize
      real(r8)                          :: x(nElecs()),y(nElecs()),z(nElecs()),xall(3*nElecs())
-     integer i,n,tag1,tag2,proc,count,ssize
+     integer i,n,tag1,tag2,ssize
 #ifdef MPI
-     integer                         :: ierr
+     integer                         :: ierr,count,proc
      type(MPI_STATUS)                :: status
 #endif
      n = nElecs()
@@ -1388,9 +1388,9 @@ CONTAINS
      integer, intent(inout)          :: nsize  ! total size per node to be read from open file, default=0: all positions
                                                ! on output: initial size on node
      real(r8)                          :: x(nElecs()),y(nElecs()),z(nElecs()),xall(3*nElecs())
-     integer i,n,nn,tag1,tag2,proc,cnt,count,addsize,ssize,tsize
+     integer i,n,nn,tag1,tag2,cnt,addsize,ssize,tsize
 #ifdef MPI
-     integer                         :: ierr
+     integer                         :: ierr,count,proc
      type(MPI_STATUS)                :: status
 #endif
 
@@ -1522,9 +1522,12 @@ CONTAINS
     real(r8), allocatable          :: x(:), y(:), z(:), xn(:), yn(:), zn(:), dv(:)
     real(r8) thresh, d
     character(len=80)              :: posfilename
-    integer io, ssize, nssize, iflag, max_size, count, all_count, n, i, j, verbose, ierr, s_allsize, i_max
+    integer io, ssize, nssize, iflag, max_size, count, all_count, n, i, j, verbose, s_allsize, i_max
     character(len=80)              :: method
     integer, parameter :: iu=19
+#ifdef MPI
+    integer ierr
+#endif
 
     call getstra(lines, nl, "file=", posfilename, iflag)
     if (iflag /= 0) call abortp("compareSampleCommand: posfile name not set")

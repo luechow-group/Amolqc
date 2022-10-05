@@ -541,7 +541,9 @@ contains
     real(r8)                      :: Samplesize, EL,EECPL,EECPNL
     real(r8)                      :: tcorr,ACvar,ACNcorr
     real(r8)                      :: accepted ! 0.0 for (all) rejected, 1.0 for (all) accepted
+#ifdef WTIMER
     real(r8)                      :: wtimer1,wtimer2,ewtime,twtime
+#endif
     real(r8), allocatable         :: Estep(:),AC(:,:),ACRingBuffer(:,:),ACresult(:)  ! autocorrelation date
     logical                     :: first,ACavail,tauFound
     type(RandomWalker), pointer :: rwp

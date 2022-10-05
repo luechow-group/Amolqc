@@ -120,7 +120,10 @@ CONTAINS
 
         integer i, ii, a, itmp, nd, idx, iull, n, ierr, nElecConfigs
         real(r8) ekin, tmp, vpot
-        real(r8) wtimer_i(8), wtimer_f(8), wtimerPhi(4)
+        real(r8) wtimerPhi(4)
+#ifdef WTIMER
+        real(r8) wtimer_i(8), wtimer_f(8)
+#endif
         !     ! automatic arrays for actual electron number!
         real(r8) x(ne), y(ne), z(ne)
         real(r8) rai(ncenter, ne), rij(ne, ne)
@@ -757,7 +760,9 @@ CONTAINS
                 fgrad(3 * ne, eConfigArray_size(ec)), &
                 flapl(eConfigArray_size(ec)), &
                 flapli(ne, eConfigArray_size(ec))
+#ifdef WTIMER
         real(r8) wtimer1, wtimer2, wtimer3, wtimer4
+#endif
 
         wtimerPhi = 0._r8
         error_code = ELOC_NONE

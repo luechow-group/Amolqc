@@ -547,11 +547,11 @@ contains
 
      ! dynamic master/worker distribution of 3d gridpoint calculation
 
-     integer i,j,k,a,ii,count,counter,allTasks,idx(2),srcID,vmax,workercounter
+     integer i,j,k,a,ii,counter,allTasks,idx(2),srcID,vmax,workercounter
      integer, allocatable :: procIdx(:,:)
      real(r8), allocatable :: values(:),allValues(:)
 #ifdef MPI
-     integer                :: ierr
+     integer                :: ierr, count
      type(MPI_STATUS)       :: status
 #endif
 
