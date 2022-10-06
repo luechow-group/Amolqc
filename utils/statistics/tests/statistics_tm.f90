@@ -4,7 +4,7 @@
 ! SPDX-License-Identifier: GPL-3.0-or-later
 
 module statistics_tm
-  use kinds_m, only: r8
+  use kinds_m, only: r8, i8
   use statistics
 #ifdef MPI
   use MPI_F08
@@ -20,7 +20,6 @@ contains
     real(r8)                :: xMin=0.d0,xMax=100.d0
     integer               :: iMin=0,iMax=100,nBins=10
     integer               :: i
-    integer, pointer      :: ih(:,:)
 
     call reset(stat)
     call reset(wstat)
@@ -54,9 +53,13 @@ contains
 
   subroutine statistic_par_test()
     integer, parameter :: MASTER=0
-    integer ierr,mytid,nproc,i, dataCount
+    integer mytid,nproc,i
+    integer(i8) dataCount
     real(r8)  meanAll
     type(simpleStat)  :: stat
+#ifdef MPI
+    integer ierr
+#endif
 
     mytid = 0
     nproc = 1

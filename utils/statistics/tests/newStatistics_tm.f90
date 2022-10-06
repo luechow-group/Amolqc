@@ -3,7 +3,7 @@
 ! SPDX-License-Identifier: GPL-3.0-or-later
 
 module newStatistics_tm
-   use kinds_m, only: r8
+   use kinds_m, only: r8, i8
    use newStatistics_m
    use error_m, only: assert
 #ifdef MPI
@@ -18,7 +18,8 @@ contains
       type(MPI_STATUS)    :: status
 #endif
       logical             :: MASTER
-      integer             :: mytid,nproc,i,n,bl
+      integer             :: mytid,nproc,i,bl
+      integer(i8) :: n
       type(stat) :: s
       type(blockstat) :: bs
       type(vectorstat) :: vs
