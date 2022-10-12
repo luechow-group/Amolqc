@@ -9,45 +9,6 @@ The code features strong multideterminant and optimization capabilities.
 
 ## Building Amolqc
 
-### Build with Make
-
-- prior to the Make build with compiled lapack/blas, the environment variable `$MATHLIBS` has to be
-  set to their path (often /usr/lib or /usr/lib64).
-
-Configuration means setting compiler, MPI, LAPACK, optimization level,
-and possibly random number generator. This is done with a simple config file (.mk).
-Examples are available in "make/configs". Adapt one of the .mk files in make/configs.
-
-Then in "Amolqc" do:
-```
-./configure myconfig.mk
-make [-j3]
-```
-
-To run the testsuite in serial mode, do:
-("test=jas" can be given to run only tests matching "jas".
-Other examples: "test=ECP", "test=05")
-```
-make tests [test=jas]
-```
-
-To run the testsuite in parallel mode, do:
-```
-make testp [test=jas]
-```
-
-The executable is "Amolqc/bin/amolqc".
-
-
-Prior to compilation, the following modifications may be done in "Amolqc/make/config.mk"
-```
-WARNINGS = yes         # prints compile warnings
-RNG = MT               # Replaces the default MRG random number generator with a Mersenne Twister implementation.
-F90FLAGS += -DWTIMER   # Calculates wall clock time evaluation for individual parts of the code.
-F90FLAGS += -DCHKNANUP # Checks for NANs in Sherman Morrison updates and do ordinary determinant evaluation instead
-                       # for these excited determinants.
-```
-
 ### Build with CMake and Make
 
 CMake version 3.10 or higher is required.
