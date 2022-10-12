@@ -13,7 +13,7 @@ The code features strong multideterminant and optimization capabilities.
 
 CMake version 3.10 or higher is required.
 
-The same settings as in the make/configs/\*.mk files can be set in a cmake/configs/\*.cmake file.
+The settings can be set in a cmake/configs/\*.cmake file.
 - create your own file (eg. cmake/configs/myconfig.cmake)
 
 If the environment variable `$FC` is set, the compiler from that variable is taken instead of
