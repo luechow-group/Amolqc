@@ -94,3 +94,29 @@ Intel serial test:
     paths:
     - cmake-build-intel-serial/
     policy: pull
+
+GNU serial std08 build:
+  stage: build
+  script:
+    - mkdir -p cmake-build-gnu-std08-serial
+    - cd cmake-build-gnu-std08-serial
+    - cmake -DCONFIG_FILE=OFF -DCMAKE_Fortran_COMPILER=gfortran -DMPI=OFF -DADDITIONAL_FLAGS="-std=f2008" ..
+    - make -j4
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-gnu-std08-serial"
+    paths:
+      - cmake-build-gnu-std08-serial/
+    policy: pull-push
+
+GNU parallel std08 build:
+  stage: build
+  script:
+    - mkdir -p cmake-build-gnu-std08-parallel
+    - cd cmake-build-gnu-std08-parallel
+    - cmake -DCONFIG_FILE=OFF -DCMAKE_Fortran_COMPILER=mpifort -DMPI=ON -DADDITIONAL_FLAGS="-std=f2008" ..
+    - make -j4
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-gnu-std08-parallel"
+    paths:
+      - cmake-build-gnu-std08-parallel/
+    policy: pull-push
