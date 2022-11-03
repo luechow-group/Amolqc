@@ -11,7 +11,7 @@ module optParamsELin_m
    use global_m
    use subloop_m, only: subloop
    use sorting_m, only: quickSortIndex
-   use rWSample_m
+   use rwSample_m
    use elocAndPsiTermsLin_m
    use wfParameters_m
    use waveFunction_m, only: writeWF

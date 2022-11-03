@@ -11,7 +11,7 @@ module optParamsVNL2SOL_m
    use kinds_m, only: r8
    use global_m
    use subloop_m, only: subloop
-   use rWSample_m
+   use rwSample_m
    use elocAndPsiTermsLM_m
    use wfParameters_m
    use multiDetParam_m

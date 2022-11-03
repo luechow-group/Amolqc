@@ -6,7 +6,7 @@
 !
 ! SPDX-License-Identifier: GPL-3.0-or-later
 
-MODULE rWSample_m
+MODULE rwSample_m
 
   use kinds_m, only: r8
   use global_m
@@ -1647,12 +1647,12 @@ CONTAINS
      enddo
   end subroutine unWeight
 
-end MODULE rWSample_m
+end MODULE rwSample_m
 
 !-----------------------!
 subroutine testBalance(s)
 !-----------------------!
-  use rWSample_m
+  use rwSample_m
   implicit none
   type(RWSample), intent(inout)   :: s
   real(r8)  E,EAll,stdDev,stdDevAll,var,varAll

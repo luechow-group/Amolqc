@@ -6,7 +6,7 @@ module optParamsWBFGS_m
 
    use kinds_m, only: r8
    use global_m
-   use rWSample_m
+   use rwSample_m
    use elocAndPsiTermsWEBFGS_m
    use wfParameters_m
    use lbfgsb3_m, only: setulb

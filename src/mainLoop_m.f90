@@ -18,7 +18,7 @@ subroutine mainloop
    use parsing_m, only: getNextBlock, getinta, finda
    use utils_m, only: getToken,getTimeString,readFileParallel,expandMacro,printHeader,getFormattedHeader
    use init_m, only: initAmolqc,initFiles,initGen,finalizeAmolqc
-   use rWSample_m, only: RWSample, writeSampleCommand, compareSample, recalculateSample, &
+   use rwSample_m, only: RWSample, writeSampleCommand, compareSample, recalculateSample, &
        getFirst, isNext, getNext, getSampleSize
    use randomWalker_m, only: RandomWalker, setNumberOfElectrons, setNumberOfCenters, setEpart
    use qmcSample_m, only: sample, initInitialWalker, displaceInitialWalker

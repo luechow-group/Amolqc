@@ -21,9 +21,9 @@ MODULE qmc_m
   use statistics
   use newStatistics_m, only: stat,vectorstat
   use randomWalker_m
-  use rWSample_m
+  use rwSample_m
   use propagator_m
-  use rWStatistics_m
+  use rwStatistics_m
   use parsing_m
   use utils_m, only: getTimeString
   use elocData_m, only: setElocCutoff, getElocCutoff, eloc_initialize, &

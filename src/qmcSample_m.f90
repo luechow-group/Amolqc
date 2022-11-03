@@ -11,7 +11,7 @@ module qmcSample_m
   use parsing_m
   use statistics
   use randomWalker_m
-  use rWSample_m
+  use rwSample_m
   use propagator_m
   use waveFunction_m
   use initialPositions_m

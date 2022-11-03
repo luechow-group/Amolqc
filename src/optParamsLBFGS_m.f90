@@ -6,7 +6,7 @@ module optParamsLBFGS_m
 
    use kinds_m, only: r8
    use global_m
-   use rWSample_m
+   use rwSample_m
    use elocAndPsiTermsEBFGS_m
    use wfParameters_m
    use qmc_m, only: qmc_init, qmc_run

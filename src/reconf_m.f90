@@ -6,7 +6,7 @@ Module reconfg_m
 
 use kinds_m, only: r8
 use error_m
-use rWSample_m
+use rwSample_m
 implicit none
 
 

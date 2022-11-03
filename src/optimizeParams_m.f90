@@ -5,7 +5,7 @@
 module optimizeParams_m
 
    use global_m
-   use rWSample_m
+   use rwSample_m
    use elocAndPsiTermsLM_m
    use optParamsVarmin_m
    use optParamsVNL2SOL_m

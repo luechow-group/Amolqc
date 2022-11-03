@@ -2,7 +2,7 @@
 !
 ! SPDX-License-Identifier: GPL-3.0-or-later
 
-MODULE rWStatistics_m
+MODULE rwStatistics_m
 
 ! statistics (mean,stddev,cov) for random walkers positions (i.e. 3*ne dim)
 ! in cartesian or spherical coordinates
@@ -137,7 +137,7 @@ CONTAINS
 
 
       
-END MODULE rWStatistics_m
+END MODULE rwStatistics_m
 
 
 !====================

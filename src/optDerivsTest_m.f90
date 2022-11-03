@@ -7,7 +7,7 @@ module optDerivsTest_m
 
 use kinds_m, only: r8
 use global_m
-use rWSample_m
+use rwSample_m
 use wfParameters_m
 use jastrowParamData_m
 use multiDetParam_m

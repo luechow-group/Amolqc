@@ -9,7 +9,7 @@ MODULE properties_m
 
    use kinds_m, only: r8
    use error_m, only: error
-   use rWSample_m
+   use rwSample_m
    use wfData_m
    use mpiInterface_m, only: myMPIAllReduceSumDouble
 

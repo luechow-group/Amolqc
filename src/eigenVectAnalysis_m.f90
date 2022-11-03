@@ -5,7 +5,7 @@ module eigenVectAnalysis_m
     use fPsi2_m
     use atom_m
     use mpiInterface_m, only: myMPIReduceSumInteger
-    use rWSample_m, only: rWSample, getSampleSize, getFirst, isNext, getNext, getWalker
+    use rwSample_m, only: rWSample, getSampleSize, getFirst, isNext, getNext, getWalker
     use psiMax_m, only: psimax
     use randomWalker_m, only: RandomWalker, pos, resetTo
     use singularityParticles_m, only: singularity_particles

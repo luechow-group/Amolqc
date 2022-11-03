@@ -6,7 +6,7 @@ module maximizeSampleRho_m
    use kinds_m, only: r8
    use parsing_m
    use global_m
-   use rWSample_m, only: rWSample, getSampleSize, getFirst, isNext, getNext, getWalker
+   use rwSample_m, only: rWSample, getSampleSize, getFirst, isNext, getNext, getWalker
    use rhoMax_m, only: rhoMax_t
    use randomWalker_m, only: RandomWalker
 

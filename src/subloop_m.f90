@@ -10,7 +10,7 @@ module subloop_m
    use parsing_m, only: getNextBlock, getinta, finda
    use utils_m, only: getToken,getTimeString,readFileParallel,expandMacro,printHeader,getFormattedHeader
    use init_m, only: initAmolqc,initFiles,initGen,finalizeAmolqc
-   use rWSample_m, only: RWSample, writeSampleCommand, recalculateSample
+   use rwSample_m, only: RWSample, writeSampleCommand, recalculateSample
    use randomWalker_m, only: setNumberOfElectrons,setNumberOfCenters,setEpart
    use qmcSample_m, only: sample, initInitialWalker
    use qmc_m, only: qmc_run, qmc_init, initWalkerStat, initTrajectory
