@@ -34,7 +34,7 @@ subroutine ao_cut(aocut)
     !cc local parameters
     real(r8) :: trustr, conv
     integer :: itermax
-    parameter(trustr = 0.1, conv = 0.1d-10)
+    parameter(trustr = 0.1d0, conv = 0.1d-10)
     parameter(itermax = 10000)
 
     !cc local variables
@@ -435,7 +435,7 @@ contains
                     (-2.0d0) * sqrt(3.0d0) / 9.0d0 * r**2 * exp(-a * r**2) * &
                     sqrt(5.0d0)
         elseif (mode==3) then
-            fxxy = 0.5 * sqrt(6.0d0 / a) + trustr
+            fxxy = 0.5d0 * sqrt(6.0d0 / a) + trustr
         endif
 
     end function fxxy

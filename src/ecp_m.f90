@@ -98,7 +98,7 @@ module ecp_m
 
    type :: uparr
          logical :: moved=.false.
-         real(r8)  :: pos(3)=0.0
+         real(r8)  :: pos(3)=0
    end type uparr
 
 contains
