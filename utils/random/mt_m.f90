@@ -250,7 +250,7 @@ IMPLICIT NONE
 
 real(r8)            :: u, sum
 real(r8),  SAVE     :: v, sln
-real(r8), PARAMETER :: one = 1.0, vsmall = TINY( one )
+real(r8), PARAMETER :: one = 1, vsmall = TINY( one )
 
 
   DO

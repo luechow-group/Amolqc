@@ -154,7 +154,7 @@ subroutine ao_cut(aocut)
     !        do ic=1, ngto(bf)
     !        write(*,'(2f20.14,2x,a,2f14.8)')
     !     .    cntrctn(1,ic,bf),cntrctn(2,ic,bf),bl(bf),aocuts(bf),
-    !     .    aocuts(bf)*0.52918
+    !     .    aocuts(bf)*0.52918_r8
     !          if (bl(bf)=='S') then
     !            write(*,*) s(1,cntrctn(1,ic,bf),aocuts(bf))*cntrctn(2,ic,bf)
     !          elseif (bl(bf)=='P') then
@@ -324,7 +324,7 @@ contains
         real(r8) :: tmp
 
         if (type==1) then
-            tmp = log(0.5 * aocut / a)
+            tmp = log(0.5_r8 * aocut / a)
             tmp = abs(tmp)
             startguess = sqrt(tmp)
         elseif (type==2) then
@@ -366,7 +366,7 @@ contains
         elseif (mode==2) then
             px = (-1.0d0 + 2.0d0 * a * r**2) * (-exp(-a * r**2))
         elseif (mode==3) then
-            px = 0.5 * sqrt(2.0d0) / sqrt(a) + trustr
+            px = 0.5_r8 * sqrt(2.0d0) / sqrt(a) + trustr
             !           !Start guess: largest root of 1st derivative + trust radius
         endif
 
@@ -395,7 +395,7 @@ contains
         integer :: mode
 
         if (mode==1) then
-            dxy = 0.5 * r**2 * exp(-a * r**2) * sqrt(3.0d0)
+            dxy = 0.5_r8 * r**2 * exp(-a * r**2) * sqrt(3.0d0)
         elseif (mode==2) then
             dxy = (-1.0d0 + a * r**2) * (-r) * exp(-a * r**2) * &
                     sqrt(3.0d0)
@@ -416,7 +416,7 @@ contains
         elseif (mode==2) then
             fxxx = ((-3.0d0) + 2.0d0 * a * r**2) * (-r)**2 * exp(-a * r**2)
         elseif (mode==3) then
-            fxxx = 0.5 * sqrt(6.0d0 / a) + trustr
+            fxxx = 0.5_r8 * sqrt(6.0d0 / a) + trustr
         endif
 
     end function fxxx
@@ -454,7 +454,7 @@ contains
                     (-sqrt(3.0d0)) / 9 * r**2 * exp(-a * r**2) * &
                     sqrt(15.0d0)
         elseif (mode==3) then
-            fxyz = 0.5 * sqrt(6.0d0 / a) + trustr
+            fxyz = 0.5_r8 * sqrt(6.0d0 / a) + trustr
         endif
 
     end function fxyz

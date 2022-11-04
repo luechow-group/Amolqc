@@ -172,9 +172,9 @@ contains
         class(gcube), intent(inout) :: this
         real(r8), intent(out)      :: cx,cy,cz
         integer, intent(in)      :: kx,ky,kz
-        cx = this%ax + (kx+0.5)*this%hx
-        cy = this%ay + (ky+0.5)*this%hy
-        cz = this%az + (kz+0.5)*this%hz
+        cx = this%ax + (kx+0.5_r8)*this%hx
+        cy = this%ay + (ky+0.5_r8)*this%hy
+        cz = this%az + (kz+0.5_r8)*this%hz
     end subroutine gcube_getBinCenter
 
 
@@ -268,9 +268,9 @@ contains
         call give_ref()
         allocate(bins_small(2*this%sbin+1))
         write(iu,100) this%ncenter,&
-        this%ax+this%hx*(0.5+ref(1)-this%sbin),&
-        this%ay+this%hy*(0.5+ref(2)-this%sbin),&
-        this%az+this%hz*(0.5+ref(3)-this%sbin)
+        this%ax+this%hx*(0.5_r8+ref(1)-this%sbin),&
+        this%ay+this%hy*(0.5_r8+ref(2)-this%sbin),&
+        this%az+this%hz*(0.5_r8+ref(3)-this%sbin)
         write(iu,100) this%sbin*2+1,dble(this%hx),dble(0),dble(0)
         write(iu,100) this%sbin*2+1,dble(0),dble(this%hy),dble(0)
         write(iu,100) this%sbin*2+1,dble(0),dble(0),dble(this%hz)
@@ -307,10 +307,10 @@ contains
         real(r8) :: Sum,Sumi,Sumj,Sumk
         integer :: i,j,k
 
-        Sum=0.0
-        Sumi=0.0
-        Sumj=0.0
-        Sumk=0.0
+        Sum=0
+        Sumi=0
+        Sumj=0
+        Sumk=0
 
         do i=0,this%n-1
             do j=0,this%n-1

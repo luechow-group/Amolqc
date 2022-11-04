@@ -25,7 +25,7 @@ contains
       filtered_data = filtered_data / ( SUM(filtered_data)/SIZE(filtered_data) )
 
       ! get array of logicals
-      plateau = filtered_data < 0.5
+      plateau = filtered_data < 0.5_r8
 
       ! remove possible starting plateau
       i = 1

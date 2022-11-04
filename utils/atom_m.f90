@@ -58,9 +58,9 @@ module atom_m
    real(r8), allocatable :: mAtomDist(:,:)
 
    ! thresholds for atoms_whatPosition
-   real(r8)  :: mNucThresh = 0.01
-   real(r8)  :: mCoreThresh = 2.0
-   real(r8)  :: mBondDiff = 0.4
+   real(r8)  :: mNucThresh = 0.01_r8
+   real(r8)  :: mCoreThresh = 2.0_r8
+   real(r8)  :: mBondDiff = 0.4_r8
 
 
    private

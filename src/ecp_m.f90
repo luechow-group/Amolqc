@@ -745,7 +745,7 @@ contains
       real(r8) vecGridPoints(-1:size(Vkk1,1))
 
       if(present(tmscupdate)) then
-         tmscupdate%pos=0.0
+         tmscupdate%pos=0
          tmscupdate%moved=.false.
       endif
       nGridPoints = size(Vkk1,1)
