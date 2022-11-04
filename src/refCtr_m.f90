@@ -483,7 +483,7 @@ contains
             rp => p%elem(1)    ! compare with head element == reference structure
             call this%calcDistances(rp,ALLPERM,i-1,outIdx,meanDist,maxDist,idx)
             write(iu,'(i5,a,f13.6,a,i7,a,i5,a,2f10.3)') i,' structure with best value=',f,'    # found:',totalCount, &
-                                          "   min dist to ",outIDx,"  max/mean dist:",maxDist*bohr2angs,meanDist*bohr2angs
+                                          "   min dist to ",outIDx,"  max/mean dist:",maxDist*bohr2ang,meanDist*bohr2ang
          else
             write(iu,'(i5,a,f13.6,a,i7)') i,' structure with best value=',f,'    # found:',totalCount
          end if

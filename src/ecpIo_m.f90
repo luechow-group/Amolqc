@@ -123,7 +123,7 @@ CONTAINS
       call ecp%getPseudoAtoms(pa)
       do p=1,size(pa)
          if (pa(p)%cutoff > 0.d0) then
-            write(iul,'(i4,2x,a4,6x,i4,6x,f10.5)') p,atoms(pa(p)%a)%elem,pa(p)%nGridPoints,pa(p)%cutoff*bohr2angs
+            write(iul,'(i4,2x,a4,6x,i4,6x,f10.5)') p,atoms(pa(p)%a)%elem,pa(p)%nGridPoints,pa(p)%cutoff*bohr2ang
          else
             write(iul,'(i4,2x,a4,6x,i4,10x,a)') p,atoms(pa(p)%a)%elem,pa(p)%nGridPoints,'n/a'
          endif

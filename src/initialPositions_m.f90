@@ -403,9 +403,9 @@ contains
 
      if (logmode>=3) then
         write(iul,*) ' box:'
-        write(iul,'(2(g12.3))') ax*bohr2angs,bx*bohr2angs,ay*bohr2angs,by*bohr2angs, &
-                                az*bohr2angs,bz*bohr2angs
-        write(iul,'(3(g12.3))') hx*bohr2angs,hy*bohr2angs,hz*bohr2angs
+        write(iul,'(2(g12.3))') ax*bohr2ang,bx*bohr2ang,ay*bohr2ang,by*bohr2ang, &
+                                az*bohr2ang,bz*bohr2ang
+        write(iul,'(3(g12.3))') hx*bohr2ang,hy*bohr2ang,hz*bohr2ang
         write(iul,'(a,i6)') 'maxMOIdx = ',maxMOIdx
      end if
 
@@ -501,7 +501,7 @@ contains
         write(iul,*) ' mu for each MO in list:'
         do ii=1,MOIdxLen
            mo = MOIdxList(ii)
-           write(iul,'(2i5,3f10.3)') ii,mo,mMu(:,ii)*bohr2angs
+           write(iul,'(2i5,3f10.3)') ii,mo,mMu(:,ii)*bohr2ang
         end do
         write(iul,*) ' MO types:'
         do ii=1,MOIdxLen
@@ -523,7 +523,7 @@ contains
         cov(2,1) = cov(1,2)
         cov(3,1) = cov(1,3)
         cov(3,2) = cov(2,3)
-        if (logmode >= 3) write(iul,'(3f10.3)') ((cov(i,j)*bohr2angs,j=1,3),i=1,3)
+        if (logmode >= 3) write(iul,'(3f10.3)') ((cov(i,j)*bohr2ang,j=1,3),i=1,3)
         lwork = size(work)
         ev = cov   
         call dsyev('V', 'U', 3, ev, 3, lambda, work, lwork, ierr)
@@ -708,7 +708,7 @@ contains
          write(iul,*) ' mu for each MO in list:'
          do ii=1,MOIdxLen
             mo = MOIdxList(ii)
-            write(iul,'(2i5,3f10.3)') ii,mo,mMu(:,ii)*bohr2angs
+            write(iul,'(2i5,3f10.3)') ii,mo,mMu(:,ii)*bohr2ang
          end do
          write(iul,*) ' MO types:'
          do ii=1,MOIdxLen
@@ -732,7 +732,7 @@ contains
          if (logmode >= 3) then
             write(iul,*) 'result ii,mo=',ii,MOIdxList(ii)
             write(iul,*) ' cov matrices:'
-            write(iul,'(3f10.3)') ((cov(i,j)*bohr2angs,j=1,3),i=1,3)
+            write(iul,'(3f10.3)') ((cov(i,j)*bohr2ang,j=1,3),i=1,3)
          end if
          lwork = size(work)
          ev = cov   
@@ -767,7 +767,7 @@ contains
          write(iul,*) ' after broadcast: mu and m for each MO in list:'
          do ii=1,MOIdxLen
             mo = MOIdxList(ii)
-            write(iul,'(2i5,3f10.3)') ii,mo,mMu(:,ii)*bohr2angs
+            write(iul,'(2i5,3f10.3)') ii,mo,mMu(:,ii)*bohr2ang
          end do
          do ii=1,MOIdxLen
             mo = MOIdxList(ii)

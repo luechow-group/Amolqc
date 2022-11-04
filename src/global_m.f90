@@ -19,6 +19,7 @@ MODULE global_m
   use kinds_m, only: r8
   use globalUtils_m
   use parsing_m
+  use atom_m, only: bohr2ang
 
 ! global constants
 
@@ -40,9 +41,7 @@ MODULE global_m
   integer,parameter :: MAXSUBLINES=50      ! max. # of lines in subroutines in .in script
   integer,parameter :: MAXLEN=120          ! max. line length of .in script lines
   integer,parameter :: MAXSUBS=5           ! max. of subroutine in .in script
-  real(r8),parameter  :: Pi= ACOS(-1._r8)
-  ! NIST 2018 https://physics.nist.gov/cgi-bin/cuu/Value?bohrrada0 :
-  real(r8),parameter  :: bohr2angs = 0.52917721067_r8
+  real(r8),parameter  :: pi= ACOS(-1._r8)
   real(r8),parameter  :: debye=2.541765_r8    ! au -> Debye
   integer, parameter :: MAXSIZE=100        ! array size for saving E and var
   integer, parameter :: WTIMER_ELOC=1, WTIMER_PHI=2, WTIMER_AO=3, WTIMER_MO=4, WTIMER_AOMO=5, &

@@ -42,7 +42,8 @@ module atom_m
       'Es','Fm','Md','No','Lr','Rf','Db','Sg',&
       'Bh','Hs','Mt','Ds','Rg','Cn','Nh','Fl',&
       'Mc','Lv','Ts','Og']
-   real(r8),parameter  :: Bohr2angs = 0.529177249d0
+   ! NIST 2018 https://physics.nist.gov/cgi-bin/cuu/Value?bohrrada0
+   real(r8),parameter  :: bohr2ang = 0.529177210903_r8
 
 
    ! in and output
@@ -69,7 +70,7 @@ module atom_m
              atoms_getNSCenter,atoms_getNCLast,atoms_countElectrons,atoms_checkAtomOrder,atoms_getBox, &
              getPSEIdx,getPSESymbol,atoms_initPositionThresholds,atoms_whatPosition,atoms_whatType, &
              atoms_spaceWarpTransform, atom_getPosition, atom_getDistance, atoms_getPositionMatrix, &
-             atom_getAtomicNumber
+             atom_getAtomicNumber, bohr2ang
 
 contains
 
@@ -125,9 +126,9 @@ contains
                'atom: init inconsistent with configuration')
 
    if (mAngstrom) then
-      self%cx = x / bohr2angs
-      self%cy = y / bohr2angs
-      self%cz = z / bohr2angs
+      self%cx = x / bohr2ang
+      self%cy = y / bohr2ang
+      self%cz = z / bohr2ang
    else
       self%cx = x
       self%cy = y
@@ -398,9 +399,9 @@ contains
    integer :: i
    real(r8)  :: x(size(self)),y(size(self)),z(size(self))
 
-   x = self(:)%cx * bohr2angs
-   y = self(:)%cy * bohr2angs
-   z = self(:)%cz * bohr2angs
+   x = self(:)%cx * bohr2ang
+   y = self(:)%cy * bohr2ang
+   z = self(:)%cz * bohr2ang
 
    if (.not.mWithSA .and. .not.mWithCharge .and. .not.mWithBasis) then
       do i=1,size(self)

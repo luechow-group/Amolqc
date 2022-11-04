@@ -640,7 +640,7 @@ CONTAINS
     write(iu,*) 'amolqc trajectory data: atoms in xyz'
     do i=1,ncenter
        write(iu,'(A2,2X,3G13.6)')    &
-            atoms(i)%elem,atoms(i)%cx*bohr2angs,atoms(i)%cy*bohr2angs,atoms(i)%cz*bohr2angs
+            atoms(i)%elem,atoms(i)%cx*bohr2ang,atoms(i)%cy*bohr2ang,atoms(i)%cz*bohr2ang
     enddo
     write(iu,*) 'walker 1 trajectory for electron='
     write(iu,*) ne

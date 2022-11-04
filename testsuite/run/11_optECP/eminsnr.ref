@@ -20,16 +20,17 @@
   Sebastian Manten, Christian Diedrich, Annika Bande, Tony C. Scott,
   Annett Schwarz, Rene Petz, Raphael Berner, Alexander Sturm,
   Marko Hermsen, Kaveh Haghighi Mood, Christoph Schulte,
-  Leonard Reuter, Michael A. Heuer, Jil Ludovicy
+  Leonard Reuter, Michael A. Heuer, Jil Ludovicy, Vladimir Terzi,
+  Michel V. Heinz
 
 
- version:          v7.0.1-34-g22adf9-dirty
- compiler version: Intel(R) Fortran Intel(R) 64 Compiler for applications running on Intel(R) 64, Version 18.0.3.222 Build 20180410
+ version:          v7.0.1-149-g037d19-dirty
+ compiler version: Intel(R) Fortran Intel(R) 64 Compiler Classic for applications running on Intel(R) 64, Version 2021.7.0 Build 20220726_000000
  compiler options: -fpp -warn none -O3
 
 
- run started on tcrocks.pc.rwth-aachen.de at 2021-08-02T09:56:32.697+02:00 on    1 processor(s)
- using path: /home/terzi/dev/Amolqc
+ run started on  at 2022-11-04T15:18:23.528+01:00 on    1 processor(s)
+ using path: /home/vterzi/Development/Amolqc
  
 ==============================> reading input <=================================
  
@@ -214,8 +215,8 @@ C    0.00000   0.00000   0.62128
 
  qmc: Emean =       -11.11425 var =         0.07591
 
- wall clock time for   qmc :               0.06 s
- cpu time (master) for qmc :               0.06 s
+ wall clock time for   qmc :               0.04 s
+ cpu time (master) for qmc :               0.04 s
 
 
  
@@ -384,8 +385,8 @@ C    0.00000   0.00000   0.62128
 
  sample accumulation: new total sample size is          500
 
- wall clock time for   qmc :               0.59 s
- cpu time (master) for qmc :               0.59 s
+ wall clock time for   qmc :               0.55 s
+ cpu time (master) for qmc :               0.55 s
 
 
  
@@ -417,11 +418,11 @@ C    0.00000   0.00000   0.62128
 
  reading   6 classes of orbital rotations
  initializing orbital rotation parameters with np=          36
- params = jas+mo+ci    method = lm_newton    param mode=  1
+ params = jas+mo+ci    method = snr    param mode=  1
 
    - -  energy minimization using Newton-Raphson: initialization  - -
 
- parameters:  nrmethod =   3   gradient mode =   1
+ parameters:  nrmethod =   3   gradient factor =        0.000
   starting wf parameter optimization with optType=jas+mo+ci
  with Emean=      -11.00338 +/-      0.01886 var=       0.177 size=       497
  Difference to projection: Delta E=      -11.00338 Delta var =       0.177
@@ -436,36 +437,37 @@ C    0.00000   0.00000   0.62128
   6:  nu =        0.102400 Hessian positive definite
 
  gradient with abs mean =   0.4638E-01 and abs max =  0.2291    
- -0.1783E-01 -0.1838E-01 -0.1665E-01 -0.3353E-01 -0.4059E-01 -0.4144E-01 -0.1217E-01 -0.3244E-01 -0.8368E-01 -0.1725E-01
+ -0.1783E-01 -0.1838E-01 -0.1665E-01 -0.3353E-01 -0.4059E-01 -0.4144E-01 -0.1217E-01 -0.3245E-01 -0.8368E-01 -0.1725E-01
  -0.3037E-01  0.8180E-01  0.4115E-01 -0.7047E-01 -0.1733      0.1737E-01  0.3145E-01  0.1317     -0.1355     -0.2291    
  -0.8341E-01 -0.2217E-01  0.2014E-01 -0.2612E-01  0.2316E-02 -0.7183E-01 -0.1115E-01  0.1725     -0.7137E-01 -0.5109E-01
-  0.5473E-02  0.6806E-02  0.7260E-01 -0.4526E-01  0.8730E-02  0.2394E-02  0.3790E-03 -0.1353E-01 -0.1344E-01  0.2824E-02
+  0.5473E-02  0.6807E-02  0.7260E-01 -0.4526E-01  0.8730E-02  0.2394E-02  0.3790E-03 -0.1353E-01 -0.1344E-01  0.2824E-02
   0.2703E-02 -0.6921E-03 -0.2013E-01 -0.6599E-02 -0.8974E-01  0.9704E-01 -0.3483E-01  0.6027E-01 -0.7651E-03
  
-  norm(delta_p)=  0.645895957372708     
-  mean abs(delta_p_i)=  7.127141867344242E-002
-  delta_q = -7.634147190139701E-002
+  norm(delta_p)=  0.645895477491475     
+  mean abs(delta_p_i)=  7.127136719003691E-002
+  delta_q = -7.634142151761264E-002
  
   new parameter vector:
  -0.3123      0.3775     -0.3374     -0.1761      0.5389     -0.8495     -0.6630      0.4579      0.4723E-01 -0.1096E-01
   0.8695E-01  0.2533E-01 -0.3813E-01 -0.2126E-01  0.4746E-01  0.4950E-01  0.7749E-01  0.3728E-01  0.1724      0.9362E-01
  -0.6762E-01  0.6987E-03 -0.4330E-01  0.3118E-02  0.1983      0.4861E-01 -0.7108E-01 -0.3456E-01  0.1849E-01  0.2061    
-  0.3809E-01 -0.7041E-01 -0.2568E-01  0.2582E-01 -0.1413     -0.1046      0.1345     -0.4169E-01  0.8975E-03 -0.1026    
-  0.5968E-01  0.7119E-01 -0.1085E-02 -0.1634      0.8190E-01 -0.9839E-01  0.3039E-01  0.1547E-02 -0.8458E-02
+  0.3808E-01 -0.7041E-01 -0.2568E-01  0.2582E-01 -0.1413     -0.1046      0.1345     -0.4169E-01  0.8976E-03 -0.1026    
+  0.5968E-01  0.7119E-01 -0.1086E-02 -0.1634      0.8190E-01 -0.9839E-01  0.3039E-01  0.1547E-02 -0.8458E-02
 
- projected Emean =      -11.29002 var =         2.32830
+ projected Emean =      -11.29002 var =         2.32829
 
- r =         3.75477   delta_f =        -0.28664  e0 =       -11.00338
+ r =         3.75476   delta_f =        -0.28664  e0 =       -11.00338
  -> decreasing nu to        0.051200
 
  
  ci coefficients are normalized
  
-
- ================>     calling subroutine aeq
-
- =======>      $sample - creating or modifying the walker sample      <=======
-
+ 
+--------------------------> calling subroutineaeq <-----------------------------
+ 
+ 
+============> $sample - creating or modifying the walker sample <===============
+ 
  changing size of sample
  sample size has been reduced by     496 to       1 walkers per node
  
@@ -474,9 +476,9 @@ C    0.00000   0.00000   0.62128
  cpu time (master) for sample :               0.00 s
 
 
-
- =======>      $qmc - running a qmc calculation      <=======
-
+ 
+=====================> $qmc - running a qmc calculation <=======================
+ 
 
              step       size              <E>                   <V>     AR 
  --------------------------------------------------------------------------
@@ -484,15 +486,15 @@ C    0.00000   0.00000   0.62128
             200         1       -10.80925 +/-   0.08709     0.751   0.440
             300         1       -10.58235 +/-   0.08550     0.724   0.420
 
- qmc: Emean =       -10.58235 var =         0.72377
+ qmc: Emean =       -10.58235 var =         0.72376
 
- wall clock time for   qmc :               0.03 s
- cpu time (master) for qmc :               0.03 s
+ wall clock time for   qmc :               0.04 s
+ cpu time (master) for qmc :               0.04 s
 
 
-
- =======>      $qmc - running a qmc calculation      <=======
-
+ 
+=====================> $qmc - running a qmc calculation <=======================
+ 
 
              step       size              <E>                   <V>     AR 
  --------------------------------------------------------------------------
@@ -576,24 +578,24 @@ C    0.00000   0.00000   0.62128
           7        0.0343772      0.0079925
           8        0.0438661      0.0146220
           9        0.0374238      0.0187119
-         10        0.0437227      0.0356994
-         11        0.0063845      0.0090290
+         10        0.0437227      0.0356995
+         11        0.0063846      0.0090291
 
  WARNING: stddev and global N_corr may be unreliable
   (block_len < 20*N_corr)
 
  sample accumulation: new total sample size is          500
 
- wall clock time for   qmc :               0.60 s
- cpu time (master) for qmc :               0.60 s
+ wall clock time for   qmc :               0.70 s
+ cpu time (master) for qmc :               0.70 s
 
 
-
- =======>      $save_results - storing current results      <=======
-
-
- =======>      $sample - creating or modifying the walker sample      <=======
-
+ 
+==================> $save_result - storing current results <====================
+ 
+ 
+============> $sample - creating or modifying the walker sample <===============
+ 
  removing outliers
 
   using trimmed mean (parallel version)
@@ -609,9 +611,9 @@ C    0.00000   0.00000   0.62128
  cpu time (master) for sample :               0.00 s
 
 
-
- =============>    end subroutine aeq
-
+ 
+----------------------------> end subroutine aeq <------------------------------
+ 
  with Emean=      -10.82720 +/-      0.03654 var=       0.665 size=       498
  Difference to projection: Delta E=        0.46282 Delta var =      -1.663
   -> Hessian not positive definite!
@@ -629,18 +631,18 @@ C    0.00000   0.00000   0.62128
   0.2487E-01 -0.1230     -0.9034E-01  0.3470      0.4478E-01 -0.1299E-01 -0.3313E-01 -0.2653E-01  0.3697E-01  0.1041E-01
   0.7045E-03 -0.1124E-01 -0.2057E-01 -0.5756E-03  0.3798     -0.3964      0.1103     -0.4401     -0.1157    
  
-  norm(delta_p)=  0.190853489067893     
-  mean abs(delta_p_i)=  1.788924922220976E-002
-  delta_q = -0.168660353345122     
+  norm(delta_p)=  0.190852999366933     
+  mean abs(delta_p_i)=  1.788919748084506E-002
+  delta_q = -0.168659728246639     
  
   new parameter vector:
- -0.3064      0.3848     -0.3290     -0.1984      0.5273     -0.8531     -0.6773      0.4639     -0.6375E-02 -0.1063E-01
+ -0.3064      0.3848     -0.3290     -0.1984      0.5273     -0.8531     -0.6773      0.4639     -0.6374E-02 -0.1063E-01
   0.1561      0.1409E-01 -0.4263E-01 -0.2772E-01  0.3147E-01  0.2869E-01  0.1127      0.6406E-01  0.1304      0.2850E-01
  -0.8218E-01  0.2523E-02  0.1060E-01  0.1012E-01  0.2373      0.3507E-01 -0.8364E-01 -0.2410E-01  0.1175E-01  0.2075    
-  0.4470E-01 -0.8875E-01 -0.2523E-01  0.8230E-02 -0.1493     -0.1030      0.1408     -0.3262E-01  0.3428E-03 -0.1049    
+  0.4470E-01 -0.8875E-01 -0.2523E-01  0.8230E-02 -0.1493     -0.1030      0.1408     -0.3262E-01  0.3429E-03 -0.1049    
   0.6047E-01  0.7461E-01  0.3541E-02 -0.1673      0.1529E-01 -0.1748E-01  0.8528E-02  0.2500E-01 -0.1179E-01
 
- projected Emean =      -10.99906 var =         1.63433
+ projected Emean =      -10.99906 var =         1.63430
 
  r =         1.01897   delta_f =        -0.17186  e0 =       -10.82720
  -> decreasing nu to        1.638400
@@ -649,8 +651,8 @@ C    0.00000   0.00000   0.62128
  ci coefficients are normalized
  
 
- wall clock time for   optimize_parameters :               1.97 s
- cpu time (master) for optimize_parameters :               1.97 s
+ wall clock time for   optimize_parameters :               2.20 s
+ cpu time (master) for optimize_parameters :               2.18 s
 
 
  
@@ -785,16 +787,16 @@ C    0.00000   0.00000   0.62128
            4300         1       -10.60380 +/-   0.04460     0.197   0.470
            4400         1       -10.97096 +/-   0.03738     0.138   0.490
            4500         1       -10.92792 +/-   0.03461     0.119   0.620
-           4600         1       -10.71893 +/-   0.07771     0.598   0.450
+           4600         1       -10.71893 +/-   0.07770     0.598   0.450
            4700         1       -10.92377 +/-   0.04365     0.189   0.550
            4800         1       -10.91797 +/-   0.03420     0.116   0.510
            4900         1       -11.06930 +/-   0.04709     0.220   0.410
 
 
   FINAL RESULT:
- total energy                 =     -10.95217 +/- 0.01679 E_h
+ total energy                 =     -10.95216 +/- 0.01679 E_h
  kinetic energy               =       7.27165 +/- 0.14627 E_h
- e-n potential energy         =     -37.20967 +/- 0.19103 E_h
+ e-n potential energy         =     -37.20966 +/- 0.19103 E_h
  e-e potential energy         =      12.17183 +/- 0.07096 E_h
  n-n potential energy         =       6.81403 E_h
  variance (of E_loc)          =       0.27275 +/- 0.02176 E_h^2
@@ -812,21 +814,21 @@ C    0.00000   0.00000   0.62128
  log2(blen)   error estimate   errors error
           0        0.0073634      0.0001474
           1        0.0093176      0.0002639
-          2        0.0112824      0.0004520
+          2        0.0112823      0.0004520
           3        0.0134214      0.0007611
           4        0.0151640      0.0012180
-          5        0.0156437      0.0017828
+          5        0.0156436      0.0017828
           6        0.0168789      0.0027381
           7        0.0175486      0.0040800
           8        0.0192328      0.0064109
           9        0.0193756      0.0096878
          10        0.0121353      0.0099085
-         11        0.0143666      0.0203174
+         11        0.0143666      0.0203175
 
  sample accumulation: new total sample size is          500
 
- wall clock time for   qmc :               0.60 s
- cpu time (master) for qmc :               0.60 s
+ wall clock time for   qmc :               0.56 s
+ cpu time (master) for qmc :               0.56 s
 
 
  
@@ -841,16 +843,16 @@ table of results:
     i         energy          error       variance       varError  
 -------------------------------------------------------------------
     1      -10.85862        0.03490         0.7836         0.0689
-    2      -10.95217        0.01679         0.2728         0.0218
+    2      -10.95216        0.01679         0.2727         0.0218
 -------------------------------------------------------------------
 
 
 
- wall clock time for run         :   0d 00:00:03.370
+ wall clock time for run         :   0d 00:00:03.428
  total cpu time for run (core-h) :            0.0009
  cpu time per mpi process (h)    :            0.0009
 
-Amolqc run finished on 2021-08-02T09:56:36.068+02
+Amolqc run finished on 2022-11-04T15:18:26.958+01
 
 Bye!
 

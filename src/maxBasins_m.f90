@@ -104,7 +104,7 @@ contains
 
       tolSim = 1.d-1
       call getdbla(lines,nl,'tol_sim=',tolSim,iflag)      ! similar structure if max distance is smaller
-      tolSim = tolSim / bohr2angs
+      tolSim = tolSim / bohr2ang
 
       call getstra(lines,nl,'ref_file=',reffile,iflag1)
       call getstra(lines,nl,'excl_file=',exclfile,iflag2)
