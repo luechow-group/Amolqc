@@ -1,5 +1,3 @@
-image: registry.git.rwth-aachen.de/luechow-group/amolqc:combined
-
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
@@ -10,7 +8,52 @@ stages:
 before_script:
   - export AMOLQC=/builds/luechow-group/Amolqc
 
+
+GNU serial build:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
+  stage: build
+  script:
+    - ./configure.sh serial_gnu.cmake
+    - mkdir -p cmake-build-gnu-serial
+    - cd cmake-build-gnu-serial
+    - cmake ..
+    - make -j4
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-gnu-serial"
+    paths:
+      - cmake-build-gnu-serial/
+    policy: pull-push
+
+GNU serial std08 build:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
+  stage: build
+  script:
+    - mkdir -p cmake-build-gnu-std08-serial
+    - cd cmake-build-gnu-std08-serial
+    - cmake -DCONFIG_FILE=OFF -DCMAKE_Fortran_COMPILER=gfortran -DMPI=OFF -DADDITIONAL_FLAGS="-std=f2008" ..
+    - make -j4
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-gnu-std08-serial"
+    paths:
+      - cmake-build-gnu-std08-serial/
+    policy: pull-push
+
+GNU serial test:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
+  stage: test
+  dependencies:
+    - GNU serial build
+  script:
+    - cd cmake-build-gnu-serial
+    - ctest -E StatisticsTests --output-on-failure -j4
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-gnu-serial"
+    paths:
+      - cmake-build-gnu-serial/
+    policy: pull
+
 GNU parallel build:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
   stage: build
   script:
   - ./configure.sh openmpi_lapack.cmake
@@ -25,7 +68,22 @@ GNU parallel build:
     - cmake-build-gnu-parallel/
     policy: pull-push
 
+GNU parallel std08 build:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
+  stage: build
+  script:
+    - mkdir -p cmake-build-gnu-std08-parallel
+    - cd cmake-build-gnu-std08-parallel
+    - cmake -DCONFIG_FILE=OFF -DCMAKE_Fortran_COMPILER=mpifort -DMPI=ON -DADDITIONAL_FLAGS="-std=f2008" ..
+    - make -j4
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-gnu-std08-parallel"
+    paths:
+      - cmake-build-gnu-std08-parallel/
+    policy: pull-push
+
 GNU parallel test:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
   stage: test
   dependencies:
   - GNU parallel build
@@ -38,35 +96,8 @@ GNU parallel test:
     - cmake-build-gnu-parallel/
     policy: pull
 
-
-GNU serial build:
-  stage: build
-  script:
-  - ./configure.sh serial_gnu.cmake
-  - mkdir -p cmake-build-gnu-serial
-  - cd cmake-build-gnu-serial
-  - cmake ..
-  - make -j4
-  cache:
-    key: "$CI_COMMIT_REF_SLUG-gnu-serial"
-    paths:
-    - cmake-build-gnu-serial/
-    policy: pull-push
-
-GNU serial test:
-  stage: test
-  dependencies:
-  - GNU serial build
-  script:
-  - cd cmake-build-gnu-serial
-  - ctest -E StatisticsTests --output-on-failure -j4
-  cache:
-    key: "$CI_COMMIT_REF_SLUG-gnu-serial"
-    paths:
-    - cmake-build-gnu-serial/
-    policy: pull
-
 Intel serial build:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.0
   stage: build
   script:
   - source /opt/intel/parallel_studio_xe_2019/psxevars.sh intel64
@@ -82,6 +113,7 @@ Intel serial build:
     policy: pull-push
 
 Intel serial test:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.0
   stage: test
   dependencies:
   - Intel serial build
@@ -94,29 +126,3 @@ Intel serial test:
     paths:
     - cmake-build-intel-serial/
     policy: pull
-
-GNU serial std08 build:
-  stage: build
-  script:
-    - mkdir -p cmake-build-gnu-std08-serial
-    - cd cmake-build-gnu-std08-serial
-    - cmake -DCONFIG_FILE=OFF -DCMAKE_Fortran_COMPILER=gfortran -DMPI=OFF -DADDITIONAL_FLAGS="-std=f2008" ..
-    - make -j4
-  cache:
-    key: "$CI_COMMIT_REF_SLUG-gnu-std08-serial"
-    paths:
-      - cmake-build-gnu-std08-serial/
-    policy: pull-push
-
-GNU parallel std08 build:
-  stage: build
-  script:
-    - mkdir -p cmake-build-gnu-std08-parallel
-    - cd cmake-build-gnu-std08-parallel
-    - cmake -DCONFIG_FILE=OFF -DCMAKE_Fortran_COMPILER=mpifort -DMPI=ON -DADDITIONAL_FLAGS="-std=f2008" ..
-    - make -j4
-  cache:
-    key: "$CI_COMMIT_REF_SLUG-gnu-std08-parallel"
-    paths:
-      - cmake-build-gnu-std08-parallel/
-    policy: pull-push
