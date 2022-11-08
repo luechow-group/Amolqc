@@ -61,8 +61,8 @@ add_fortran_library(src STATIC
         qmcSample_m.f90
         propagator_m.f90
         randomWalker_m.f90
-        rWSample_m.f90
-        rWStatistics_m.f90
+        rwSample_m.f90
+        rwStatistics_m.f90
         reconf_m.f90
         properties_m.f90
         initialPositions_m.f90

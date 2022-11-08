@@ -95,37 +95,28 @@ Intel serial test:
     - cmake-build-intel-serial/
     policy: pull
 
-GNU make serial build:
+GNU serial std08 build:
   stage: build
   script:
-  - export MATHLIBS=/usr/lib/x86_64-linux-gnu
-  - mkdir -p make-build-gnu-serial
-  - cp -r src make-build-gnu-serial
-  - cp -r utils make-build-gnu-serial
-  - cp -r bib make-build-gnu-serial
-  - cp -r make make-build-gnu-serial
-  - cp -r testsuite make-build-gnu-serial
-  - cp Makefile make-build-gnu-serial
-  - cp configure.sh make-build-gnu-serial
-  - cd make-build-gnu-serial
-  - ./configure.sh serial_gnu.mk
-  - make -j4
+    - mkdir -p cmake-build-gnu-std08-serial
+    - cd cmake-build-gnu-std08-serial
+    - cmake -DCONFIG_FILE=OFF -DCMAKE_Fortran_COMPILER=gfortran -DMPI=OFF -DADDITIONAL_FLAGS="-std=f2008" ..
+    - make -j4
   cache:
-    key: "$CI_COMMIT_REF_SLUG-gnu-serial-make"
+    key: "$CI_COMMIT_REF_SLUG-gnu-std08-serial"
     paths:
-    - make-build-gnu-serial/
+      - cmake-build-gnu-std08-serial/
     policy: pull-push
 
-GNU make serial test:
-  stage: test
-  dependencies:
-  - GNU make serial build
+GNU parallel std08 build:
+  stage: build
   script:
-  - export MATHLIBS=/usr/lib/x86_64-linux-gnu
-  - cd make-build-gnu-serial
-  - make tests
+    - mkdir -p cmake-build-gnu-std08-parallel
+    - cd cmake-build-gnu-std08-parallel
+    - cmake -DCONFIG_FILE=OFF -DCMAKE_Fortran_COMPILER=mpifort -DMPI=ON -DADDITIONAL_FLAGS="-std=f2008" ..
+    - make -j4
   cache:
-    key: "$CI_COMMIT_REF_SLUG-gnu-serial-make"
+    key: "$CI_COMMIT_REF_SLUG-gnu-std08-parallel"
     paths:
-    - make-build-gnu-serial/
-    policy: pull
+      - cmake-build-gnu-std08-parallel/
+    policy: pull-push

@@ -5,7 +5,7 @@
 module optimizeParams_m
 
    use global_m
-   use rWSample_m
+   use rwSample_m
    use elocAndPsiTermsLM_m
    use optParamsVarmin_m
    use optParamsVNL2SOL_m
@@ -41,7 +41,7 @@ contains
    character(len=9)      :: optType      ! 'jastrow'|'ci'
    character(len=20)     :: optMethod    ! 'varmin1' ...
    integer               :: optMode      ! code for different parameter sets for same optType
-   integer iter,oldlogmode,newlogmode,thislogmode,iflag
+   integer oldlogmode,thislogmode,iflag
    logical energyMin, varMin
 
    converged = .true.

@@ -11,7 +11,7 @@ module optParamsVarmin_m
    use kinds_m, only: r8
    use global_m
    use subloop_m, only: subloop
-   use rWSample_m
+   use rwSample_m
    use elocAndPsiTermsLM_m
    use wfParameters_m
    use parsing_m
@@ -45,7 +45,7 @@ contains
    real(r8), allocatable                  :: g(:),b(:),H(:,:),H0(:,:),Imat(:,:)  ! gradient and Hessian
    real(r8) emean, var, eOld, varOld, lambda,varRef,varRefOld,optERef,optLMlambda
    real(r8)                               :: eRef
-   integer lwork,iter,i,j,info,eqIter,eqStep,lmIter,optIter,NRMode
+   integer lwork,iter,i,info,eqIter,eqStep,lmIter,optIter,NRMode
    logical eRefPresent, fixed
    integer, allocatable                 :: ipiv(:)
    real(r8), allocatable                  :: work(:)
@@ -262,7 +262,6 @@ contains
       subroutine internal_readInput()
       !-----------------------------!
       integer iflag
-      logical                       :: found
       character(len=3)              :: s
       character(len=40) optMethod
 

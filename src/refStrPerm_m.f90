@@ -142,9 +142,8 @@ contains
       integer, intent(in)                   :: iu     ! unit to write to
       character(len=*), intent(in)          :: str    ! output string "Ref" or "Max"
       type(reference), pointer              :: rp
-      type(refl_vlist)                      :: rl
       type(refl_vlist), pointer             :: p
-      integer i,j,io,totalCount
+      integer i,j,totalCount
       real(r8) f
       integer, parameter :: MAXSHOW = 15
 

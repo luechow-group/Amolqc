@@ -12,6 +12,7 @@
 ! - use of iso_fortran_env
 ! - commented out all write statements with !wr
 ! - replaced r(1) with r(*)
+! - replaced character*XXX with character(len=XXX)
 
 subroutine assess ( d, iv, p, step, stlstg, v, x, x0 )
 use kinds_m, only: r8
@@ -2354,7 +2355,7 @@ use kinds_m, only: r8
   integer iv1
   integer j
   integer m
-  character*7 model(6)
+  character(len=7) model(6)
   integer :: needhd = 39
   integer nf
   integer :: nfcall = 6
@@ -5553,10 +5554,10 @@ use kinds_m, only: r8
   real(r8) v(*)
   real(r8) vk
   real(r8) vm(27)
-  character*8 vn(27)
+  character(len=8) vn(27)
   real(r8) vx(27)
 
-     character*4 cngd(3), dflt(3), which(3)
+     character(len=4) cngd(3), dflt(3), which(3)
 !
 ! iv and v subscripts
 !

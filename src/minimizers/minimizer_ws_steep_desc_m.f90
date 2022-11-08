@@ -66,7 +66,7 @@ contains
       real(r8)                     :: g(size(x)), g_new(size(x)), x_new(size(x))
       real(r8)                     :: delta_x(size(x))
       real(r8)                     :: gmax, dt
-      integer                    :: iter, verbose, iul, i, ls_iter, n_eval
+      integer                    :: iter, verbose, iul, ls_iter, n_eval
       type(singularity_particles):: sp
       logical                    :: is_corrected
 

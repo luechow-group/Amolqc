@@ -8,7 +8,7 @@ module maximizeSample_m
    use parsing_m, only: getinta, getloga
    use global_m
    use mpiInterface_m, only: myMPIReduceSumInteger
-   use rWSample_m, only: rWSample, getSampleSize, getFirst, isNext, getNext, getWalker
+   use rwSample_m, only: rWSample, getSampleSize, getFirst, isNext, getNext, getWalker
    use psiMax_m, only: psimax
    use randomWalker_m, only: RandomWalker
 

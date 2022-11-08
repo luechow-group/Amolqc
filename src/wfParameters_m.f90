@@ -225,7 +225,7 @@ contains
    type(WFParamDef), intent(in) :: this
    real(r8)                     :: cicoeffs_get(this%nParams+1)
    real(r8)                     :: p(this%nParams+1)
-   if (this%optType .ne. 'ci') call abortp('cicoeffs_get: this function is only for pure ci optimization')
+   if (this%optType /= 'ci') call abortp('cicoeffs_get: this function is only for pure ci optimization')
    if (this%optMode==3) call abortp('cicoeffs_get: this function can not be used for optmod=2 ')
    call getCIParamsVector(3,p)
    cicoeffs_get = p
@@ -239,7 +239,7 @@ contains
       character(len=120), intent(in) :: lines(nl)
       character(len=40)              :: token(MAXL)
       real(r8),allocatable             :: p(:)
-      integer optMode,iflag,np,io,i,ii,ntokens
+      integer optMode,iflag,np,i,ii,ntokens
       real(r8) pp
       character(len=9)      :: optType      ! 'jastrow'|'ci'
       type(WFParamDef)        :: WFP

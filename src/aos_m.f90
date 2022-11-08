@@ -636,7 +636,7 @@ contains
                 gaussFOrder = .false.
             end if
 
-            if (ie .eq. 0) then                     ! AO's for all electrons
+            if (ie == 0) then                     ! AO's for all electrons
                 i1 = 1
                 i2 = ne
             else
@@ -1059,7 +1059,7 @@ contains
 
                         else     !more then 1 GTO in contraction, splines used !
                             r2 = rr * rr
-                            j = (csplnpnt - 1) * rr / (csalpha + rr) + 1
+                            j = INT((csplnpnt - 1) * rr / (csalpha + rr) + 1)
                             df = rr - csplx(j)
 
                             !           // only primitive cartesian gaussians: 1s,2p,3d,4f
@@ -1672,7 +1672,7 @@ contains
             gaussFOrder = .false.
         end if
 
-        if (ie .eq. 0) then                     ! AO's for all electrons
+        if (ie == 0) then                     ! AO's for all electrons
             i1 = 1
             i2 = ne
         else
@@ -2061,7 +2061,7 @@ contains
             gaussFOrder = .false.
         end if
 
-        if (ie .eq. 0) then                     ! AO's for all electrons
+        if (ie == 0) then                     ! AO's for all electrons
             i1 = 1
             i2 = ne
         else
@@ -2225,7 +2225,7 @@ contains
 
                     else     !more then 1 GTO in contraction, splines used !
                         r2 = rr * rr
-                        j = (csplnpnt - 1) * rr / (csalpha + rr) + 1
+                        j = INT((csplnpnt - 1) * rr / (csalpha + rr) + 1)
                         df = rr - csplx(j)
 
                         !           // only primitive cartesian gaussians: 1s,2p,3d,4f

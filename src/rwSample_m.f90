@@ -6,7 +6,7 @@
 !
 ! SPDX-License-Identifier: GPL-3.0-or-later
 
-MODULE rWSample_m
+MODULE rwSample_m
 
   use kinds_m, only: r8
   use global_m
@@ -308,7 +308,6 @@ CONTAINS
   !---------------------------------------------------!
     type(RWSample), intent(in)      :: s
     real(r8)                          :: getMeanWeight
-       real(r8)                       :: var,stdDev
 
     integer                         :: i
     type(SimpleStat)                :: stat
@@ -437,7 +436,7 @@ CONTAINS
     type(IntList)                   :: leftList,rightList
     type(IntNode), pointer          :: p
     real(r8)                          :: leftProb,rightProb,sigma
-    integer                         :: i,j,k,it,maxData,idx,keepLeft,keepRight,removeLeft,removeRight,start
+    integer                         :: i,j,k,it,maxData,keepLeft,keepRight,removeLeft,removeRight
     type(IndexedHistogram)          :: stat
 
     maxData = s%sampleSize
@@ -547,12 +546,12 @@ CONTAINS
      integer            :: idlemax   ! the highest "active" tid may be "idle"
      integer            :: tag1, nmax, nmax0, count, nSize
 #ifdef MPI
-     integer            :: ierr
+     integer            :: ierr,maxsize,sizes(maxMPINodes)
      type(MPI_STATUS)   :: status
 #endif
      real               :: starttime, endtime
      real(r8), pointer    :: vec(:),vecrecv(:),vecjoin(:)
-     integer            :: thissize(1),sizes(maxMPINodes),maxsize
+     integer            :: thissize(1)
 
      call assert(s%sampleSize * nproc >= 10,"remove_outliers with trimmed mean requires at least 10 walkers")
 
@@ -1133,7 +1132,7 @@ CONTAINS
     ! receive n walkers from 'node' and append to sample
     type(RWSample), intent(inout)      :: s
     integer, intent(in)                :: n, node
-    integer i,idx
+    integer i
     type(RandomWalker), pointer            :: newRW
 
     allocate(newRW)
@@ -1157,7 +1156,7 @@ CONTAINS
       integer, intent(in)           :: i
       type(RWSample),intent(inout)  :: s
 !     internal parameters:
-      integer             :: n,f
+      integer             :: n
 
       call assert(i<= nDWGen(),"(SaveFathers): invalid index i")
 
@@ -1179,7 +1178,7 @@ CONTAINS
 !     in/output parameter:
       real(r8), intent(inout) :: wsons(:)   ! w.sum of sons
 
-      integer :: n,f
+      integer :: n
 
       call assert(i<= nDWGen(),"(SaveFathers): invalid index i")
 
@@ -1199,7 +1198,7 @@ CONTAINS
     integer                            :: senders(2*nproc)
     integer                            :: receivers(2*nproc)
     integer                            :: idx(nproc)
-    integer i,ierr,sender(2),receiver(2),n,targetSize,sdr,rcv
+    integer i,ierr,sender(2),receiver(2),targetSize,sdr,rcv
     integer walkers,walkersToSend,walkersToReceive,walkersMax
     real(r8)                             :: sizeMean,sizeStdDev
     type(simpleStat)                   :: sizeStat
@@ -1320,9 +1319,9 @@ CONTAINS
      integer, intent(in)             :: iu
      integer, intent(out)            :: tsize
      real(r8)                          :: x(nElecs()),y(nElecs()),z(nElecs()),xall(3*nElecs())
-     integer i,n,tag1,tag2,proc,count,ssize
+     integer i,n,tag1,tag2,ssize
 #ifdef MPI
-     integer                         :: ierr
+     integer                         :: ierr,count,proc
      type(MPI_STATUS)                :: status
 #endif
      n = nElecs()
@@ -1388,9 +1387,9 @@ CONTAINS
      integer, intent(inout)          :: nsize  ! total size per node to be read from open file, default=0: all positions
                                                ! on output: initial size on node
      real(r8)                          :: x(nElecs()),y(nElecs()),z(nElecs()),xall(3*nElecs())
-     integer i,n,nn,tag1,tag2,proc,cnt,count,addsize,ssize,tsize
+     integer i,n,nn,tag1,tag2,cnt,addsize,ssize,tsize
 #ifdef MPI
-     integer                         :: ierr
+     integer                         :: ierr,count,proc
      type(MPI_STATUS)                :: status
 #endif
 
@@ -1522,9 +1521,12 @@ CONTAINS
     real(r8), allocatable          :: x(:), y(:), z(:), xn(:), yn(:), zn(:), dv(:)
     real(r8) thresh, d
     character(len=80)              :: posfilename
-    integer io, ssize, nssize, iflag, max_size, count, all_count, n, i, j, verbose, ierr, s_allsize, i_max
+    integer io, ssize, nssize, iflag, max_size, count, all_count, n, i, j, verbose, s_allsize, i_max
     character(len=80)              :: method
     integer, parameter :: iu=19
+#ifdef MPI
+    integer ierr
+#endif
 
     call getstra(lines, nl, "file=", posfilename, iflag)
     if (iflag /= 0) call abortp("compareSampleCommand: posfile name not set")
@@ -1645,12 +1647,12 @@ CONTAINS
      enddo
   end subroutine unWeight
 
-end MODULE rWSample_m
+end MODULE rwSample_m
 
 !-----------------------!
 subroutine testBalance(s)
 !-----------------------!
-  use rWSample_m
+  use rwSample_m
   implicit none
   type(RWSample), intent(inout)   :: s
   real(r8)  E,EAll,stdDev,stdDevAll,var,varAll

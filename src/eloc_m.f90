@@ -118,15 +118,17 @@ CONTAINS
         real(r8), intent(in), optional :: tau      ! time step for T moves
         logical, intent(inout), optional :: isMoved(:) ! T move accepted? for each EConfig
 
-        integer i, ii, a, itmp, nd, idx, iull, n, ierr, nElecConfigs
-        real(r8) ekin, tmp, vpot
-        real(r8) wtimer_i(8), wtimer_f(8), wtimerPhi(4)
+        integer i, ii, iull, n, ierr, nElecConfigs
+        real(r8) ekin
+        real(r8) wtimerPhi(4)
+#ifdef WTIMER
+        real(r8) wtimer_i(8), wtimer_f(8)
+#endif
         !     ! automatic arrays for actual electron number!
         real(r8) x(ne), y(ne), z(ne)
         real(r8) rai(ncenter, ne), rij(ne, ne)
         real(r8) rrai(ncenter, ne, eConfigArray_size(ec))    ! rai for all elec configs
         real(r8) rrij(ne, ne, eConfigArray_size(ec))         ! rij for all elec configs
-        real(r8) u, ugrad(3 * ne), ulapl, ulapli(ne)
         real(r8) uu(eConfigArray_size(ec))
         real(r8) uugrad(3 * ne, eConfigArray_size(ec))
         real(r8) uulapl(eConfigArray_size(ec))
@@ -757,7 +759,9 @@ CONTAINS
                 fgrad(3 * ne, eConfigArray_size(ec)), &
                 flapl(eConfigArray_size(ec)), &
                 flapli(ne, eConfigArray_size(ec))
+#ifdef WTIMER
         real(r8) wtimer1, wtimer2, wtimer3, wtimer4
+#endif
 
         wtimerPhi = 0._r8
         error_code = ELOC_NONE
@@ -976,7 +980,7 @@ CONTAINS
         type(TMoveDataType), intent(inout), optional :: TMoveData ! triggers T move calculation
 
         real(r8) :: x(size(rrij, 1)), y(size(rrij, 1)), z(size(rrij, 1))
-        integer :: n, np, npJ, npJ1, npJ2, npJnl, npCI, npMO, i
+        integer :: np, npJ, npJ1, npJ2, npJnl, npCI, npMO, i
         type(RdataUpdate) :: Rdu
 
         !        !

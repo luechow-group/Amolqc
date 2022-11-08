@@ -58,13 +58,12 @@ contains
       real(r8), optional, intent(in)                 :: sameThreshold
       character(len=40), optional, intent(in)      :: exclFile
       real(r8) x(ne),y(ne),z(ne),xx(ne,3)
-      integer l,i,j,k,n,nWords,io,nlen
+      integer l,i,j,n,nWords,io,nlen
       character(len=120) line
       character(len=20) words(12)
       character(len=1) emode
       character(len=4) suffix
       type(reference) :: r,r0
-      logical found
       real(r8) nucThresh,coreThresh,bondDiff
       integer, parameter :: iu = 12
 
@@ -125,7 +124,7 @@ contains
    contains
 
       subroutine read_refFile()
-         integer ref,ref2,nref,count,nomax,noel,io,outIdx,tCount,elemLength,idx
+         integer ref,ref2,count,nomax,noel,io,outIdx,tCount,elemLength,idx
          real(r8) wgt,f,meanDist,maxDist
          type(reference), pointer                 :: rp
          type(refl_vlist), pointer                :: p
@@ -268,7 +267,7 @@ contains
 
    subroutine refcd_destroy(this)
       class(refContainerDom), intent(inout) :: this
-      integer l,i
+      integer l
       do l=1,this%getSize()
          call this%ctrPos(l)%destroy()
       end do
@@ -296,14 +295,10 @@ contains
    subroutine refcd_insert(this,r)
       class(refContainerDom), intent(inout) :: this
       type(reference), intent(in)              :: r
-      type(reference)                          :: r1
       type(reference), pointer                 :: rp
-      type(refl_vlist)                         :: rl
       type(refl_vlist), pointer                :: p
-      real(r8)                                   :: x(ne,3),xx(3),rr(3)
-      real(r8)                                   :: f,f0,wgt,dist,d,thr,maxdist,meandist,smallestDist
-      logical foundSpin, inserted
-      integer i,j,k,ns,smallestIdx,cnt,io
+      real(r8)                                   :: maxdist,meandist,smallestDist
+      integer i,smallestIdx
 
       ! refDomain insert is not really inserting the reference
       ! Only the closest of the stored references is identified, the index and
@@ -441,12 +436,9 @@ contains
       character(len=*), intent(in)          :: fname  ! file to write to (without .ref!!!)
       character(len=*), intent(in)          :: str    ! output string "Ref" or "Max"
       type(reference), pointer              :: rp
-      type(refl_vlist)                      :: rl
       type(refl_vlist), pointer             :: p
       integer                               :: naNuc, nbNuc    ! alpha, beta elecs at nucleus (not varied)
-      integer i,n,m,io,totalcnt
-      integer, allocatable                  :: idx(:)
-      real(r8) xx(ne,3),sg(ne,3)
+      integer i,n,io
       integer, parameter :: iu2 = 13
       real(r8), parameter  :: thresh = 0.002d0
 

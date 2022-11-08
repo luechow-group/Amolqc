@@ -52,7 +52,7 @@ contains
       real(r8)                     :: x_old(size(x)), force_old(size(x)), velocity_old(size(x))
       real(r8)                     :: force0(size(x)), g_old(size(x))
       real(r8)                     :: alpha, tau, mass, gmax, vel, proj
-      integer                    :: iter, verbose, iul, latency, i, ls_iter
+      integer                    :: iter, verbose, iul, latency, ls_iter
       type(singularity_particles):: sp, sp_old
       logical is_corrected
 

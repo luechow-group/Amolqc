@@ -182,7 +182,7 @@ contains
       type(refl_vlist)                         :: rl
       type(refl_vlist), pointer                :: p
       real(r8)                                   :: x(ne,3),xx(3),rr(3)
-      real(r8)                                   :: f,f0,wgt,dist,d,thr,maxdist
+      real(r8)                                   :: f,wgt,dist,d,maxdist
       logical found, sfound
       integer i,j,k,ns
       integer, pointer :: irev(:)
@@ -309,15 +309,10 @@ contains
       class(refContainerPos)                :: this
       character(len=*), intent(in)          :: fname  ! file to write to
       character(len=*), intent(in)          :: str    ! output string "Ref" or "Max"
-      type(reference), pointer              :: rp
-      type(refl_vlist)                      :: rl
-      type(refl_vlist), pointer             :: p
-      integer                               :: naNuc, nbNuc    ! alpha, beta elecs at nucleus (not varied)
-      integer                               :: aNucElec(getNNuc()), bNucElec(getNNuc()) ! nuc a -> elec i (at nuc)
-      integer n,i,j,io
+      integer n,i,io
       integer(i8) cnt
       integer, parameter            :: iu = 13
-      real(r8) f,thresh
+      real(r8) thresh
       real(r8) :: mean(ne,3), stddev(ne,3)
 
       !! careful: usually only from from MASTER

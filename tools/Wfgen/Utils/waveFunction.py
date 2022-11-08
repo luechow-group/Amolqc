@@ -201,7 +201,7 @@ class WaveFunction:
         if self.bohr:
             print('Warning: atom positions are already in Bohr, convert_to_bohr does nothing')
         else:
-            bohr2ang = 0.52917721067  # 0.529177210903
+            bohr2ang = 0.529177210903
             for i in range(len(self.atoms)):
                 for j in range(3):
                     self.atoms[i].position[j] /= bohr2ang

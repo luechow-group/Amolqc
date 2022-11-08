@@ -14,9 +14,6 @@ MODULE qmc_m
 
   use, intrinsic :: ieee_arithmetic, only: ieee_quiet_nan, ieee_value, ieee_is_normal
   use kinds_m, only: r8, i8
-#ifdef NAG
-  use, intrinsic :: f90_unix_io, only: flush
-#endif
   use OMP_LIB
   use global_m
   use wfData_m, only: do_epart, vpot0
@@ -24,9 +21,9 @@ MODULE qmc_m
   use statistics
   use newStatistics_m, only: stat,vectorstat
   use randomWalker_m
-  use rWSample_m
+  use rwSample_m
   use propagator_m
-  use rWStatistics_m
+  use rwStatistics_m
   use parsing_m
   use utils_m, only: getTimeString
   use elocData_m, only: setElocCutoff, getElocCutoff, eloc_initialize, &
@@ -93,8 +90,8 @@ MODULE qmc_m
   logical     :: mLoadBalance = .false.       ! balance sample sizes in parallel runs
   logical     :: mAdaptTau = .false.          ! adapt tau at beginning of run to some AR
   logical     :: mAutoCorrelation = .false.   ! calc autocorrelation of E_L data (only VMC)
-  character*1 :: mStatType='c'
-  character*3 :: mMethod='VMC'        ! QMC method
+  character(len=1) :: mStatType='c'
+  character(len=3) :: mMethod='VMC'        ! QMC method
 
   !Future Walking
   logical    :: mFuture = .false.            ! switch for Future-Walking
@@ -149,9 +146,9 @@ contains
     character(len=12)          :: s1
     logical                    :: found,found1,found2
     real(r8) tau,ds,cf
-    integer wgt,bgte,move,tauFlag,iflag1,vb,blockdiscard
+    integer bgte,move,tauFlag,iflag1,vb,blockdiscard
     integer(i8) accSize
-    logical join,kill,split,ar,rc,eLocalCutOff,changed
+    logical ar,rc,eLocalCutOff
     integer :: int_rcv(nproc), ierr
 
 
@@ -432,7 +429,7 @@ contains
     if (found) mShowDetails = 1
 
     call propagator_reset()
-    blockdiscard = mStepsDiscard / mBlockLen
+    blockdiscard = INT(mStepsDiscard / mBlockLen)
     call propagator_init(mWeight,move,tmove,blockdiscard,bgte,tau,ds,ar,rc,mt,mWalkerBlock)
 
     !Max Analysis - Check for consistent sample size on each core
@@ -533,18 +530,20 @@ contains
     type(psimax), intent(inout), optional :: psimax_obj
     type(rhoMax_t), intent(inout), optional :: rhoMax
 
-    integer                     :: block,ps,bs,i,j,k,idx,tauFoundStep
-    integer(i8)                   :: n,st,w
+    integer                     :: block,bs,i,j,k,idx
+    integer(i8)                   :: n,st,tauFoundStep
     real(r8)                      :: elocCounter,ERef,varAllNodes
     real(r8)                      :: EMeanAllNodes,sampleSizeAllNodes,eTotal,vTotal
-    real(r8)                      :: ElocalStat,E,var,stddev,stdDevAllNodes
+    real(r8)                      :: E,var,stddev,stdDevAllNodes
     real(r8)                      :: EMeanlocal
     real(r8)                      :: VenMeanAllNodes, VeeMeanAllNodes, TMeanAllNodes
-    real(r8)                      :: sampleWeightAllNodes,sampleWeight
-    real(r8)                      :: Samplesize, EL,EECPL,EECPNL
+    real(r8)                      :: sampleWeightAllNodes
+    real(r8)                      :: EL,EECPL,EECPNL
     real(r8)                      :: tcorr,ACvar,ACNcorr
     real(r8)                      :: accepted ! 0.0 for (all) rejected, 1.0 for (all) accepted
+#ifdef WTIMER
     real(r8)                      :: wtimer1,wtimer2,ewtime,twtime
+#endif
     real(r8), allocatable         :: Estep(:),AC(:,:),ACRingBuffer(:,:),ACresult(:)  ! autocorrelation date
     logical                     :: first,ACavail,tauFound
     type(RandomWalker), pointer :: rwp
@@ -562,12 +561,9 @@ contains
     type(simpleStat) :: blockStatlocal    ! for local (Procs) BlockStat
     type(stat)       :: autocorrEStat
     type(vectorstat) :: autocorrStat
-    logical          :: converged
-    logical          :: t, cutoff
     type(RWSample) :: history ! used to accumulate samples
-    integer :: histSize, tmove
+    integer :: histSize
     integer(i8) :: dataAllNodes,tStep
-    character(len=17)  :: s
 
     type(DecorrelationData_t), target :: decorrDtot, decorrD
     type(Decorrelation_t) :: decorr
@@ -779,7 +775,7 @@ contains
              end if
           end if
 
-          block = st/mBlockLen
+          block = INT(st/mBlockLen)
           call propagator_endOfBlock(block)  ! allow propagator to do stuff at end of block
 
           if (mWalkerStatistics) then
@@ -1033,8 +1029,7 @@ contains
 
       ! pre-allocate the new history to avoid expensive reallocation in the
       ! qmc loop
-      histSize = getSampleSize(history) + &
-        (mSteps / mStepStride) * mAccumulateSampleSize
+      histSize = getSampleSize(history) + INT(mSteps / mStepStride) * mAccumulateSampleSize
       call reallocateSample(history, histSize)
     end subroutine internal_accumulateInit
 
@@ -1099,16 +1094,16 @@ contains
          do i=1,idx
             AC(0,i) = Estep(i)*Estep(i)
             do k=1,mAutoCorrMax
-               j = mod(tStep-k-1,mAutoCorrMax) + 1
+               j = INT(mod(tStep-k-1,INT(mAutoCorrMax, i8)) + 1)
                AC(k,i) = ACRingBuffer(j,i)*Estep(i)
             end do
-            j = mod(tStep-1,mAutoCorrMax) + 1
+            j = INT(mod(tStep-1,INT(mAutoCorrMax, i8)) + 1)
             ACRingBuffer(j,i) = Estep(i)
             call autocorrStat%add(AC(:,i))
             call autocorrEStat%add(Estep(i))
          end do
        else ! fill ring buffer
-         j = mod(tStep-1,mAutoCorrMax) + 1
+         j = INT(mod(tStep-1,INT(mAutoCorrMax, i8)) + 1)
          do i=1,idx
             ACRingBuffer(j,i) = Estep(i)
          end do
@@ -1206,7 +1201,7 @@ contains
     if (mSplit) then
 
        sampleSize = getSampleSize(sample)
-       maxSize    = SAMPLE_SIZE_FACTOR*getMaxSampleSize(sample)
+       maxSize    = INT(SAMPLE_SIZE_FACTOR*getMaxSampleSize(sample))
        rwp => getFirst(sample)
        ps = 0
        do
@@ -1242,7 +1237,7 @@ contains
   ! reconfiguration of sample
 
   type(RWSample), intent(inout) :: sample
-  type(RandomWalker), pointer :: rwp,rwpJoin
+  type(RandomWalker), pointer :: rwp
 
   select case (mRcf)
     case (1)
@@ -1295,7 +1290,7 @@ contains
     if (logmode >= 3) then
        write(iul,'(A,2F15.4,I6,2F15.4,I15)') 'POP:',Sampleweight,getSampleWeight(sample),   &
              getSampleSize(sample),ERef,sERef,st
-       call flush(iul)
+       flush(iul)
     endif
     if (sampleWeight > 2*Samplesize) then
        write(iul + mytid,'(A,G13.3)') ' sample overflow: all weights=',Sampleweight
@@ -1377,9 +1372,6 @@ contains
 
   integer                     :: nl
   character(len=120)          :: lines(nl)
-  integer                     :: iflag
-  integer                     :: blockStride
-  integer                     :: stepStride
   character(len=1)            :: statType
 
   if (nproc > 1) call abortp('walkerstat only in serial runs')
@@ -1403,9 +1395,6 @@ contains
   use global_m
   integer                     :: nl
   character(len=120)          :: lines(nl)
-  integer                     :: iflag
-  integer                     :: blockStart,stepStride
-  logical                     :: trajectory
 
   if (nproc > 1) call abortp('trajectory only in serial runs')
   open(43,file=trim(baseName)//'.trj')

@@ -43,9 +43,6 @@ MODULE jastrowSM_m
     !     ----------------
 
       use kinds_m, only: r8
-#ifdef NAG
-      use, intrinsic :: f90_unix_io, only: flush
-#endif
       use error_m
       use atom_m
       use wfData_m
@@ -120,7 +117,7 @@ CONTAINS
 
         character(len = *), intent(in) :: lines(:)! lines array
         integer, intent(in) :: nl      ! actual # of lines
-        integer a, k, tpar, alstat, io
+        integer a, k, tpar, io
 
         read(lines(2), *) k0
         if (k0 /= 0) then
@@ -161,8 +158,8 @@ CONTAINS
 
         character(len = *), intent(in) :: lines(:)! lines array
         integer, intent(in) :: nl      ! actual # of lines
-        integer a, k, alstat, io, idx, kk
-        integer idxStart, idxEnd, i, j, line, pwr, enStart, enEnd
+        integer a, k, io, idx, kk
+        integer idxStart, idxEnd, i, line, pwr, enStart, enEnd
         integer jasCenter
         character(len = 10) :: word(20)
         integer :: nWords
@@ -365,10 +362,12 @@ CONTAINS
 
         character(len = *), intent(in) :: jt
 
-        integer a, iu, k
-        integer idxStart, idxEnd, i, j, line, pwr, enStart, enEnd
+        integer a, k
+        integer idxStart, idxEnd, i, line, pwr, enStart, enEnd
         character(len = 9) :: oldJasType
         integer jasCenter
+
+        logical opened
 
         oldJasType = jastype
         jastype = jt
@@ -566,7 +565,8 @@ CONTAINS
             endif
         endif
 
-        call flush(iul)
+        inquire(iul, opened=opened)
+        if (opened) flush(iul)
 
     end subroutine jasChangeType_sm
 
@@ -602,7 +602,7 @@ CONTAINS
     subroutine jas_shortoutput_sm(iu)
         !     ---------------------------------
 
-        integer k, iu
+        integer iu
 
         if (k0 /= 0) then
             write(iu, '(i5,a)') k0, " generic Schmidt-Moskowitz terms"
@@ -626,7 +626,7 @@ CONTAINS
         if (diffeecusp) then
             write(iu, '(L1)') diffeecusp
         endif
-        if (k0.ne.0) then
+        if (k0/=0) then
             write(iu, '(5F10.5)') bpg, (apg(a), a = 1, atoms(nclast)%sa)
             write(iu, '(5F10.5)') (cjas(k), k = 1, k0)
         endif
@@ -641,7 +641,6 @@ CONTAINS
 
         integer, intent(in) :: iu
 
-        integer a, k
         if (k0 /= 0) then
             write(iu, '(i5,2a)') k0, " generic Schmidt-Moskowitz terms of type ", trim(jastype)
         endif
@@ -678,7 +677,7 @@ CONTAINS
         real(r8)  xij(nmax, nmax), yij(nmax, nmax), zij(nmax, nmax)
         real(r8)  xai(amax, nmax), yai(amax, nmax), zai(amax, nmax)
         real(r8)  xyzi, xyzj
-        real(r8)  tmp, tmp1, tmp2, t
+        real(r8)  tmp1, tmp2, t
 
 #ifdef NEWINIT
         mFij = 0.d0
@@ -1894,7 +1893,7 @@ CONTAINS
 
         integer i, j, a, k, line
         integer s, v
-        real(r8)  tmp, tmp1, tmp2, t, jexp
+        real(r8)  tmp1, tmp2, t, jexp
         real(r8)  huu
         real(r8)  kuu
 
@@ -1952,8 +1951,8 @@ CONTAINS
 
                     !---------Electron-Nucleus-Correlation-Terms----------------------------------
 
-                    !      if (tcontrol(k,1).eq.3) then
-                    if (tcontrol(k, 1).eq.2) then
+                    !      if (tcontrol(k,1)==3) then
+                    if (tcontrol(k, 1)==2) then
                         s = tcontrol(k, 6)
                         do a = tcontrol(k, 3), tcontrol(k, 4)
                             uu2(i) = uu2(i) + cjas(k) * t * raibar(s, a, i) !\sum_i^{ne}\sum_{i<j}^{ne}{r_i + r_j} =
@@ -1966,15 +1965,15 @@ CONTAINS
                         !        ijuu(i,j)    = 0d0
 
                         !---------Electron-Electron-Correlation-Terms---------------------------
-                        !        if (tcontrol(k,1).eq.2) then
-                        if (tcontrol(k, 1).eq.1) then
+                        !        if (tcontrol(k,1)==2) then
+                        if (tcontrol(k, 1)==1) then
                             v = tcontrol(k, 5)
                             ijuu(i, j) = ijuu(i, j) + cjas(k) * rijbar(v, i, j)
                         endif
 
                         !---------Electron-Electron-Nucleus-Correlation-Terms----------------------
-                        !        if (tcontrol(k,1).eq.4) then
-                        if (tcontrol(k, 1).eq.3) then
+                        !        if (tcontrol(k,1)==4) then
+                        if (tcontrol(k, 1)==3) then
                             s = tcontrol(k, 6)
                             do a = tcontrol(k, 3), tcontrol(k, 4)
                                 !            ijuu(i,j) = ijuu(i,j)+2*cjas(k)*raibar(s,a,i)*raibar(s,a,j)
@@ -1983,8 +1982,8 @@ CONTAINS
                         endif
                         !-----------------------------------------------------------------------
 
-                        !        if (tcontrol(k,1).eq.5) then
-                        if (tcontrol(k, 1).eq.4) then
+                        !        if (tcontrol(k,1)==5) then
+                        if (tcontrol(k, 1)==4) then
                             v = tcontrol(k, 5)
                             s = tcontrol(k, 6)
                             do a = tcontrol(k, 3), tcontrol(k, 4)
@@ -2122,8 +2121,8 @@ CONTAINS
                     kuu = 0d0
 
                     !---------Electron-Electron-Correlation-Terms---------------------------
-                    !           if (tcontrol(k,1).eq.2) then
-                    if (tcontrol(k, 1).eq.1) then
+                    !           if (tcontrol(k,1)==2) then
+                    if (tcontrol(k, 1)==1) then
                         v = tcontrol(k, 5)
                         kuu = rijbar(v, i, j)
                         !            !!!write(iul,'(a,2i3,g20.10)') 'DBG--->',i,ie,rijbar(v,i,j)
@@ -2131,8 +2130,8 @@ CONTAINS
 
 
                     !---------Electron-Electron-Nucleus-Correlation-Terms--------------------
-                    !           if (tcontrol(k,1).eq.4) then
-                    if (tcontrol(k, 1).eq.3) then
+                    !           if (tcontrol(k,1)==4) then
+                    if (tcontrol(k, 1)==3) then
                         s = tcontrol(k, 6)
                         do a = tcontrol(k, 3), tcontrol(k, 4)
                             !               kuu = kuu + 2*raibar(s,a,i)*raibar(s,a,j)
@@ -2142,8 +2141,8 @@ CONTAINS
                     endif
                     !-----------------------------------------------------------------------
 
-                    !           if (tcontrol(k,1).eq.5) then
-                    if (tcontrol(k, 1).eq.4) then
+                    !           if (tcontrol(k,1)==5) then
+                    if (tcontrol(k, 1)==4) then
                         v = tcontrol(k, 5)
                         s = tcontrol(k, 6)
                         do a = tcontrol(k, 3), tcontrol(k, 4)
@@ -2169,8 +2168,8 @@ CONTAINS
 
             !---------Electron-Nucleus-Correlation-Terms---------------------------
             do k = 1, k0
-                !        if (tcontrol(k,1).eq.3) then
-                if (tcontrol(k, 1).eq.2) then
+                !        if (tcontrol(k,1)==3) then
+                if (tcontrol(k, 1)==2) then
                     s = tcontrol(k, 6)
                     tmp1 = 0d0
                     do a = tcontrol(k, 3), tcontrol(k, 4)
@@ -2188,15 +2187,15 @@ CONTAINS
                     kuu = 0d0
 
                     !---------Electron-Electron-Correlation-Terms------------------------------
-                    !           if (tcontrol(k,1).eq.2) then
-                    if (tcontrol(k, 1).eq.1) then
+                    !           if (tcontrol(k,1)==2) then
+                    if (tcontrol(k, 1)==1) then
                         v = tcontrol(k, 5)
                         kuu = rijbar(v, i, j)
                     endif
 
                     !---------Electron-Electron-Nucleus-Correlation-Terms----------------------
-                    !           if (tcontrol(k,1).eq.4) then
-                    if (tcontrol(k, 1).eq.3) then
+                    !           if (tcontrol(k,1)==4) then
+                    if (tcontrol(k, 1)==3) then
                         s = tcontrol(k, 6)
                         do a = tcontrol(k, 3), tcontrol(k, 4)
                             !               kuu = kuu + 2*raibar(s,a,i)*raibar(s,a,j)
@@ -2205,8 +2204,8 @@ CONTAINS
                     endif
                     !-----------------------------------------------------------------------
 
-                    !           if (tcontrol(k,1).eq.5) then
-                    if (tcontrol(k, 1).eq.4) then
+                    !           if (tcontrol(k,1)==5) then
+                    if (tcontrol(k, 1)==4) then
                         v = tcontrol(k, 5)
                         s = tcontrol(k, 6)
                         do a = tcontrol(k, 3), tcontrol(k, 4)
@@ -2303,7 +2302,7 @@ CONTAINS
         real(r8)  uu(kmax)
         real(r8)  xij(nmax, nmax), yij(nmax, nmax), zij(nmax, nmax)
         real(r8)  xai(amax, nmax), yai(amax, nmax), zai(amax, nmax)
-        real(r8)  tmp, tmp1, tmp2, t
+        real(r8)  tmp1, tmp2, t
 
         real(r8) Fijk(ne, ne, 0:k0 - 1), Gki(0:k0 - 1, ne)
 

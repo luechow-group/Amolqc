@@ -17,27 +17,43 @@
   Arne Luechow, RWTH Aachen University, 52056 Aachen, Germany
 
  with contributions from:
-  Sebastian Manten, Christian Diedrich, Annika Bande, Tony Scott,
-  Rene Petz, Raphael Berner, Alexander Sturm, Kaveh Haghighi Mood
+  Sebastian Manten, Christian Diedrich, Annika Bande, Tony C. Scott,
+  Annett Schwarz, Rene Petz, Raphael Berner, Alexander Sturm,
+  Marko Hermsen, Kaveh Haghighi Mood, Christoph Schulte,
+  Leonard Reuter, Michael A. Heuer, Jil Ludovicy, Vladimir Terzi,
+  Michel V. Heinz
 
 
- version 6.5-dev-20150318    
+ version:          v7.0.1-151-g3bcd97-dirty
+ compiler version: Intel(R) Fortran Intel(R) 64 Compiler Classic for applications running on Intel(R) 64, Version 2021.7.0 Build 20220726_000000
+ compiler options: -fpp -warn none -O3
+ mpi version:      Intel(R) MPI Library 2021.7 for Linux* OS
 
 
- run started on tcrocks.pc.rwth-aachen.de at Fri Sep 28 15:49:59 2018 on    2 processor(s)
- using path: /home/luechow/Projekte/Eqmc/amolqc_test/amolqc65dev
 
- =======>      $gen - initializing RNG and setting general parameters       <=======
-
+ run started on  at 2022-11-04T16:53:15.405+01:00 on    2 processor(s)
+ using path: /home/vterzi/Development/Amolqc
+ 
+==============================> reading input <=================================
+ 
+$gen(seed=101)
+$wf(read,file='../../wavefunction/H2O-SM3.wf')
+$sample(create,start=density,generate=random,size=10)
+$qmc(vmc,move=rey,steps=100,block_len=10,discard=5,accept_ratio=0.5)
+ 
+==========> $gen - initializing RNG and setting general parameters <============
+ 
  seed =    101     verbose level = 2
-
- =======>      $wf - wave function      <=======
-
+ 
+===========================> $wf - wave function <==============================
+ 
  wave function settings:
     with BLAS/LAPACK      
     cusp-corrected splines for contracted GTOs
 
  using sequential AO and MO mode 
+ 
+ using the standard determinant update algorithm
  
  wave function ../../wavefunction/H2O-SM3.wf with: 
            title =Watersingle
@@ -69,24 +85,29 @@ H    0.00000  -0.76012  -0.47059
  AO/MO evaluation carried out using aocalc and mocalc.
  
   MOs read ...
+ 
+    NCSFs =        1 Ndets =        1
+    1 unique alpha and    1 unique beta determinants
+                          are going to be calculated.
+ 
   CSFs read ...
-
- =======>      $sample - creating or modifying the walker sample      <=======
-
+ 
+============> $sample - creating or modifying the walker sample <===============
+ 
  creating new sample
 
  created initial random sample using atom densities
  sample size (all nodes):           20
- <E>_allnodes =     -76.2240 +/-       2.3740 V_allnodes =     107.0843
+ <E>_allnodes =     -76.2240 +/-       2.3740 V_allnodes =     107.0833
  
 
- wall clock time for   sample :               0.01 s
+ wall clock time for   sample :               0.00 s
  cpu time (master) for sample :               0.00 s
 
 
-
- =======>      $qmc - running a qmc calculation      <=======
-
+ 
+=====================> $qmc - running a qmc calculation <=======================
+ 
 
    * * *  VMC calculation  * * *
 
@@ -116,39 +137,62 @@ H    0.00000  -0.76012  -0.47059
 
              step       size              <E>                   <V>     AR 
  --------------------------------------------------------------------------
-             10        20       -75.20002 +/-   0.72769   105.376   0.540
-             20        20       -75.05226 +/-   0.72519   104.653   0.400
-             30        20       -74.86525 +/-   0.72184   103.691   0.480
-             40        20       -74.75263 +/-   0.72128   103.530   0.560
-             50        20       -75.15957 +/-   0.72642   105.011   0.610
-             60        20       -75.10947 +/-   0.72336   104.127   0.470
-             70        20       -74.94454 +/-   0.72582   104.835   0.480
-             80        20       -75.02356 +/-   0.72865   105.656   0.450
-             90        20       -75.27541 +/-   0.72703   105.186   0.420
-            100        20       -74.93002 +/-   0.72346   104.155   0.500
+             10        20       -75.20004 +/-   0.72768   105.375   0.540
+             20        20       -75.05228 +/-   0.72518   104.652   0.400
+             30        20       -74.86527 +/-   0.72184   103.690   0.480
+             40        20       -74.75265 +/-   0.72128   103.529   0.560
+             50        20       -75.15959 +/-   0.72642   105.010   0.610
+             60        20       -75.10948 +/-   0.72336   104.126   0.470
+             70        20       -74.94455 +/-   0.72581   104.834   0.480
+             80        20       -75.02357 +/-   0.72865   105.655   0.450
+             90        20       -75.27543 +/-   0.72703   105.186   0.420
+            100        20       -74.93004 +/-   0.72345   104.154   0.500
 
 
   FINAL RESULT:
- total energy                 =     -75.03127 +/- 0.05100 E_h
- block average energy         =     -75.03127 E_h
- variance (of wave function)  =     104.64530 E_h^2
+ total energy                 =     -75.03129 +/- 0.05100 E_h
+ kinetic energy               =      84.62707 +/- 4.63819 E_h
+ e-n potential energy         =    -208.09931 +/- 4.44030 E_h
+ e-e potential energy         =      39.28380 +/- 0.74239 E_h
+ n-n potential energy         =       9.15716 E_h
+ variance (of E_loc)          =     104.64436 +/- 0.22794 E_h^2
+ block average variance       =     104.62095 E_h^2
  tau (adapted)                =        0.0149 fixed at step           75
  N_corr (global)              =       0.0
+
+  FLYVBJERG-PETERSEN: 
+ variance                     =     104.66269 E_h^2
+ WARNING: Plateau has not been reached, following values are not reliable!
+ error                        =       1.79295 E_h
+ block length                 =     512
+ n_corr                       =      58.36
+
+ log2(blen)   error estimate   errors error
+          0        0.2347033      0.0076168
+          1        0.2337760      0.0107320
+          2        0.2296427      0.0149169
+          3        0.2256042      0.0207686
+          4        0.2968395      0.0388100
+          5        0.4035813      0.0749432
+          6        0.5744089      0.1535172
+          7        0.8553182      0.3354834
+          8        1.1819479      0.6823979
+          9        1.7929520      1.7929520
 
  WARNING: stddev and global N_corr may be unreliable
   (number of blocks not discarded < 20)
 
- wall clock time for   qmc :               0.07 s
+ wall clock time for   qmc :               0.02 s
  cpu time (master) for qmc :               0.02 s
 
 
 
 
- wall clock time for run         :   0d 00:00:00.084
+ wall clock time for run         :   0d 00:00:00.023
  total cpu time for run (core-h) :            0.0000
  cpu time per mpi process (h)    :            0.0000
 
-Amolqc run finished on Fri Sep 28 15:49:59 2018  
+Amolqc run finished on 2022-11-04T16:53:15.429+01
 
 Bye!
 

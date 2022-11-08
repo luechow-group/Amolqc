@@ -29,6 +29,11 @@ else()
     set(DEBUG_FLAGS "${DEBUG_FLAGS} ${LINEINFO_FLAGS}")
 endif()
 
+if(NOT ${ADDITIONAL_FLAGS} STREQUAL "")
+    set(FLAGS "${FLAGS} ${ADDITIONAL_FLAGS}")
+    message("set additional flags: ${ADDITIONAL_FLAGS}")
+endif()
+
 # sets final fortran flags
 set(CMAKE_Fortran_FLAGS         "${FLAGS} -D${CMAKE_Fortran_COMPILER_ID}")
 

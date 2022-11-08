@@ -123,7 +123,7 @@ CONTAINS
       call ecp%getPseudoAtoms(pa)
       do p=1,size(pa)
          if (pa(p)%cutoff > 0.d0) then
-            write(iul,'(i4,2x,a4,6x,i4,6x,f10.5)') p,atoms(pa(p)%a)%elem,pa(p)%nGridPoints,pa(p)%cutoff*bohr2angs
+            write(iul,'(i4,2x,a4,6x,i4,6x,f10.5)') p,atoms(pa(p)%a)%elem,pa(p)%nGridPoints,pa(p)%cutoff*bohr2ang
          else
             write(iul,'(i4,2x,a4,6x,i4,10x,a)') p,atoms(pa(p)%a)%elem,pa(p)%nGridPoints,'n/a'
          endif
@@ -180,7 +180,8 @@ CONTAINS
       integer                      :: nl      ! actual # of lines
       integer a,nPseudoAtoms,p
       logical fileExists
-      character basispath*180, ecpfname*180, ecpname*3
+      character(len=180) basispath, ecpfname
+      character(len=3) ecpname
       type(PseudoAtomData), allocatable :: pa(:)
 
       call getAmolqcPath(basispath)

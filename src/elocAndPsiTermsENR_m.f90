@@ -302,7 +302,7 @@ contains
    type(ElocAndPsiTermsENR), intent(inout) :: this
    real(r8), intent(out) :: e0
    real(r8), intent(out) :: fi(:),fiEL(:)  ! for notation see type def.
-   integer nData(1),nTotalData(1),np,np2,n,i,j
+   integer nData(1),nTotalData(1),np,n
    real(r8) vsum(this%EPTB%wfp%nParams)
    np = this%EPTB%wfp%nParams
    nData(1) = this%EPTB%nData
@@ -331,7 +331,7 @@ contains
    type(ElocAndPsiTermsENR), intent(in) :: this
    real(r8), intent(out) :: e0
    real(r8), intent(out) :: fi(:),fiEL(:)  ! for notation see type def.
-   integer n,np,i,j
+   integer n,np
    n = this%EPTB%nData
    np = size(fi)
 

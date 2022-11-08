@@ -86,7 +86,7 @@ contains
       real(r8), intent(out)          :: extrapolatedValue
       real(r8), optional, intent(out):: estimatedError
       integer, optional, intent(out) :: iterations
-      real(r8) :: oldValue, oldError, eps, bestValue, bestError
+      real(r8) :: oldValue, eps, bestValue, bestError
       real(r8), allocatable :: T(:,:)
       integer  :: i, j, bestIter
 

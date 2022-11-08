@@ -29,9 +29,9 @@ subroutine aomocut_calc(ie, x, y, z, rai)
     real(r8) :: sqr3, sqr5
     parameter (sqr3 = 1.73205080756887729d0, sqr5 = 2.236067977499789696d0)
     ! local variables
-    integer :: bf, a, i, i1, i2, ii, ic, al
+    integer :: bf, a, i, i1, i2, ic, al
     integer :: j, d, moc, n
-    real(r8) :: xx, yy, zz, rr, r2, alp, nrm, u, ux, dx, dy, dz, tmp, &
+    real(r8) :: xx, yy, zz, rr, r2, alp, u, ux, dx, dy, dz, tmp, &
             dx2, dy2, dz2, dxyz, dxdy, dxdz, dydz
     real(r8) :: dy2dx, dx2dy, dx2dz, dz2dx, dy2dz, dz2dy, dxdydz
     !cc
@@ -59,7 +59,7 @@ subroutine aomocut_calc(ie, x, y, z, rai)
         gaussFOrder = .false.
     endif
 
-    if (ie .eq. 0) then                     ! AO's for all electrons
+    if (ie == 0) then                     ! AO's for all electrons
         i1 = 1
         i2 = ne
     else
@@ -88,21 +88,21 @@ subroutine aomocut_calc(ie, x, y, z, rai)
             rr = rai(a, i)                      ! r_ai
 
             if (cutao) then                    !AO - Cutoff
-                if (rr.gt.aocuts(bf)) then       ! --> do nothing but adjusting the counters
-                    if (bl(bf) .eq. 'S') then
+                if (rr>aocuts(bf)) then       ! --> do nothing but adjusting the counters
+                    if (bl(bf) == 'S') then
                         moc = moc + nmos(al)
                         al = al + 1
-                    elseif (bl(bf) .eq. 'P') then
+                    elseif (bl(bf) == 'P') then
                         do n = 0, 2
                             moc = moc + nmos(al + n)
                         enddo
                         al = al + 3
-                    elseif (bl(bf) .eq. 'D') then
+                    elseif (bl(bf) == 'D') then
                         do n = 0, 5
                             moc = moc + nmos(al + n)
                         enddo
                         al = al + 6
-                    elseif (bl(bf) .eq. 'F') then
+                    elseif (bl(bf) == 'F') then
                         do n = 0, 9
                             moc = moc + nmos(al + n)
                         enddo
@@ -116,7 +116,7 @@ subroutine aomocut_calc(ie, x, y, z, rai)
 
             r2 = rr * rr
 
-            if (bl(bf) .eq. 'S') then                 ! 1s GTO
+            if (bl(bf) == 'S') then                 ! 1s GTO
 
                 dx = xx - atoms(a)%cx
                 dy = yy - atoms(a)%cy
@@ -149,7 +149,7 @@ subroutine aomocut_calc(ie, x, y, z, rai)
 
                 al = al + 1
 
-            else if (bl(bf) .eq. 'P') then             ! 2p GTO's
+            else if (bl(bf) == 'P') then             ! 2p GTO's
                 !              // do all 3 P simultaneously (same exponent is required)
                 !              // order p_x,p_y,p_z
 
@@ -207,7 +207,7 @@ subroutine aomocut_calc(ie, x, y, z, rai)
 
                 al = al + 3
 
-            else if (bl(bf) .eq. 'D') then         ! 3d GTO
+            else if (bl(bf) == 'D') then         ! 3d GTO
                 !              // do all 6 D simultaneously (same exponent is required)
                 !              // order: d_xx, d_yy, d_zz, d_xy, d_xz, d_yz  (like GAMESS)
 
@@ -538,11 +538,10 @@ subroutine aomocut1_calc(ie, x, y, z, rai)
     real(r8) :: sqr3, sqr5
     parameter (sqr3 = 1.73205080756887729d0, sqr5 = 2.236067977499789696d0)
     ! variables
-    integer :: bf, a, i, ii, i1, i2, ic, al
+    integer :: bf, a, i, i1, i2, ic, al
     integer :: j, d, moc, n
-    real(r8) :: xx, yy, zz, rr, alp, nrm, u, dx, dy, dz, r2, dx2, dy2, dz2
+    real(r8) :: xx, yy, zz, rr, alp, u, dx, dy, dz, r2, dx2, dy2, dz2
     real(r8) :: dxdy, dxdz, dydz
-    real(r8) :: tmp
 
     !cc
     real(r8) :: tmps
@@ -561,7 +560,7 @@ subroutine aomocut1_calc(ie, x, y, z, rai)
         gaussFOrder = .false.
     endif
 
-    if (ie .eq. 0) then                     ! AO's for all electrons
+    if (ie == 0) then                     ! AO's for all electrons
         i1 = 1
         i2 = ne
     else
@@ -585,21 +584,21 @@ subroutine aomocut1_calc(ie, x, y, z, rai)
             rr = rai(a, i)                      ! r_ai
 
             if (cutao) then                    !AO - Cutoff
-                if (rr.gt.aocuts(bf)) then       ! --> do nothing but adjusting the counters
-                    if (bl(bf) .eq. 'S') then
+                if (rr>aocuts(bf)) then       ! --> do nothing but adjusting the counters
+                    if (bl(bf) == 'S') then
                         moc = moc + nmos(al)
                         al = al + 1
-                    elseif (bl(bf) .eq. 'P') then
+                    elseif (bl(bf) == 'P') then
                         do n = 0, 2
                             moc = moc + nmos(al + n)
                         enddo
                         al = al + 3
-                    elseif (bl(bf) .eq. 'D') then
+                    elseif (bl(bf) == 'D') then
                         do n = 0, 5
                             moc = moc + nmos(al + n)
                         enddo
                         al = al + 6
-                    elseif (bl(bf) .eq. 'F') then
+                    elseif (bl(bf) == 'F') then
                         do n = 0, 9
                             moc = moc + nmos(al + n)
                         enddo
@@ -613,7 +612,7 @@ subroutine aomocut1_calc(ie, x, y, z, rai)
 
             r2 = rr * rr
 
-            if (bl(bf) .eq. 'S') then                 ! 1s GTO
+            if (bl(bf) == 'S') then                 ! 1s GTO
 
                 tmps = 0d0
 
@@ -633,7 +632,7 @@ subroutine aomocut1_calc(ie, x, y, z, rai)
 
                 al = al + 1
 
-            else if (bl(bf) .eq. 'P') then             ! 2p GTO's
+            else if (bl(bf) == 'P') then             ! 2p GTO's
                 !              // do all 3 P simultaneously (same exponent is required)
                 !              // order p_x,p_y,p_z
 
@@ -664,7 +663,7 @@ subroutine aomocut1_calc(ie, x, y, z, rai)
 
                 al = al + 3
 
-            else if (bl(bf) .eq. 'D') then         ! 3d GTO
+            else if (bl(bf) == 'D') then         ! 3d GTO
                 !              // do all 6 D simultaneously (same exponent is required)
                 !              // order: d_xx, d_yy, d_zz, d_xy, d_xz, d_yz  (like GAMESS)
 
@@ -833,10 +832,10 @@ subroutine aomocutspl_calc(ie, x, y, z, rai)
     real(r8) :: sqr3, sqr5
     parameter (sqr3 = 1.73205080756887729d0, sqr5 = 2.236067977499789696d0)
     ! local variables
-    integer :: bf, a, i, i1, i2, ii, ic, al
+    integer :: bf, a, i, i1, i2, al
     integer :: j, d, moc, n
     integer :: spl, ispl
-    real(r8) :: xx, yy, zz, rr, r2, alp, nrm, u, ux, uxx, u2, dx, dy, dz, tmp, &
+    real(r8) :: xx, yy, zz, rr, r2, alp, u, ux, uxx, u2, dx, dy, dz, tmp, &
             dx2, dy2, dz2, dxyz, dxdy, dxdz, dydz
     real(r8) :: df
     !cc
@@ -864,7 +863,7 @@ subroutine aomocutspl_calc(ie, x, y, z, rai)
         gaussFOrder = .false.
     endif
 
-    if (ie .eq. 0) then                     ! AO's for all electrons
+    if (ie == 0) then                     ! AO's for all electrons
         i1 = 1
         i2 = ne
     else
@@ -893,21 +892,21 @@ subroutine aomocutspl_calc(ie, x, y, z, rai)
             rr = rai(a, i)                      ! r_ai
 
             if (cutao) then                    !AO - Cutoff
-                if (rr.gt.aocuts(bf)) then       ! --> do nothing but adjusting the counters
-                    if (bl(bf) .eq. 'S') then
+                if (rr>aocuts(bf)) then       ! --> do nothing but adjusting the counters
+                    if (bl(bf) == 'S') then
                         moc = moc + nmos(al)
                         al = al + 1
-                    elseif (bl(bf) .eq. 'P') then
+                    elseif (bl(bf) == 'P') then
                         do n = 0, 2
                             moc = moc + nmos(al + n)
                         enddo
                         al = al + 3
-                    elseif (bl(bf) .eq. 'D') then
+                    elseif (bl(bf) == 'D') then
                         do n = 0, 5
                             moc = moc + nmos(al + n)
                         enddo
                         al = al + 6
-                    elseif (bl(bf) .eq. 'F') then
+                    elseif (bl(bf) == 'F') then
                         do n = 0, 9
                             moc = moc + nmos(al + n)
                         enddo
@@ -921,9 +920,9 @@ subroutine aomocutspl_calc(ie, x, y, z, rai)
 
             r2 = rr * rr
 
-            if (so(bf).eq.0) then !only 1 GTO in contraction, no splines used !
+            if (so(bf)==0) then !only 1 GTO in contraction, no splines used !
 
-                if (bl(bf) .eq. 'S') then                 ! 1s GTO
+                if (bl(bf) == 'S') then                 ! 1s GTO
 
                     dx = xx - atoms(a)%cx
                     dy = yy - atoms(a)%cy
@@ -953,7 +952,7 @@ subroutine aomocutspl_calc(ie, x, y, z, rai)
 
                     al = al + 1
 
-                else if (bl(bf) .eq. 'P') then             ! 2p GTO's
+                else if (bl(bf) == 'P') then             ! 2p GTO's
                     !              // do all 3 P simultaneously (same exponent is required)
                     !              // order p_x,p_y,p_z
 
@@ -1005,7 +1004,7 @@ subroutine aomocutspl_calc(ie, x, y, z, rai)
 
                     al = al + 3
 
-                else if (bl(bf) .eq. 'D') then         ! 3d GTO
+                else if (bl(bf) == 'D') then         ! 3d GTO
                     !              // do all 6 D simultaneously (same exponent is required)
                     !              // order: d_xx, d_yy, d_zz, d_xy, d_xz, d_yz  (like GAMESS)
 
@@ -1297,10 +1296,10 @@ subroutine aomocutspl_calc(ie, x, y, z, rai)
             else ! CGTO (more than one primitive gaussian) --> use splines
 
                 !cc            r2 = rr*rr
-                spl = (csplnpnt - 1) * rr / (csalpha + rr) + 1
+                spl = INT((csplnpnt - 1) * rr / (csalpha + rr) + 1)
                 df = rr - csplx(spl)
 
-                if (bl(bf) .eq. 'S') then                 ! 1s GTO
+                if (bl(bf) == 'S') then                 ! 1s GTO
 
                     ispl = 3 * so(bf) - 2
                     tmps(1) = cspla(ispl, spl) + df * (csplb(ispl, spl)&
@@ -1335,7 +1334,7 @@ subroutine aomocutspl_calc(ie, x, y, z, rai)
 
                     al = al + 1
 
-                else if (bl(bf) .eq. 'P') then             ! 2p GTO's
+                else if (bl(bf) == 'P') then             ! 2p GTO's
                     !              // do all 3 P simultaneously (same exponent is required)
                     !              // order p_x,p_y,p_z
 
@@ -1392,7 +1391,7 @@ subroutine aomocutspl_calc(ie, x, y, z, rai)
 
                     al = al + 3
 
-                else if (bl(bf) .eq. 'D') then         ! 3d GTO
+                else if (bl(bf) == 'D') then         ! 3d GTO
                     !              // do all 6 D simultaneously (same exponent is required)
                     !              // order: d_xx, d_yy, d_zz, d_xy, d_xz, d_yz  (like GAMESS)
 
@@ -1722,11 +1721,10 @@ subroutine aomocut1spl_calc(ie, x, y, z, rai)
     real(r8) :: sqr3, sqr5
     parameter (sqr3 = 1.73205080756887729d0, sqr5 = 2.236067977499789696d0)
     ! local variables
-    integer :: bf, a, i, i1, i2, ii, ic, al
+    integer :: bf, a, i, i1, i2, al
     integer :: j, d, moc, n
     integer :: spl, ispl
-    real(r8) :: xx, yy, zz, rr, r2, alp, nrm, u, ux, uxx, u2, dx, dy, dz, tmp, &
-            dx2, dy2, dz2, dxdy, dxdz, dydz
+    real(r8) :: xx, yy, zz, rr, r2, alp, u, dx, dy, dz, dx2, dy2, dz2
     real(r8) :: df
     !cc
     real(r8) :: tmps
@@ -1753,7 +1751,7 @@ subroutine aomocut1spl_calc(ie, x, y, z, rai)
         gaussFOrder = .false.
     endif
 
-    if (ie .eq. 0) then                     ! AO's for all electrons
+    if (ie == 0) then                     ! AO's for all electrons
         i1 = 1
         i2 = ne
     else
@@ -1778,21 +1776,21 @@ subroutine aomocut1spl_calc(ie, x, y, z, rai)
             rr = rai(a, i)                      ! r_ai
 
             if (cutao) then                    !AO - Cutoff
-                if (rr.gt.aocuts(bf)) then       ! --> do nothing but adjusting the counters
-                    if (bl(bf) .eq. 'S') then
+                if (rr>aocuts(bf)) then       ! --> do nothing but adjusting the counters
+                    if (bl(bf) == 'S') then
                         moc = moc + nmos(al)
                         al = al + 1
-                    elseif (bl(bf) .eq. 'P') then
+                    elseif (bl(bf) == 'P') then
                         do n = 0, 2
                             moc = moc + nmos(al + n)
                         enddo
                         al = al + 3
-                    elseif (bl(bf) .eq. 'D') then
+                    elseif (bl(bf) == 'D') then
                         do n = 0, 5
                             moc = moc + nmos(al + n)
                         enddo
                         al = al + 6
-                    elseif (bl(bf) .eq. 'F') then
+                    elseif (bl(bf) == 'F') then
                         do n = 0, 9
                             moc = moc + nmos(al + n)
                         enddo
@@ -1806,9 +1804,9 @@ subroutine aomocut1spl_calc(ie, x, y, z, rai)
 
             r2 = rr * rr
 
-            if (so(bf).eq.0) then !only 1 GTO in contraction, no splines used !
+            if (so(bf)==0) then !only 1 GTO in contraction, no splines used !
 
-                if (bl(bf) .eq. 'S') then                 ! 1s GTO
+                if (bl(bf) == 'S') then                 ! 1s GTO
 
                     alp = cntrctn(1, 1, bf)
                     u = cntrctn(2, 1, bf) * exp(-alp * r2)
@@ -1822,7 +1820,7 @@ subroutine aomocut1spl_calc(ie, x, y, z, rai)
 
                     al = al + 1
 
-                else if (bl(bf) .eq. 'P') then             ! 2p GTO's
+                else if (bl(bf) == 'P') then             ! 2p GTO's
                     !              // do all 3 P simultaneously (same exponent is required)
                     !              // order p_x,p_y,p_z
 
@@ -1848,7 +1846,7 @@ subroutine aomocut1spl_calc(ie, x, y, z, rai)
 
                     al = al + 3
 
-                else if (bl(bf) .eq. 'D') then         ! 3d GTO
+                else if (bl(bf) == 'D') then         ! 3d GTO
                     !              // do all 6 D simultaneously (same exponent is required)
                     !              // order: d_xx, d_yy, d_zz, d_xy, d_xz, d_yz  (like GAMESS)
 
@@ -1984,10 +1982,10 @@ subroutine aomocut1spl_calc(ie, x, y, z, rai)
             else ! CGTO (more than one primitive gaussian) --> use splines
 
                 !cc            r2 = rr*rr
-                spl = (csplnpnt - 1) * rr / (csalpha + rr) + 1
+                spl = INT((csplnpnt - 1) * rr / (csalpha + rr) + 1)
                 df = rr - csplx(spl)
 
-                if (bl(bf) .eq. 'S') then                 ! 1s GTO
+                if (bl(bf) == 'S') then                 ! 1s GTO
 
                     ispl = 3 * so(bf) - 2
                     tmps = cspla(ispl, spl) + df * (csplb(ispl, spl)&
@@ -2002,7 +2000,7 @@ subroutine aomocut1spl_calc(ie, x, y, z, rai)
 
                     al = al + 1
 
-                else if (bl(bf) .eq. 'P') then             ! 2p GTO's
+                else if (bl(bf) == 'P') then             ! 2p GTO's
                     !              // do all 3 P simultaneously (same exponent is required)
                     !              // order p_x,p_y,p_z
 
@@ -2029,7 +2027,7 @@ subroutine aomocut1spl_calc(ie, x, y, z, rai)
 
                     al = al + 3
 
-                else if (bl(bf) .eq. 'D') then         ! 3d GTO
+                else if (bl(bf) == 'D') then         ! 3d GTO
                     !              // do all 6 D simultaneously (same exponent is required)
                     !              // order: d_xx, d_yy, d_zz, d_xy, d_xz, d_yz  (like GAMESS)
 

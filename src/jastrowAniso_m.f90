@@ -733,7 +733,7 @@ contains
     character(len=*), intent(in) :: lines(:)
     integer, intent(inout) :: idx
     integer :: m
-    integer, allocatable :: gl_oldorder(:)
+    real(r8), allocatable :: gl_oldorder(:)
 
     this%gl = 0.0d0
     do m=1,this%gnum
@@ -1538,7 +1538,7 @@ contains
       enddo
     enddo
     if (MASTER) then
-      if (.not.( all(tidx.eq.tidx_temp) )) then
+      if (.not.( all(tidx==tidx_temp) )) then
         resorted = .true.
         do k=1 , (SIZE(tidx) / 10) +1
           tJasAOLines%n = k

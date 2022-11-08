@@ -218,7 +218,6 @@ contains
    subroutine psimax_correctForSingularities(this, sample, H)
       class(psimax), intent(inout) :: this
       type(singularity_particles)  :: sp
-      real(r8)                     :: x(getNElec()), y(getNElec()), z(getNElec())
       real(r8), intent(inout)      :: sample(3*getNElec())
       real(r8)                     :: xx(3*getNElec())
       real(r8), intent(inout)      :: H(:,:)
@@ -226,7 +225,7 @@ contains
       real(r8)                     :: f, delta_x(SIZE(xx))
       real(r8)                     :: step_size
       logical                      :: is_corrected
-      integer                      :: n, i
+      integer                      :: n
 
       !initialize variables
       n = getNElec()
@@ -254,7 +253,7 @@ contains
       real(r8)  :: maximum(3*getNElec())
       real(r8)  :: sample(3*getNElec())
       real(r8)  :: kinetic_energies(getNElec())
-      integer   :: i, n, w, iflag, info, lwork, num_neg_eigv
+      integer   :: i, n, iflag, info, lwork, num_neg_eigv
       integer   :: idx(getNElec())
       logical   :: lold, correct_num_neg_eigv, is_minimum, is_corrected
       type(eConfigArray) :: sample_ec
@@ -405,9 +404,7 @@ contains
    subroutine psimax_writeResults(this)
       class(psimax), intent(in)    :: this
       integer, parameter :: iu=12
-      real(r8)          :: min_save, rcvCount(0:10)
-      integer         :: i,k
-      real(r8)          :: F
+      real(r8)          :: rcvCount(0:10)
 
       call myMPIReduceSumDouble(sCounter, rcvCount, 11)
 

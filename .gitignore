@@ -31,13 +31,6 @@ sftp-config.json
 *.o
 *.pyc
 
-# make
-mod
-bin
-*depends.mk
-make/config.mk
-configs/*.mk
-
 # cmake
 build*
 cmake-build*

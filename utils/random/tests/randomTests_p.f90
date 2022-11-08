@@ -16,9 +16,9 @@ program randomTest_p
     integer,parameter :: ops = 10000000
     rng = "mrg"
 
-    if(COMMAND_ARGUMENT_COUNT() .gt. 0) then
+    if(COMMAND_ARGUMENT_COUNT() > 0) then
         call GET_COMMAND_ARGUMENT(1, rng)
-        if(COMMAND_ARGUMENT_COUNT() .gt. 1) then
+        if(COMMAND_ARGUMENT_COUNT() > 1) then
             call GET_COMMAND_ARGUMENT(2, tmp)
             read(tmp, "(I10)") seed
             write(0, *) "Using seed", seed

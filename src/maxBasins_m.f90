@@ -78,12 +78,11 @@ contains
    subroutine maxbas_init(lines,nl)
       integer, intent(in)             :: nl
       character(len=120), intent(in)  :: lines(:)
-      integer                         :: i,iflag,iflag1,iflag2,iflag3,j,a,sbin
+      integer                         :: i,iflag,iflag1,iflag2,iflag3,j,sbin
       real(r8)                          :: ax,bx,ay,by,az,bz
       real(r8)                          :: cx(ncenter),cy(ncenter),cz(ncenter)
       real(r8)                          :: tolSim
       integer                         :: elemIdx(ncenter)
-      logical                         :: found
       character(len=3) ic1,ic2
       character(len=80) line1,line2
       character(len=40)               :: reffile,exclfile,lralist
@@ -105,7 +104,7 @@ contains
 
       tolSim = 1.d-1
       call getdbla(lines,nl,'tol_sim=',tolSim,iflag)      ! similar structure if max distance is smaller
-      tolSim = tolSim / bohr2angs
+      tolSim = tolSim / bohr2ang
 
       call getstra(lines,nl,'ref_file=',reffile,iflag1)
       call getstra(lines,nl,'excl_file=',exclfile,iflag2)
@@ -407,7 +406,7 @@ contains
       integer             :: allidx1(nproc*ne)
       real(r8)              :: vec(6*ne+2)
       real(r8)              :: vec_rcv((6*ne+2)*nproc)
-      integer             :: ierr,i,n,m,l,k,j
+      integer             :: ierr,i,n,m,l,k
       integer             :: idx2(ne),idx(ne),int_rcv(nproc)
       type(reference)     :: r
       real(r8), parameter   :: EPS = 1.d-4
@@ -521,7 +520,7 @@ contains
                            call mLRStat(m,k)%add(temp1)
                            call mLRStat(m,k)%add(temp2)
 
-                           if (((temp1(3) .gt. 0) .and. (temp2(3) .gt. 0)) .or. ((temp1(3) .lt. 0) .and. (temp2(3) .lt. 0))) then
+                           if (((temp1(3) > 0) .and. (temp2(3) > 0)) .or. ((temp1(3) < 0) .and. (temp2(3) < 0))) then
                               mLRResult(k,2) = mLRResult(k,2) + 1
                            else
                               mLRResult(k,3) = mLRResult(k,3) + 1
@@ -623,11 +622,10 @@ contains
       integer             :: allidx1(nproc*ne)
       real(r8)              :: vec(6*ne+2)
       real(r8)              :: vec_rcv((6*ne+2)*nproc)
-      integer             :: ierr,i,n,m,l,k,j
+      integer             :: ierr,i,n,m,l,k
       integer             :: idx2(ne), idx(ne), int_rcv(nproc)
       type(reference)     :: r
       real(r8), parameter   :: EPS = 1.d-4
-      real(r8)              :: temp1(3),temp2(3),tempMat(2,2)
 
       vec(1:ne) = x(1:ne)
       vec(ne+1:2*ne) = y(1:ne)
@@ -822,11 +820,11 @@ contains
             !!mystddev = 0.d0
             !!if (mynd > 1) mystddev = stdDevMean(mEPairStat(np,m))
             !!write(900+mytid,'(4i5,3f20.3)') mytid,i,j,np,mynd,mymean,mystddev
-            !!call flush(900+mytid)
+            !!flush(900+mytid)
             pairRatio = meanAllNodes(mEPairStat(np,m))
             stddev = stdDevMeanAllNodes(mEPairStat(np,m))
             !!write(900+mytid,'(4i5,3f20.3)') mytid,i,j,np,nd,mean,stddev
-            !!call flush(900+mytid)
+            !!flush(900+mytid)
             if (MASTER) then
               write(mIU2,'(3i4,2f8.3,3x)',advance='no') i,j,np,pairRatio,stddev
               if (pairRatio > PAIRTHRESH) then
@@ -855,7 +853,7 @@ contains
    subroutine maxbas_collectEPairs(m,idx)
        integer, intent(in)    :: m                ! maximum
        integer, intent(in)    :: idx(:)           ! permutation
-       integer i,j,ii,jj,itmp,np
+       integer i,j,ii,jj,np
        logical spinPair
 
        !!!write(998,'(a,i4)') 'new max ',m
@@ -943,7 +941,7 @@ contains
             endif
          enddo
       enddo
-      if (diff .le. lraconv) then
+      if (diff <= lraconv) then
          allocate(itensor(mLRPairCount,3,3),ev(ne,3),stat=alstat)
          itensor = 0d0
          ! construct covariance matrix / inertia tensor

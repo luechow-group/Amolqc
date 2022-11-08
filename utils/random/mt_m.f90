@@ -104,13 +104,13 @@ DO  mti=1,n-1
 !
 ! The code here is used instead to prevent integer overflow.
    temp=69069.D0*DBLE(mt(mti-1))
-   itemp=mod(temp,two31)
-   itemp2=temp/two31
-   if (mod(itemp2,2).ne.0) then
-     if (itemp.gt.0) then
-       itemp=itemp-two31
+   itemp=INT(mod(temp,two31))
+   itemp2=INT(temp/two31)
+   if (mod(itemp2,2)/=0) then
+     if (itemp>0) then
+       itemp=INT(itemp-two31)
      else
-       itemp=itemp+two31
+       itemp=INT(itemp+two31)
      endif
    endif
    mt(mti)=itemp
@@ -250,7 +250,7 @@ IMPLICIT NONE
 
 real(r8)            :: u, sum
 real(r8),  SAVE     :: v, sln
-real(r8), PARAMETER :: one = 1.0, vsmall = TINY( one )
+real(r8), PARAMETER :: one = 1, vsmall = TINY( one )
 
 
   DO

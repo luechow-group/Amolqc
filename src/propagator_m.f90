@@ -33,7 +33,7 @@ module propagator_m
   logical     :: mRejCross=.false.    ! reject nodal crossing?
   logical     :: mNoExp = .false.
   logical     :: mTauIsSet = .false.
-  character*3 :: mMoveType='all'      ! 'all' or 'one' electron moves
+  character(len=3) :: mMoveType='all'      ! 'all' or 'one' electron moves
 
   real(r8)           :: mSqrtTau=0
 
@@ -110,7 +110,7 @@ contains
     real(r8), intent(in)             :: tau,ds
     logical, intent(in)            :: ar,rc
     character(len=3), intent(in)   :: mt
-    integer :: alstat,i
+    integer :: i
 
     mWeight         = wgt
     mMove           = move
@@ -262,8 +262,8 @@ contains
   real(r8) function propagator_getInitialTau(ar)
   !------------------------------------------!
      real(r8), intent(in) :: ar ! desired acceptance ratio
-     integer i
-     real(r8) Zmax,a
+     integer i,Zmax
+     real(r8) a
 
      call assert(ar > 0.d0,"propagator_getInitialTau: positive argument required")
      Zmax = 0
@@ -359,7 +359,7 @@ contains
     real(r8) xi,mp,s1,sn1, tau
     real(r8) r2(size(rwb))
     real(r8) vvr(size(rwb)),vvnr(size(rwb)),accRatio(size(rwb))
-    real(r8) uold(size(rwb)), x(ne), y(ne), z(ne)
+    real(r8) x(ne), y(ne), z(ne)
     real(r8) dw
     logical isAccepted(size(rwb)), isMoved(size(rwb)), noTmove(size(rwb))
     type(eConfigArray) :: ec
@@ -548,13 +548,10 @@ contains
     real(r8), intent(out) :: r2(:)
 
     integer i,w
-    real(r8) :: u
     real(r8) :: phiOld(size(rwb)), uOld(size(rwb))
     logical :: calcjs(size(rwb))
     real(r8) :: diffx(ne),diffy(ne),diffz(ne)
     real(r8) :: x(ne),y(ne),z(ne),x1(ne),y1(ne),z1(ne)
-    real(r8) :: xNew(ne),yNew(ne),zNew(ne)
-    real(r8) :: driftx(ne),drifty(ne),driftz(ne)
     type(eConfigArray) :: ecOld,ecNew
 
     call eConfigArray_new(ecOld,ne,size(rwb))
@@ -609,13 +606,10 @@ contains
     real(r8), intent(out) :: r2(:)
 
     integer i,w,tmove
-    real(r8) :: u,tau
+    real(r8) :: tau
     real(r8) :: phiOld(size(rwb)), uOld(size(rwb))
-    logical :: calcjs(size(rwb))
     real(r8) :: diffx(ne),diffy(ne),diffz(ne)
     real(r8) :: x(ne),y(ne),z(ne),x1(ne),y1(ne),z1(ne)
-    real(r8) :: xNew(ne),yNew(ne),zNew(ne)
-    real(r8) :: driftx(ne),drifty(ne),driftz(ne)
     type(eConfigArray) :: ecOld,ecNew
     logical :: isMoved(size(rwb))
 
@@ -674,7 +668,7 @@ contains
     logical,intent(out)               :: noTmove(:)
 
     integer i,w,tmove
-    real(r8) :: mp,u,tau
+    real(r8) :: mp,tau
     real(r8) :: phiOld(size(rwb)),uOld(size(rwb))
     real(r8) :: diffx(ne),diffy(ne),diffz(ne)
     real(r8) :: x(ne),y(ne),z(ne),x1(ne),y1(ne),z1(ne)
@@ -849,7 +843,7 @@ contains
 
          v2  = v2 * (0.5d0*(1d0 + vxz) + tmp/((4d0 + tmp)*10d0))
          vf  = (-1d0 + sqrt(1d0 + 2d0*v2*mTau))/(v2*mTau)
-         if (logmode .ge. 5) write(iul,'(A6,2G12.5)') &
+         if (logmode >= 5) write(iul,'(A6,2G12.5)') &
              'vf,a=',vf,tmp/(4d0+tmp)
          vv1x = vf*driftx(i)                     ! modified velocity
          vv1y = vf*drifty(i)
@@ -926,7 +920,7 @@ contains
               + (y(i)-atoms(nnu0)%cy)**2 + (z(i)-atoms(nnu0)%cz)**2)
          tmp1 = zeta**3/pi*exp(-2d0*zeta*tmp1)
          gf = gf * (p1*tmp + q1*tmp1)
-         if (logmode .ge. 5) write(iul,'(A8,5G24.16)') 'g,g1,g2', &
+         if (logmode >= 5) write(iul,'(A8,5G24.16)') 'g,g1,g2', &
               p1*tmp + q1*tmp1,tmp,tmp1,p1,q1
          vv1 = vv1 + vf*v20
       enddo

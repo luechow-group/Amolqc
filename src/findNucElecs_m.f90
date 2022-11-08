@@ -75,8 +75,7 @@ contains
       real(r8), intent(inout) :: x(:), y(:), z(:)   ! coords
       integer, intent(inout), optional :: idx(:)  ! j=idx(i) means x(i) was before x(j). idx is updated
                                                   ! meaning x(i) was x(j) prior to all swaps
-      integer i, ia, ib, a, iamin, ibmin, ica, icb, na, itmp
-      real(r8) dmin
+      integer ia, ib, a, iamin, ibmin, ica, icb, na, itmp
       real(r8) rai(getNNuc(), getNElec())
       real(r8), parameter :: EPS = 0.d0   ! put electrons EPS outside nucleus to avoid singularities in Vpot!
 
@@ -127,7 +126,7 @@ contains
       logical, intent(out)    :: found
       integer, intent(inout), optional :: idx(:) ! j=idx(i) means x(i) was originally x(j)
 
-      integer i, ia, ib, a, iamin, ibmin, ica, icb, na, itmp, k
+      integer ia, ib, a, iamin, ibmin, ica, icb, na, itmp, k
       real(r8) dmin
       real(r8) rai(getNNuc(), getNElec())
       real(r8), parameter :: EPS = 0.d0       ! put electrons EPS outside nucleus to avoid singularities!
@@ -195,8 +194,8 @@ contains
       integer, intent(out)           :: naNuc, nbNuc      ! alpha, beta elecs at nucleus (not varied)
       integer, intent(out), optional :: aNucElec(:), bNucElec(:) ! nuc a -> elec i (at nuc)
       integer, intent(in), optional  :: nucList(:)        ! check only nuclei in list (e.g. no ecp nuclei)
-      integer i, ia, ib, a, iamin, ibmin, ica, icb, na, k
-      real(r8) dmin, tmp
+      integer a, iamin, ibmin, na, k
+      real(r8) dmin
       real(r8) rai(getNNuc(), getNElec())
 
       call assert(size(x)==getNElec(), '(findNucElecs): illegal sizes on entry')
@@ -273,7 +272,7 @@ contains
       real(r8), intent(in)             :: x(:),y(:),z(:)    ! coords
       integer, intent(inout)         :: slist(:)          ! slist(i)==a: electron i at nuc a; ==0: not at a nuc
       integer, intent(inout)         :: nnuc              ! 
-      integer i, k, n, iamin
+      integer i, n, iamin
       real(r8) dmin
       real(r8) rai(getNNuc(), getNElec())
 
@@ -310,8 +309,8 @@ contains
       logical, intent(out)           :: isSet             ! .true. if coords are changed on exit
       integer, intent(inout), optional :: aNucElec(:), bNucElec(:) ! nuc a -> elec i (at nuc)
       integer, intent(in), optional  :: nucList(:)        ! check only nuclei in list (e.g. no ecp nuclei)
-      integer i, ia, ib, a, iamin, ibmin, ica, icb, na, k
-      real(r8) dmin, tmp
+      integer a, iamin, ibmin, na, k
+      real(r8) dmin
       real(r8) rai(getNNuc(), getNElec())
 
       call assert(size(x)==getNElec() .and. size(aNucElec)==getNNuc(), &

@@ -17,39 +17,53 @@
   Arne Luechow, RWTH Aachen University, 52056 Aachen, Germany
 
  with contributions from:
-  Sebastian Manten, Christian Diedrich, Annika Bande, Tony Scott,
-  Rene Petz, Raphael Berner, Alexander Sturm, Kaveh Haghighi Mood
+  Sebastian Manten, Christian Diedrich, Annika Bande, Tony C. Scott,
+  Annett Schwarz, Rene Petz, Raphael Berner, Alexander Sturm,
+  Marko Hermsen, Kaveh Haghighi Mood, Christoph Schulte,
+  Leonard Reuter, Michael A. Heuer, Jil Ludovicy, Vladimir Terzi,
+  Michel V. Heinz
 
 
- version 6.5-dev-20150318    
+ version:          v7.0.1-149-g037d19-dirty
+ compiler version: Intel(R) Fortran Intel(R) 64 Compiler Classic for applications running on Intel(R) 64, Version 2021.7.0 Build 20220726_000000
+ compiler options: -fpp -warn none -O3
 
 
- run started on  at Thu Sep 27 11:22:43 2018 on    1 processor(s)
- using path: /Users/luechow/Projekte/Eqmc/amolqc65dev
-
- =======>      $gen - initializing RNG and setting general parameters       <=======
-
+ run started on  at 2022-11-04T15:17:47.644+01:00 on    1 processor(s)
+ using path: /home/vterzi/Development/Amolqc
+ 
+==============================> reading input <=================================
+ 
+$gen(seed=101)
+$wf(read,file='../../wavefunction/H2O-SM3.wf')
+$sample(create,start=density,generate=random,size=10)
+$qmc(vmc,move=rey,steps=100,block_len=10,discard=5,accept_ratio=0.5)
+ 
+==========> $gen - initializing RNG and setting general parameters <============
+ 
  seed =    101     verbose level = 2
-
- =======>      $wf - wave function      <=======
-
+ 
+===========================> $wf - wave function <==============================
+ 
  wave function settings:
     with BLAS/LAPACK      
     cusp-corrected splines for contracted GTOs
 
  using sequential AO and MO mode 
-
+ 
+ using the standard determinant update algorithm
+ 
  wave function ../../wavefunction/H2O-SM3.wf with: 
            title =Watersingle
            basis =       TZPAE       MO format =         gau         jastrow =   sm3      
           charge =     0                  spin =     1                 coord =  angstrom  
   atomic_charges =      F      same_atoms =      F    no_H_jastrow =      F
-
+ 
   geometry (in angstrom):
 O    0.00000   0.00000   0.11765
 H    0.00000   0.76012  -0.47059
 H    0.00000  -0.76012  -0.47059
-
+ 
 
  basis set:
  basis name: TZPAE.abs
@@ -65,28 +79,33 @@ H    0.00000  -0.76012  -0.47059
  Jastrow factor of type sm3 read with:
    14 generic Schmidt-Moskowitz terms of type sm3
   Jastrow factor read ...
-
+ 
  AO/MO evaluation carried out using aocalc and mocalc.
-
+ 
   MOs read ...
+ 
+    NCSFs =        1 Ndets =        1
+    1 unique alpha and    1 unique beta determinants
+                          are going to be calculated.
+ 
   CSFs read ...
-
- =======>      $sample - creating or modifying the walker sample      <=======
-
+ 
+============> $sample - creating or modifying the walker sample <===============
+ 
  creating new sample
 
  created initial random sample using atom densities
- sample size:           10
- <E>  =     -72.9634 +/-       4.3652 V   =     171.4981
-
+ sample size (all nodes):           10
+ <E>_allnodes =     -72.9634 +/-       4.3652 V_allnodes =     171.4960
+ 
 
  wall clock time for   sample :               0.00 s
  cpu time (master) for sample :               0.00 s
 
 
-
- =======>      $qmc - running a qmc calculation      <=======
-
+ 
+=====================> $qmc - running a qmc calculation <=======================
+ 
 
    * * *  VMC calculation  * * *
 
@@ -105,35 +124,56 @@ H    0.00000  -0.76012  -0.47059
       future walking =           F       pop ctrl = global
               Reconf =           F             RcfMethod =           1
           accumulate =           F
-
+ 
     propagator parameters:
 
               weight =        none                  move =    Reynolds
             moveType =         all
                  tau =     0.01733            drift_scal =     1.00000
              AR step =           T             rej_cross =           F
-
+ 
 
              step       size              <E>                   <V>     AR 
  --------------------------------------------------------------------------
-             10        10       -71.79527 +/-   1.27988   162.171   0.540
-             20        10       -71.85591 +/-   1.28123   162.513   0.400
-             30        10       -71.93515 +/-   1.28268   162.881   0.410
-             40        10       -71.90285 +/-   1.28323   163.020   0.540
-             50        10       -72.04941 +/-   1.28750   164.108   0.570
-             60        10       -72.45668 +/-   1.30000   167.309   0.380
-             70        10       -72.24720 +/-   1.29300   165.514   0.450
-             80        10       -72.28168 +/-   1.29369   165.689   0.530
-             90        10       -72.06072 +/-   1.28786   164.199   0.460
-            100        10       -71.99558 +/-   1.28732   164.061   0.470
+             10        10       -71.79530 +/-   1.27987   162.169   0.540
+             20        10       -71.85594 +/-   1.28122   162.511   0.400
+             30        10       -71.93518 +/-   1.28267   162.878   0.410
+             40        10       -71.90288 +/-   1.28322   163.018   0.540
+             50        10       -72.04944 +/-   1.28749   164.106   0.570
+             60        10       -72.45671 +/-   1.29999   167.307   0.380
+             70        10       -72.24723 +/-   1.29300   165.512   0.450
+             80        10       -72.28170 +/-   1.29368   165.687   0.530
+             90        10       -72.06074 +/-   1.28785   164.197   0.460
+            100        10       -71.99561 +/-   1.28731   164.059   0.470
 
 
   FINAL RESULT:
- total energy                 =     -72.05805 +/- 0.06648 E_h
- block average energy         =     -72.05805 E_h
- variance (of wave function)  =     164.18634 E_h^2
+ total energy                 =     -72.05807 +/- 0.06648 E_h
+ kinetic energy               =      86.86182 +/- 9.19985 E_h
+ e-n potential energy         =    -207.31633 +/- 9.01050 E_h
+ e-e potential energy         =      39.23928 +/- 0.69523 E_h
+ n-n potential energy         =       9.15716 E_h
+ variance (of E_loc)          =     164.18430 +/- 0.51323 E_h^2
+ block average variance       =     164.14452 E_h^2
  tau (adapted)                =        0.0169 fixed at step           50
  N_corr (global)              =       0.0
+
+  FLYVBJERG-PETERSEN: 
+ variance                     =     164.39531 E_h^2
+ error                        =       0.09947 E_h
+ block length                 =      64
+ n_corr                       =       0.06
+
+ log2(blen)   error estimate   errors error
+          0        0.4159900      0.0190970
+          1        0.3869907      0.0251377
+          2        0.3372658      0.0310478
+          3        0.1974901      0.0258207
+          4        0.1755168      0.0325926
+          5        0.1072355      0.0286599
+          6        0.0994702      0.0390154
+          7        0.0793311      0.0458018
+          8        0.1394841      0.1394841
 
  WARNING: stddev and global N_corr may be unreliable
   (number of blocks not discarded < 20)
@@ -144,11 +184,11 @@ H    0.00000  -0.76012  -0.47059
 
 
 
- wall clock time for run         :   0d 00:00:00.026
+ wall clock time for run         :   0d 00:00:00.024
  total cpu time for run (core-h) :            0.0000
  cpu time per mpi process (h)    :            0.0000
 
-Amolqc run finished on Thu Sep 27 11:22:43 2018  
+Amolqc run finished on 2022-11-04T15:17:47.670+01
 
 Bye!
 

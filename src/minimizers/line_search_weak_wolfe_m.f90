@@ -94,11 +94,11 @@ contains
          gtd = dot_product(grad, d)
 
          ! the first condition must be checked first. NOTE THE >=.
-         if (f >= f0 + this%c1_ * t * g0) then   ! .or. isnan(f) !! first condition violated, gone too far
+         if (f >= f0 + this%c1_ * t * g0) then   ! .or. IEEE_IS_NAN(f) !! first condition violated, gone too far
             beta = t
             gradbeta = grad            ! discard f
          ! now the second condition.  NOTE THE <=
-         else if (gtd <= this%c2_ * g0) then   ! isnan(gtd) !! second condition violated, not gone far enough
+         else if (gtd <= this%c2_ * g0) then   ! IEEE_IS_NAN(gtd) !! second condition violated, not gone far enough
             alpha = t
             xalpha = x
             falpha = f

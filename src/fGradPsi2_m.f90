@@ -3,6 +3,7 @@
 ! SPDX-License-Identifier: GPL-3.0-or-later
 
 module fGradPsi2_m
+    use, intrinsic :: IEEE_ARITHMETIC, only: IEEE_IS_NAN
     use kinds_m, only: r8
     use error_m
     use elocData_m, only: elPhi, elU, elxDrift, elyDrift, elzDrift
@@ -59,7 +60,7 @@ contains
         end do
 
         ! sing correction
-        where (ISNAN(g)) g = 0._r8
+        where (IEEE_IS_NAN(g)) g = 0._r8
 
         f = NORM2(g)
 

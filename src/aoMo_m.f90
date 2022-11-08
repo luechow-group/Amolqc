@@ -112,7 +112,7 @@ CONTAINS
             gaussFOrder = .false.
         endif
 
-        if (ie .eq. 0) then                     ! AO's for all electrons
+        if (ie == 0) then                     ! AO's for all electrons
             i1 = 1
             i2 = ne
         else
@@ -140,14 +140,14 @@ CONTAINS
                 rr = rai(a, i)                      ! r_ai
 
                 if (cutao) then                    !AO - Cutoff
-                    if (rr.gt.aocuts(bf)) then       ! --> do nothing but adjusting the counters
-                        if (bl(bf) .eq. 'S') then
+                    if (rr>aocuts(bf)) then       ! --> do nothing but adjusting the counters
+                        if (bl(bf) == 'S') then
                             moc = moc + norb
-                        elseif (bl(bf) .eq. 'P') then
+                        elseif (bl(bf) == 'P') then
                             moc = moc + 3 * norb
-                        elseif (bl(bf) .eq. 'D') then
+                        elseif (bl(bf) == 'D') then
                             moc = moc + 6 * norb
-                        elseif (bl(bf) .eq. 'F') then
+                        elseif (bl(bf) == 'F') then
                             moc = moc + 10 * norb
                         else
                             call abortp('(getaos): wrong GTO')
@@ -158,7 +158,7 @@ CONTAINS
 
                 r2 = rr * rr
 
-                if (bl(bf) .eq. 'S') then                 ! 1s GTO
+                if (bl(bf) == 'S') then                 ! 1s GTO
 
                     dx = xx - atoms(a)%cx
                     dy = yy - atoms(a)%cy
@@ -188,7 +188,7 @@ CONTAINS
                         mat2(j, i, 1) = mat2(j, i, 1) + tmp * tmps(5)
                     enddo
 
-                else if (bl(bf) .eq. 'P') then             ! 2p GTO's
+                else if (bl(bf) == 'P') then             ! 2p GTO's
                     !              // do all 3 P simultaneously (same exponent is required)
                     !              // order p_x,p_y,p_z
 
@@ -243,7 +243,7 @@ CONTAINS
                         enddo
                     enddo
 
-                else if (bl(bf) .eq. 'D') then         ! 3d GTO
+                else if (bl(bf) == 'D') then         ! 3d GTO
                     !              // do all 6 D simultaneously (same exponent is required)
                     !              // order: d_xx, d_yy, d_zz, d_xy, d_xz, d_yz  (like GAMESS)
 
@@ -583,7 +583,7 @@ CONTAINS
 
         !-----Calculation of the AO's
 
-        if (ie .eq. 0) then                     ! AO's for all electrons
+        if (ie == 0) then                     ! AO's for all electrons
             i1 = 1
             i2 = ne
         else
@@ -606,14 +606,14 @@ CONTAINS
                 rr = rai(a, i)                      ! r_ai
 
                 if (cutao) then                    !AO - Cutoff
-                    if (rr.gt.aocuts(bf)) then       ! --> do nothing but adjusting the counter
-                        if (bl(bf) .eq. 'S') then
+                    if (rr>aocuts(bf)) then       ! --> do nothing but adjusting the counter
+                        if (bl(bf) == 'S') then
                             moc = moc + norb
-                        elseif (bl(bf) .eq. 'P') then
+                        elseif (bl(bf) == 'P') then
                             moc = moc + 3 * norb
-                        elseif (bl(bf) .eq. 'D') then
+                        elseif (bl(bf) == 'D') then
                             moc = moc + 6 * norb
-                        elseif (bl(bf) .eq. 'F') then
+                        elseif (bl(bf) == 'F') then
                             moc = moc + 10 * norb
                         else
                             call abortp('(getaos): wrong GTO')
@@ -624,7 +624,7 @@ CONTAINS
 
                 r2 = rr * rr
 
-                if (bl(bf) .eq. 'S') then                 ! 1s GTO
+                if (bl(bf) == 'S') then                 ! 1s GTO
 
                     tmps = 0d0
 
@@ -641,7 +641,7 @@ CONTAINS
                         mat(j, i, 1) = mat(j, i, 1) + cmoa(moc) * tmps
                     enddo
 
-                else if (bl(bf) .eq. 'P') then             ! 2p GTO's
+                else if (bl(bf) == 'P') then             ! 2p GTO's
                     !              // do all 3 P simultaneously (same exponent is required)
                     !              // order p_x,p_y,p_z
 
@@ -668,7 +668,7 @@ CONTAINS
                         enddo
                     enddo
 
-                else if (bl(bf) .eq. 'D') then         ! 3d GTO
+                else if (bl(bf) == 'D') then         ! 3d GTO
                     !              // do all 6 D simultaneously (same exponent is required)
                     !              // order: d_xx, d_yy, d_zz, d_xy, d_xz, d_yz  (like GAMESS)
 
@@ -853,7 +853,7 @@ CONTAINS
             gaussFOrder = .false.
         endif
 
-        if (ie .eq. 0) then                     ! AO's for all electrons
+        if (ie == 0) then                     ! AO's for all electrons
             i1 = 1
             i2 = ne
         else
@@ -881,14 +881,14 @@ CONTAINS
                 rr = rai(a, i)                      ! r_ai
 
                 if (cutao) then                    !AO - Cutoff
-                    if (rr.gt.aocuts(bf)) then       ! --> do nothing but adjusting the counters
-                        if (bl(bf) .eq. 'S') then
+                    if (rr>aocuts(bf)) then       ! --> do nothing but adjusting the counters
+                        if (bl(bf) == 'S') then
                             moc = moc + norb
-                        elseif (bl(bf) .eq. 'P') then
+                        elseif (bl(bf) == 'P') then
                             moc = moc + 3 * norb
-                        elseif (bl(bf) .eq. 'D') then
+                        elseif (bl(bf) == 'D') then
                             moc = moc + 6 * norb
-                        elseif (bl(bf) .eq. 'F') then
+                        elseif (bl(bf) == 'F') then
                             moc = moc + 10 * norb
                         else
                             call abortp('(getaos): wrong GTO')
@@ -899,9 +899,9 @@ CONTAINS
 
                 r2 = rr * rr
 
-                if (so(bf).eq.0) then !only 1 GTO in contraction, no splines used !
+                if (so(bf)==0) then !only 1 GTO in contraction, no splines used !
 
-                    if (bl(bf) .eq. 'S') then                 ! 1s GTO
+                    if (bl(bf) == 'S') then                 ! 1s GTO
 
                         dx = xx - atoms(a)%cx
                         dy = yy - atoms(a)%cy
@@ -928,7 +928,7 @@ CONTAINS
                             mat2(j, i, 1) = mat2(j, i, 1) + tmp * tmps(5)
                         enddo
 
-                    else if (bl(bf) .eq. 'P') then             ! 2p GTO's
+                    else if (bl(bf) == 'P') then             ! 2p GTO's
                         !              // do all 3 P simultaneously (same exponent is required)
                         !              // order p_x,p_y,p_z
 
@@ -976,7 +976,7 @@ CONTAINS
                             enddo
                         enddo
 
-                    else if (bl(bf) .eq. 'D') then         ! 3d GTO
+                    else if (bl(bf) == 'D') then         ! 3d GTO
                         !              // do all 6 D simultaneously (same exponent is required)
                         !              // order: d_xx, d_yy, d_zz, d_xy, d_xz, d_yz  (like GAMESS)
 
@@ -1256,10 +1256,10 @@ CONTAINS
                 else ! CGTO (more than one primitive gaussian) --> use splines
 
                     !cc            r2 = rr*rr
-                    spl = (csplnpnt - 1) * rr / (csalpha + rr) + 1
+                    spl = INT((csplnpnt - 1) * rr / (csalpha + rr) + 1)
                     df = rr - csplx(spl)
 
-                    if (bl(bf) .eq. 'S') then                 ! 1s GTO
+                    if (bl(bf) == 'S') then                 ! 1s GTO
 
                         ispl = 3 * so(bf) - 2
                         tmps(1) = cspla(ispl, spl) + df * (csplb(ispl, spl)&
@@ -1291,7 +1291,7 @@ CONTAINS
                             mat2(j, i, 1) = mat2(j, i, 1) + tmp * tmps(5)
                         enddo
 
-                    else if (bl(bf) .eq. 'P') then             ! 2p GTO's
+                    else if (bl(bf) == 'P') then             ! 2p GTO's
                         !              // do all 3 P simultaneously (same exponent is required)
                         !              // order p_x,p_y,p_z
 
@@ -1345,7 +1345,7 @@ CONTAINS
                             enddo
                         enddo
 
-                    else if (bl(bf) .eq. 'D') then         ! 3d GTO
+                    else if (bl(bf) == 'D') then         ! 3d GTO
                         !              // do all 6 D simultaneously (same exponent is required)
                         !              // order: d_xx, d_yy, d_zz, d_xy, d_xz, d_yz  (like GAMESS)
 
@@ -1689,7 +1689,7 @@ CONTAINS
             gaussFOrder = .false.
         endif
 
-        if (ie .eq. 0) then                     ! AO's for all electrons
+        if (ie == 0) then                     ! AO's for all electrons
             i1 = 1
             i2 = ne
         else
@@ -1713,14 +1713,14 @@ CONTAINS
                 rr = rai(a, i)                      ! r_ai
 
                 if (cutao) then                    !AO - Cutoff
-                    if (rr.gt.aocuts(bf)) then       ! --> do nothing but adjusting the counters
-                        if (bl(bf) .eq. 'S') then
+                    if (rr>aocuts(bf)) then       ! --> do nothing but adjusting the counters
+                        if (bl(bf) == 'S') then
                             moc = moc + norb
-                        elseif (bl(bf) .eq. 'P') then
+                        elseif (bl(bf) == 'P') then
                             moc = moc + 3 * norb
-                        elseif (bl(bf) .eq. 'D') then
+                        elseif (bl(bf) == 'D') then
                             moc = moc + 6 * norb
-                        elseif (bl(bf) .eq. 'F') then
+                        elseif (bl(bf) == 'F') then
                             moc = moc + 10 * norb
                         else
                             call abortp('(getaos): wrong GTO')
@@ -1731,9 +1731,9 @@ CONTAINS
 
                 r2 = rr * rr
 
-                if (so(bf).eq.0) then !only 1 GTO in contraction, no splines used !
+                if (so(bf)==0) then !only 1 GTO in contraction, no splines used !
 
-                    if (bl(bf) .eq. 'S') then                 ! 1s GTO
+                    if (bl(bf) == 'S') then                 ! 1s GTO
 
                         alp = cntrctn(1, 1, bf)
                         u = cntrctn(2, 1, bf) * exp(-alp * r2)
@@ -1745,7 +1745,7 @@ CONTAINS
                             mat(j, i, 1) = mat(j, i, 1) + tmp * u
                         enddo
 
-                    else if (bl(bf) .eq. 'P') then             ! 2p GTO's
+                    else if (bl(bf) == 'P') then             ! 2p GTO's
                         !              // do all 3 P simultaneously (same exponent is required)
                         !              // order p_x,p_y,p_z
 
@@ -1769,7 +1769,7 @@ CONTAINS
                             enddo
                         enddo
 
-                    else if (bl(bf) .eq. 'D') then         ! 3d GTO
+                    else if (bl(bf) == 'D') then         ! 3d GTO
                         !              // do all 6 D simultaneously (same exponent is required)
                         !              // order: d_xx, d_yy, d_zz, d_xy, d_xz, d_yz  (like GAMESS)
 
@@ -1898,10 +1898,10 @@ CONTAINS
                 else ! CGTO (more than one primitive gaussian) --> use splines
 
                     !cc            r2 = rr*rr
-                    spl = (csplnpnt - 1) * rr / (csalpha + rr) + 1
+                    spl = INT((csplnpnt - 1) * rr / (csalpha + rr) + 1)
                     df = rr - csplx(spl)
 
-                    if (bl(bf) .eq. 'S') then                 ! 1s GTO
+                    if (bl(bf) == 'S') then                 ! 1s GTO
 
                         ispl = 3 * so(bf) - 2
                         tmps = cspla(ispl, spl) + df * (csplb(ispl, spl)&
@@ -1914,7 +1914,7 @@ CONTAINS
                             mat(j, i, 1) = mat(j, i, 1) + tmp * tmps
                         enddo
 
-                    else if (bl(bf) .eq. 'P') then             ! 2p GTO's
+                    else if (bl(bf) == 'P') then             ! 2p GTO's
                         !              // do all 3 P simultaneously (same exponent is required)
                         !              // order p_x,p_y,p_z
 
@@ -1939,7 +1939,7 @@ CONTAINS
                             enddo
                         enddo
 
-                    else if (bl(bf) .eq. 'D') then         ! 3d GTO
+                    else if (bl(bf) == 'D') then         ! 3d GTO
                         !              // do all 6 D simultaneously (same exponent is required)
                         !              // order: d_xx, d_yy, d_zz, d_xy, d_xz, d_yz  (like GAMESS)
 

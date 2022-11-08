@@ -5,15 +5,12 @@
 module subloop_m
 
    use kinds_m, only: r8
-#ifdef NAG
-   use, intrinsic :: f90_unix_io, only: flush
-#endif
    use global_m
    use error_m
    use parsing_m, only: getNextBlock, getinta, finda
    use utils_m, only: getToken,getTimeString,readFileParallel,expandMacro,printHeader,getFormattedHeader
    use init_m, only: initAmolqc,initFiles,initGen,finalizeAmolqc
-   use rWSample_m, only: RWSample, writeSampleCommand, recalculateSample
+   use rwSample_m, only: RWSample, writeSampleCommand, recalculateSample
    use randomWalker_m, only: setNumberOfElectrons,setNumberOfCenters,setEpart
    use qmcSample_m, only: sample, initInitialWalker
    use qmc_m, only: qmc_run, qmc_init, initWalkerStat, initTrajectory
@@ -68,12 +65,13 @@ subroutine subloop(subname, smpl, exitSubLoop, psimax_obj)
    character(len=MAXLEN)       :: blockLines(MAXLINES)=''
    character(len=MAXLEN)       :: macroLines(MAXLINES)=''
    character(len=180)          :: macropath,macrofile
-   integer                     :: idx,nbl,nil,i,iuf,io,nnew,iflag,fileExistsInt,exitLoopInt,exitLoopSum
+   integer                     :: idx,nbl,nil,i,iflag,fileExistsInt,exitLoopInt,exitLoopSum
    integer                     :: loopIdx,loopIter,currentLoopIter,subIdx
    integer                     :: mLines
    real(r8)                      :: start,startCPU,endCPU
-   real(r8)                      :: tstart,tstartCPU,tendCPU,sendbuf(1),recvbuf(1),t
-   logical                     :: wfRead,found,exitLoop,fileExists,wout
+   logical                     :: found,exitLoop,fileExists,wout
+
+   logical :: opened
 
    exitSubloop = .false.
    call getAmolqcPath(macropath)
@@ -280,7 +278,8 @@ subroutine subloop(subname, smpl, exitSubLoop, psimax_obj)
             write(iul,'(3A,F18.2,A//)') ' cpu time (master) for ',trim(token),' : ', &
             endCPU-startCPU,' s'
          end if
-         call flush(iul)
+         inquire(iul, opened=opened)
+         if (opened) flush(iul)
       end if
 
    end do

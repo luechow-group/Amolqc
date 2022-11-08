@@ -62,13 +62,12 @@ contains
       character(len=40), optional, intent(in)      :: exclFile
       real(r8) x(ne),y(ne),z(ne),xx(ne,3)
       real(r8), allocatable :: vec(:)
-      integer l,i,j,k,n,nWords,io,nlen
+      integer l,i,j,n,nWords,io,nlen
       character(len=120) line
       character(len=20) words(12)
       character(len=1) emode
       character(len=4) suffix
       type(reference) :: r,r0
-      logical found
       real(r8) nucThresh,coreThresh,bondDiff
       integer, parameter :: iu = 12
 
@@ -144,9 +143,8 @@ contains
    contains
 
       subroutine read_refFile()
-         integer ref,ref2,nref,count,nomax,noel,io,outIdx,tCount,elemLength,idx
+         integer ref,ref2,count,nomax,noel,io,outIdx,tCount,elemLength,idx
          real(r8) wgt,f,meanDist,maxDist
-         type(reference), pointer                 :: rp
          character(len=20) str
          integer, parameter :: iu=12, iu1=13, iu3=14
 
@@ -422,12 +420,9 @@ contains
       type(reference), intent(in)           :: r          ! reference to check
       integer, intent(inout)                :: n          ! return idx of closest reference from this%rv
       integer, intent(inout)                :: permIdx(:) ! return permutation of closest reference
-      type(reference)                       :: r1
       type(reference), pointer              :: rp
-      real(r8)                                :: x(ne,3),xx(3),rr(3)
-      real(r8)                                :: f,f0,wgt,dist,d,thr,maxdist,meandist,smallestDist
-      logical foundSpin, inserted
-      integer i,j,k,ns,smallestIdx,cnt,io
+      real(r8)                                :: maxdist,meandist,smallestDist
+      integer i,smallestIdx
 
       !!write(900+mytid,*) '***   getIdxAndPermutation:'
       call r%setCount(1)
@@ -437,7 +432,7 @@ contains
       do i=1,this%nElems
          call this%getRefPtr(i,rp)
          if (associated(this%excl)) then
-            call calcRefDifference(rp,r,ALLPERM,meandist,maxdist,exclist=this%excl,exclmode=this%exclMode)
+            call calcRefDifference(rp,r,ALLPERM,meandist,maxdist,this%excl,exclmode=this%exclMode)
          else
             call calcRefDifference(rp,r,ALLPERM,meandist,maxdist)
          end if
@@ -466,11 +461,7 @@ contains
    subroutine writeRefFile(this)
       class(referenceVector), intent(inout)        :: this
       type(reference), pointer              :: rp
-      integer                               :: naNuc, nbNuc    ! alpha, beta elecs at nucleus (not varied)
-      integer                               :: aNucElec(getNNuc()), bNucElec(getNNuc()) ! nuc a -> elec i (at nuc)
-      integer i,n,m,io,totalcnt
-      integer, allocatable                  :: idx(:)
-      real(r8) xx(ne,3),sg(ne,3)
+      integer i,n,io
       integer, parameter :: iu2 = 13
       real(r8), parameter  :: thresh = 0.002d0
 

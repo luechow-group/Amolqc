@@ -2,7 +2,7 @@
 !
 ! SPDX-License-Identifier: GPL-3.0-or-later
 
-MODULE rWStatistics_m
+MODULE rwStatistics_m
 
 ! statistics (mean,stddev,cov) for random walkers positions (i.e. 3*ne dim)
 ! in cartesian or spherical coordinates
@@ -17,7 +17,7 @@ MODULE rWStatistics_m
   public  :: rwStatInit, rwStatReset, rwAddToStat, rwStatMean, rwStatStdDev, rwStatPrint
 
   type(vectorStat),save  :: mVStat                ! vector statistics object
-  character*1            :: mType='c'             ! type for rw statistics
+  character(len=1)            :: mType='c'             ! type for rw statistics
 
 
 CONTAINS
@@ -26,7 +26,7 @@ CONTAINS
   subroutine rwStatInit(type)
   !-------------------------!
 
-    character*1, intent(in) :: type
+    character(len=1), intent(in) :: type
 
     if (type == 's') then
        mType = 's'           ! statistics for spherical coordinates
@@ -137,7 +137,7 @@ CONTAINS
 
 
       
-END MODULE rWStatistics_m
+END MODULE rwStatistics_m
 
 
 !====================

@@ -58,11 +58,11 @@ contains
     do i = y, 8
       c = c + a(i) * v(8-i+y) ! a from y to 8, v from 8 to y
     enddo
-    c = mod(c, m)
+    c = mod(c, INT(m, i8))
 
     v(y) = c
     y = iand(y, 7) + 1
-    mrg_intran = c
+    mrg_intran = INT(c)
   end function mrg_intran
 
   real(r8) function mrg_ran()
