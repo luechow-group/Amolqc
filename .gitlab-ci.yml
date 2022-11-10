@@ -17,7 +17,7 @@ GNU serial build:
     - mkdir -p cmake-build-gnu-serial
     - cd cmake-build-gnu-serial
     - cmake ..
-    - make -j4
+    - make -j12
   cache:
     key: "$CI_COMMIT_REF_SLUG-gnu-serial"
     paths:
@@ -31,7 +31,7 @@ GNU serial std08 build:
     - mkdir -p cmake-build-gnu-std08-serial
     - cd cmake-build-gnu-std08-serial
     - cmake -DCONFIG_FILE=OFF -DCMAKE_Fortran_COMPILER=gfortran -DMPI=OFF -DADDITIONAL_FLAGS="-std=f2008" ..
-    - make -j4
+    - make -j12
   cache:
     key: "$CI_COMMIT_REF_SLUG-gnu-std08-serial"
     paths:
@@ -75,7 +75,7 @@ GNU parallel std08 build:
     - mkdir -p cmake-build-gnu-std08-parallel
     - cd cmake-build-gnu-std08-parallel
     - cmake -DCONFIG_FILE=OFF -DCMAKE_Fortran_COMPILER=mpifort -DMPI=ON -DADDITIONAL_FLAGS="-std=f2008" ..
-    - make -j4
+    - make -j12
   cache:
     key: "$CI_COMMIT_REF_SLUG-gnu-std08-parallel"
     paths:
@@ -120,7 +120,7 @@ Intel serial test:
   script:
   - source /opt/intel/parallel_studio_xe_2019/psxevars.sh intel64
   - cd cmake-build-intel-serial
-  - ctest -E StatisticsTests --output-on-failure -j12
+  - ctest -E StatisticsTests --output-on-failure -j2
   cache:
     key: "$CI_COMMIT_REF_SLUG-intel-serial"
     paths:
