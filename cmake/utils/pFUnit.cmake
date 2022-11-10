@@ -5,7 +5,7 @@ if (${PFUNIT})
   include(ExternalProject)
 
   # python is needed for the preprocessing
-  find_program(PYTHON python)
+  find_program(PYTHON python3)
 
   if (DEFINED ENV{PFUNIT})
     set(PFUNIT_BUILD_PATH $ENV{PFUNIT})
