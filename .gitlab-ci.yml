@@ -60,7 +60,7 @@ GNU parallel build:
   - mkdir -p cmake-build-gnu-parallel
   - cd cmake-build-gnu-parallel
   - cmake ..
-  - make -j4
+  - make -j12
   - chown -R user ../cmake-build-gnu-parallel
   cache:
     key: "$CI_COMMIT_REF_SLUG-gnu-parallel"
@@ -105,7 +105,7 @@ Intel serial build:
   - mkdir -p cmake-build-intel-serial
   - cd cmake-build-intel-serial
   - cmake ..
-  - make -j4
+  - make -j12
   cache:
     key: "$CI_COMMIT_REF_SLUG-intel-serial"
     paths:
@@ -120,7 +120,7 @@ Intel serial test:
   script:
   - source /opt/intel/parallel_studio_xe_2019/psxevars.sh intel64
   - cd cmake-build-intel-serial
-  - ctest -E StatisticsTests --output-on-failure -j4
+  - ctest -E StatisticsTests --output-on-failure -j12
   cache:
     key: "$CI_COMMIT_REF_SLUG-intel-serial"
     paths:
