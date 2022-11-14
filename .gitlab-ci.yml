@@ -12,6 +12,7 @@ before_script:
 GNU serial build:
   image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
   stage: build
+  resource_group: amolqc
   script:
     - ./configure.sh serial_gnu.cmake
     - mkdir -p cmake-build-gnu-serial
@@ -27,6 +28,7 @@ GNU serial build:
 GNU serial std08 build:
   image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
   stage: build
+  resource_group: amolqc
   script:
     - mkdir -p cmake-build-gnu-std08-serial
     - cd cmake-build-gnu-std08-serial
@@ -41,6 +43,7 @@ GNU serial std08 build:
 GNU serial test:
   image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
   stage: test
+  resource_group: amolqc
   dependencies:
     - GNU serial build
   script:
@@ -55,6 +58,7 @@ GNU serial test:
 GNU parallel build:
   image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
   stage: build
+  resource_group: amolqc
   script:
   - ./configure.sh openmpi_lapack.cmake
   - mkdir -p cmake-build-gnu-parallel
@@ -71,6 +75,7 @@ GNU parallel build:
 GNU parallel std08 build:
   image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
   stage: build
+  resource_group: amolqc
   script:
     - mkdir -p cmake-build-gnu-std08-parallel
     - cd cmake-build-gnu-std08-parallel
@@ -85,6 +90,7 @@ GNU parallel std08 build:
 GNU parallel test:
   image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
   stage: test
+  resource_group: amolqc
   dependencies:
   - GNU parallel build
   script:
@@ -99,6 +105,7 @@ GNU parallel test:
 Intel serial build:
   image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.0
   stage: build
+  resource_group: amolqc
   script:
   - source /opt/intel/parallel_studio_xe_2019/psxevars.sh intel64
   - ./configure.sh serial_intel.cmake
@@ -115,6 +122,7 @@ Intel serial build:
 Intel serial test:
   image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.0
   stage: test
+  resource_group: amolqc
   dependencies:
   - Intel serial build
   script:
