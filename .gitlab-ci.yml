@@ -17,7 +17,7 @@ GNU serial build:
     - mkdir -p cmake-build-gnu-serial
     - cd cmake-build-gnu-serial
     - cmake ..
-    - make -j12
+    - make -j 12
   cache:
     key: "$CI_COMMIT_REF_SLUG-gnu-serial"
     paths:
@@ -31,7 +31,7 @@ GNU serial std08 build:
     - mkdir -p cmake-build-gnu-std08-serial
     - cd cmake-build-gnu-std08-serial
     - cmake -DCONFIG_FILE=OFF -DCMAKE_Fortran_COMPILER=gfortran -DMPI=OFF -DADDITIONAL_FLAGS="-std=f2008" ..
-    - make -j12
+    - make -j 12
   cache:
     key: "$CI_COMMIT_REF_SLUG-gnu-std08-serial"
     paths:
@@ -45,7 +45,7 @@ GNU serial test:
     - GNU serial build
   script:
     - cd cmake-build-gnu-serial
-    - ctest -E StatisticsTests --output-on-failure -j4
+    - ctest -E StatisticsTests --output-on-failure -j 12
   cache:
     key: "$CI_COMMIT_REF_SLUG-gnu-serial"
     paths:
@@ -60,7 +60,7 @@ GNU parallel build:
   - mkdir -p cmake-build-gnu-parallel
   - cd cmake-build-gnu-parallel
   - cmake ..
-  - make -j12
+  - make -j 12
   - chown -R user ../cmake-build-gnu-parallel
   cache:
     key: "$CI_COMMIT_REF_SLUG-gnu-parallel"
@@ -75,7 +75,7 @@ GNU parallel std08 build:
     - mkdir -p cmake-build-gnu-std08-parallel
     - cd cmake-build-gnu-std08-parallel
     - cmake -DCONFIG_FILE=OFF -DCMAKE_Fortran_COMPILER=mpifort -DMPI=ON -DADDITIONAL_FLAGS="-std=f2008" ..
-    - make -j12
+    - make -j 12
   cache:
     key: "$CI_COMMIT_REF_SLUG-gnu-std08-parallel"
     paths:
@@ -89,7 +89,7 @@ GNU parallel test:
   - GNU parallel build
   script:
   - cd cmake-build-gnu-parallel
-  - su user -c "ctest -E StatisticsTests --output-on-failure -j2"
+  - su user -c "ctest -E StatisticsTests --output-on-failure -j 12"
   cache:
     key: "$CI_COMMIT_REF_SLUG-gnu-parallel"
     paths:
@@ -100,12 +100,11 @@ Intel serial build:
   image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.0
   stage: build
   script:
-  - source /opt/intel/parallel_studio_xe_2019/psxevars.sh intel64
   - ./configure.sh serial_intel.cmake
   - mkdir -p cmake-build-intel-serial
   - cd cmake-build-intel-serial
   - cmake ..
-  - make -j12
+  - make -j 12
   cache:
     key: "$CI_COMMIT_REF_SLUG-intel-serial"
     paths:
@@ -118,9 +117,8 @@ Intel serial test:
   dependencies:
   - Intel serial build
   script:
-  - source /opt/intel/parallel_studio_xe_2019/psxevars.sh intel64
   - cd cmake-build-intel-serial
-  - ctest -E StatisticsTests --output-on-failure -j2
+  - ctest -E StatisticsTests --output-on-failure -j 12
   cache:
     key: "$CI_COMMIT_REF_SLUG-intel-serial"
     paths:
