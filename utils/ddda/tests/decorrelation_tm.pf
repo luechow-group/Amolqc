@@ -3,7 +3,7 @@
 ! SPDX-License-Identifier: GPL-3.0-or-later
 
 module decorrelation_tm
-    use PFUNIT_MOD
+    use funit
     use kinds_m, only: r8, i8
     use, intrinsic :: iso_c_binding,   only: c_ptr, c_f_pointer, c_loc, c_null_ptr
     use decorrelation_m, only: DecorrelationData_t, Decorrelation_t, &

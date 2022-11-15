@@ -3,7 +3,7 @@
 ! SPDX-License-Identifier: GPL-3.0-or-later
 
 module plateau_tm
-    use PFUNIT_MOD
+    use funit
     use kinds_m, only : r8
     use plateau_m, only: Find_plateau
     implicit none

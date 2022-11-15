@@ -1,5 +1,5 @@
 module parsing_tm
-   use PFUNIT_MOD
+   use funit
    use kinds_m, only: r8
    use parsing_m, only: getintarra, getdblarra
 

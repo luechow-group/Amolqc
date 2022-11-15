@@ -14,7 +14,7 @@ if (BASH)
                 ${TEST}
                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
         set_tests_properties(${TEST}_serial
-                PROPERTIES LABELS "testsuite;serial;amolqc")
+                PROPERTIES LABELS "testsuite;serial;Amolqc")
     endforeach(TEST)
     if (${MPI})
         foreach(TEST ${TESTLIST})
@@ -24,7 +24,7 @@ if (BASH)
                 PARALLEL ${TEST}
                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
         set_tests_properties(${TEST}_parallel
-                PROPERTIES LABELS "testsuite;parallel;amolqc")
+                PROPERTIES LABELS "testsuite;parallel;Amolqc")
         endforeach(TEST)
     endif()
 endif()

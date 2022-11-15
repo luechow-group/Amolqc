@@ -19,11 +19,11 @@ target_link_libraries(statisticsTests
 add_test(NAME StatisticsTests_serial
          COMMAND statisticsTests)
 set_tests_properties(StatisticsTests_serial
-        PROPERTIES LABELS "utils;moduletest;amolqc;serial")
+        PROPERTIES LABELS "utils;moduletest;Amolqc;serial")
 
 if(${MPI})
     add_test(NAME StatisticsTests_parallel
             COMMAND mpiexec -n ${NPROC} ${EXECUTABLE_OUTPUT_PATH}/statisticsTests)
     set_tests_properties(StatisticsTests_parallel
-            PROPERTIES LABELS "utils;moduletest;amolqc;parallel")
+            PROPERTIES LABELS "utils;moduletest;Amolqc;parallel")
 endif()
