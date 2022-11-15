@@ -10,7 +10,7 @@ before_script:
 
 
 GNU serial build:
-  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.3.0
   stage: build
   script:
     - ./configure.sh serial_gnu.cmake
@@ -25,7 +25,7 @@ GNU serial build:
     policy: pull-push
 
 GNU serial std08 build:
-  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.3.0
   stage: build
   script:
     - mkdir -p cmake-build-gnu-std08-serial
@@ -39,7 +39,7 @@ GNU serial std08 build:
     policy: pull-push
 
 GNU serial test:
-  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.3.0
   stage: test
   dependencies:
     - GNU serial build
@@ -53,7 +53,7 @@ GNU serial test:
     policy: pull
 
 GNU parallel build:
-  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.3.0
   stage: build
   script:
   - ./configure.sh openmpi_lapack.cmake
@@ -61,7 +61,6 @@ GNU parallel build:
   - cd cmake-build-gnu-parallel
   - cmake ..
   - make -j 12
-  - chown -R user ../cmake-build-gnu-parallel
   cache:
     key: "$CI_COMMIT_REF_SLUG-gnu-parallel"
     paths:
@@ -69,7 +68,7 @@ GNU parallel build:
     policy: pull-push
 
 GNU parallel std08 build:
-  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.3.0
   stage: build
   script:
     - mkdir -p cmake-build-gnu-std08-parallel
@@ -83,13 +82,13 @@ GNU parallel std08 build:
     policy: pull-push
 
 GNU parallel test:
-  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.2.0
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.3.0
   stage: test
   dependencies:
   - GNU parallel build
   script:
   - cd cmake-build-gnu-parallel
-  - su user -c "ctest -E StatisticsTests --output-on-failure -j 12"
+  - ctest -E StatisticsTests --output-on-failure -j 12
   cache:
     key: "$CI_COMMIT_REF_SLUG-gnu-parallel"
     paths:
