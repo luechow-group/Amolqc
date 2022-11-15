@@ -96,7 +96,7 @@ GNU parallel test:
     policy: pull
 
 Intel serial build:
-  image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.0
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.1
   stage: build
   script:
   - ./configure.sh serial_intel.cmake
@@ -111,7 +111,7 @@ Intel serial build:
     policy: pull-push
 
 Intel serial test:
-  image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.0
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.1
   stage: test
   dependencies:
   - Intel serial build
