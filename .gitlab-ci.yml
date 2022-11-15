@@ -99,6 +99,7 @@ Intel serial build:
   image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.1
   stage: build
   script:
+  - . /opt/intel/oneapi/setvars.sh
   - ./configure.sh serial_intel.cmake
   - mkdir -p cmake-build-intel-serial
   - cd cmake-build-intel-serial
@@ -116,6 +117,7 @@ Intel serial test:
   dependencies:
   - Intel serial build
   script:
+  - . /opt/intel/oneapi/setvars.sh
   - cd cmake-build-intel-serial
   - ctest -E StatisticsTests --output-on-failure -j 12
   cache:
