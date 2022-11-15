@@ -123,3 +123,18 @@ Intel serial test:
     paths:
     - cmake-build-intel-serial/
     policy: pull
+
+NAG serial build:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/nag:7.1
+  stage: build
+  script:
+    - ./configure.sh serial_nag.cmake
+    - mkdir -p cmake-build-nag-serial
+    - cd cmake-build-nag-serial
+    - cmake ..
+    - make -j 12
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-nag-serial"
+    paths:
+      - cmake-build-nag-serial/
+    policy: pull-push
