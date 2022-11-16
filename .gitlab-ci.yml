@@ -88,7 +88,7 @@ GNU parallel test:
   - GNU parallel build
   script:
   - cd cmake-build-gnu-parallel
-  - ctest -E StatisticsTests -L Amolqc --output-on-failure -j 12
+  - ctest -E StatisticsTests -LE serial -L Amolqc --output-on-failure -j 6
   cache:
     key: "$CI_COMMIT_REF_SLUG-gnu-parallel"
     paths:
