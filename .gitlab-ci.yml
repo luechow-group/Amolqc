@@ -45,7 +45,7 @@ GNU serial test:
     - GNU serial build
   script:
     - cd cmake-build-gnu-serial
-    - ctest -E StatisticsTests --output-on-failure -j 12
+    - ctest -E StatisticsTests -L Amolqc --output-on-failure -j 12
   cache:
     key: "$CI_COMMIT_REF_SLUG-gnu-serial"
     paths:
@@ -88,7 +88,7 @@ GNU parallel test:
   - GNU parallel build
   script:
   - cd cmake-build-gnu-parallel
-  - ctest -E StatisticsTests --output-on-failure -j 12
+  - ctest -E StatisticsTests -L Amolqc --output-on-failure -j 12
   cache:
     key: "$CI_COMMIT_REF_SLUG-gnu-parallel"
     paths:
@@ -119,7 +119,7 @@ Intel serial test:
   script:
   - . /opt/intel/oneapi/setvars.sh
   - cd cmake-build-intel-serial
-  - ctest -E StatisticsTests --output-on-failure -j 12
+  - ctest -E StatisticsTests -L Amolqc --output-on-failure -j 12
   cache:
     key: "$CI_COMMIT_REF_SLUG-intel-serial"
     paths:
