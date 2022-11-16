@@ -8,4 +8,4 @@ set(OPTLEVEL high)
 # MKL = OFF|ON
 set(MKL ON)
 # COMPILER = mpiifort|mpifort|ifort|gfortran|pgfortran|nagfor|nvfortran etc.
-set(COMPILER mpiifort)
+set(COMPILER mpifort)

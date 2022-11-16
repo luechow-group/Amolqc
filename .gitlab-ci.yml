@@ -50,7 +50,7 @@ GNU parallel build:
   image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.3.0
   stage: build
   script:
-  - ./configure.sh openmpi_lapack.cmake
+  - ./configure.sh openmpi.cmake
   - mkdir -p cmake-build-gnu-parallel
   - cd cmake-build-gnu-parallel
   - cmake ..

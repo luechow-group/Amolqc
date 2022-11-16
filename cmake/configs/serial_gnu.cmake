@@ -7,5 +7,5 @@ set(MPI OFF)
 set(OPTLEVEL high)
 # MKL = OFF|ON
 set(MKL OFF)
-# COMPILER = mpiifort|mpifort|ifort|gfortran|pgfortran|nagfor etc.
+# COMPILER = mpiifort|mpifort|ifort|gfortran|pgfortran|nagfor|nvfortran etc.
 set(COMPILER gfortran)
