@@ -45,11 +45,6 @@ GNU serial test:
   script:
     - cd cmake-build-gnu-serial
     - ctest -E StatisticsTests -L Amolqc --output-on-failure -j 12
-  cache:
-    key: "$CI_COMMIT_REF_SLUG-gnu-serial"
-    paths:
-      - cmake-build-gnu-serial/
-    policy: pull
 
 GNU parallel build:
   image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.3.0
@@ -87,11 +82,6 @@ GNU parallel test:
   script:
   - cd cmake-build-gnu-parallel
   - ctest -E StatisticsTests -LE serial -L Amolqc --output-on-failure -j 6
-  cache:
-    key: "$CI_COMMIT_REF_SLUG-gnu-parallel"
-    paths:
-    - cmake-build-gnu-parallel/
-    policy: pull
 
 Intel serial build:
   image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.1
@@ -117,11 +107,6 @@ Intel serial test:
   - . /opt/intel/oneapi/setvars.sh
   - cd cmake-build-intel-serial
   - ctest -E StatisticsTests -L Amolqc --output-on-failure -j 12
-  cache:
-    key: "$CI_COMMIT_REF_SLUG-intel-serial"
-    paths:
-    - cmake-build-intel-serial/
-    policy: pull
 
 #NAG serial build:
 #  image: registry.git.rwth-aachen.de/luechow-group/amolqc/nag:7.1
