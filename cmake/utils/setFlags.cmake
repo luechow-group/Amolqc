@@ -16,6 +16,10 @@ if(${MPI})
     set(FLAGS "${FLAGS} -DMPI")
 endif()
 
+if(${STANDARD})
+    set(FLAGS "${FLAGS} ${STANDARD_FLAGS}")
+endif()
+
 # sets warning flags
 if(${WARNINGS})
     set(FLAGS "${FLAGS} ${WARN_FLAGS}")
