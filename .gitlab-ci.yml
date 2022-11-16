@@ -41,8 +41,7 @@ GNU serial std08 build:
 GNU serial test:
   image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.3.0
   stage: test
-  dependencies:
-    - GNU serial build
+  needs: ["GNU serial build"]
   script:
     - cd cmake-build-gnu-serial
     - ctest -E StatisticsTests -L Amolqc --output-on-failure -j 12
@@ -84,8 +83,7 @@ GNU parallel std08 build:
 GNU parallel test:
   image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.3.0
   stage: test
-  dependencies:
-  - GNU parallel build
+  needs: ["GNU parallel build"]
   script:
   - cd cmake-build-gnu-parallel
   - ctest -E StatisticsTests -LE serial -L Amolqc --output-on-failure -j 6
@@ -114,8 +112,7 @@ Intel serial build:
 Intel serial test:
   image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.1
   stage: test
-  dependencies:
-  - Intel serial build
+  needs: ["Intel serial build"]
   script:
   - . /opt/intel/oneapi/setvars.sh
   - cd cmake-build-intel-serial
