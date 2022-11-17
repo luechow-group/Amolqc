@@ -39,7 +39,11 @@ contains
     v(1) = seed
     ! initialization by Matsumoto, 2007, ACM Trans. Model. Comput. Simul. 17 (4)
     do i = 2, 8
+#ifndef NVHPC
       v(i) = iand(b * (ieor(v(i-1), shiftr(v(i-1), s))) + i - 1, q)
+#else
+      v(i) = iand(b * (ieor(v(i-1), rshift(v(i-1), s))) + i - 1, q)
+#endif
     enddo
     y = 1
 
@@ -76,7 +80,11 @@ contains
       a = iand(mrg_intran(), k)
       b = iand(mrg_intran(), k)
       ! combine to get 53 random bits
+#ifndef NVHPC
       s = iand(ior(shiftl(a, 30), b), m - 1)
+#else
+      s = iand(or(lshift(a, 30), b), m - 1)
+#endif
       ! convert to real with exponent 0
       r = dble(s) / m
     enddo
