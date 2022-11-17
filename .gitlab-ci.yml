@@ -95,6 +95,92 @@ Intel serial test:
     - cmake-build-intel-serial/
     policy: pull
 
+Intel parallel build:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.1
+  stage: build
+  script:
+    - . /opt/intel/oneapi/setvars.sh
+    - ./configure.sh intelmpi.cmake
+    - mkdir -p cmake-build-intel-parallel
+    - cd cmake-build-intel-parallel
+    - cmake ..
+    - make -j 12
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-intel-parallel"
+    paths:
+      - cmake-build-intel-parallel/
+    policy: pull-push
+
+Intel parallel test:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.1
+  stage: test
+  needs: ["Intel parallel build"]
+  script:
+    - . /opt/intel/oneapi/setvars.sh
+    - cd cmake-build-intel-parallel
+    - ctest -E StatisticsTests -LE serial -L Amolqc --output-on-failure -j 6
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-intel-parallel"
+    paths:
+      - cmake-build-intel-parallel/
+    policy: pull
+
+#Nvidia serial build:
+#  image: registry.git.rwth-aachen.de/luechow-group/amolqc/nvhpc:22.9
+#  stage: build
+#  script:
+#    - ./configure.sh serial_nvidia.cmake
+#    - mkdir -p cmake-build-nvidia-serial
+#    - cd cmake-build-nvidia-serial
+#    - cmake ..
+#    - make -j 12
+#  cache:
+#    key: "$CI_COMMIT_REF_SLUG-nvidia-serial"
+#    paths:
+#      - cmake-build-nvidia-serial/
+#    policy: pull-push
+#
+#Nvidia serial test:
+#  image: registry.git.rwth-aachen.de/luechow-group/amolqc/nvhpc:22.9
+#  stage: test
+#  needs: ["Nvidia serial build"]
+#  script:
+#    - cd cmake-build-nvidia-serial
+#    - ctest -E StatisticsTests -L Amolqc --output-on-failure -j 12
+#  cache:
+#    key: "$CI_COMMIT_REF_SLUG-nvidia-serial"
+#    paths:
+#      - cmake-build-nvidia-serial/
+#    policy: pull
+#
+#Nvidia parallel build:
+#  image: registry.git.rwth-aachen.de/luechow-group/amolqc/nvhpc:22.9
+#  stage: build
+#  script:
+#    - ./configure.sh openmpi.cmake
+#    - mkdir -p cmake-build-nvidia-parallel
+#    - cd cmake-build-nvidia-parallel
+#    - cmake ..
+#    - make -j 12
+#  cache:
+#    key: "$CI_COMMIT_REF_SLUG-nvidia-parallel"
+#    paths:
+#      - cmake-build-nvidia-parallel/
+#    policy: pull-push
+#
+#Nvidia parallel test:
+#  image: registry.git.rwth-aachen.de/luechow-group/amolqc/nvhpc:22.9
+#  stage: test
+#  needs: ["Nvidia parallel build"]
+#  script:
+#    - cd cmake-build-nvidia-parallel
+#    - ctest -E StatisticsTests -LE serial -L Amolqc --output-on-failure -j 6
+#  cache:
+#    key: "$CI_COMMIT_REF_SLUG-nvidia-parallel"
+#    paths:
+#      - cmake-build-nvidia-parallel/
+#    policy: pull
+#
 #NAG serial build:
 #  image: registry.git.rwth-aachen.de/luechow-group/amolqc/nag:7.1
 #  stage: build
@@ -109,3 +195,16 @@ Intel serial test:
 #    paths:
 #      - cmake-build-nag-serial/
 #    policy: pull-push
+#
+#NAG serial test:
+#  image: registry.git.rwth-aachen.de/luechow-group/amolqc/nag:7.1
+#  stage: test
+#  needs: ["NAG serial build"]
+#  script:
+#    - cd cmake-build-nag-serial
+#    - ctest -E StatisticsTests -L Amolqc --output-on-failure -j 12
+#  cache:
+#    key: "$CI_COMMIT_REF_SLUG-nag-serial"
+#    paths:
+#      - cmake-build-nag-serial/
+#    policy: pull
