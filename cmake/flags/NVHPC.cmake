@@ -7,5 +7,5 @@ set(OPENMP_FLAGS "-mp")
 set(LINEINFO_FLAGS "-g -traceback")
 set(STANDARD_FLAGS "-Mstandard")
 
-set(DEBUG_FLAGS "-C -Minfo=all")
-set(RELEASE_FLAGS "-O2")
+set(DEBUG_FLAGS "-Mbackslash -C -Minfo=all")
+set(RELEASE_FLAGS "-Mbackslash -O2")
