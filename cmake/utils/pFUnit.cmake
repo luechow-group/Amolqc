@@ -12,7 +12,7 @@ if (${PFUNIT})
     FetchContent_Declare(
       PFUNIT
       GIT_REPOSITORY "https://github.com/Leonard-Reuter/pFUnit"
-      GIT_TAG 286af89755d2c54558b7d43836da6d88593bb87c 
+      GIT_TAG temp 
     )  
     FetchContent_MakeAvailable(PFUNIT)
   endif()
