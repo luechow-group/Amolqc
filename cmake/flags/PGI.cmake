@@ -1,5 +1,7 @@
 # https://www.pgroup.com/resources/docs/17.10/x86/pgi-ref-guide/index.htm#cmdln-options-ref
 
+set(ALWAYS_FLAGS "-Mbackslash")
+
 set(WARN_FLAGS "")
 set(NOWARN_FLAGS "-w")
 set(PP_FLAGS "-cpp")
