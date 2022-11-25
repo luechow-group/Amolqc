@@ -339,6 +339,7 @@ $eigenvect_analysis
 no options. This command calculates the eigenvalues and -vectors of the Hessian for
 a given sample (.pos file) and writes the results into an eigenvect_analysis.yml file.
 
+$init_max_search() has to be called before to create the psiMax object.
 
 =====================================================================================
 
