@@ -676,7 +676,7 @@ contains
     logical,intent(out)               :: noTmove(:)
 
     real(r8) :: mp,tau
-    integer i,w,tmove
+    integer  :: i,w,tmove, electron
     real(r8) :: phiOld(size(rwb)),uOld(size(rwb))
     real(r8) :: diffx(ne),diffy(ne),diffz(ne)
     real(r8) :: x(ne),y(ne),z(ne),x1(ne),y1(ne),z1(ne)
