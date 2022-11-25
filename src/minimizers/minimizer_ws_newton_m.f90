@@ -103,6 +103,7 @@ contains
 
             ! calculating step
             call fn%eval_fgh(x, f, g, H, mask)
+            call this%restrict_gradient(g, H)
 
             ! calculate delta_x = -H^-1 * g by solving H*delta_x = -g
             delta_x = - this%dt*g

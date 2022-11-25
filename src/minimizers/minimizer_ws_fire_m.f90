@@ -11,6 +11,7 @@ module minimizer_ws_fire_module
    use line_search_ws_m, only: line_search_ws
    use minimizer_w_sing_module, only: minimizer_w_sing
    use minimizer_fire_module, only: fire_parameters, PASS, BACKTRACK
+   use error_m, only: abortp
    implicit none
 
    private
@@ -55,6 +56,10 @@ contains
       integer                    :: iter, verbose, iul, latency, ls_iter
       type(singularity_particles):: sp, sp_old
       logical is_corrected
+
+      if (ALLOCATED(this%not_to_minimize_) .or. ALLOCATED(this%to_minimize_)) then
+         call abortp('not_to_minimize and minimize_this are not implemented for fire')
+      end if
 
       call sp%create(size(x)/3, this%sc_%n_singularities())
 
