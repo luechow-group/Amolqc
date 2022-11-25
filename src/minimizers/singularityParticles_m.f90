@@ -17,6 +17,8 @@ module singularityParticles_m
    type :: singularity_particles
       integer, allocatable :: slist(:)  ! contains the singularity each particle is in (0 for not in singularity)
       integer, allocatable :: nuc_list(:)  ! contains the particles that are in each singularity
+      real(r8) :: sing_diag_H = 1._r8  ! sets the diagonal element of the Hessian for particles in the singularities
+                                       ! for optimization, this should be 1. For EVAnalysis some large number.
    contains
       procedure :: create => singularity_particles_create
       procedure :: n_sing => singularity_particles_n_sing
@@ -26,12 +28,14 @@ module singularityParticles_m
    end type singularity_particles
 contains
 
-   subroutine singularity_particles_create(this, n_particles, n_singularities)
-      class(singularity_particles), intent(inout)  :: this
-      integer, intent(in)                   :: n_particles, n_singularities
+   subroutine singularity_particles_create(this, n_particles, n_singularities, sing_diag_H)
+      class(singularity_particles), intent(inout) :: this
+      integer, intent(in) :: n_particles, n_singularities
+      real(r8), intent(in), optional :: sing_diag_H
       allocate(this%slist(n_particles), this%nuc_list(n_singularities))
       this%slist = 0
       this%nuc_list = 0
+      if (PRESENT(sing_diag_H)) this%sing_diag_H = sing_diag_H
    end subroutine singularity_particles_create
 
    function singularity_particles_n_sing(this) result (res)
@@ -82,7 +86,7 @@ contains
             if (mask(i)) then
                H(i,:) = 0._r8
                H(:,i) = 0._r8
-               H(i,i) = 1._r8
+               H(i,i) = this%sing_diag_H
             end if
          end do
       end if

@@ -215,10 +215,11 @@ contains
    end subroutine psimax_writeParams
 
 
-   subroutine psimax_calculateHessian(this, sample, H)
+   subroutine psimax_calculateHessian(this, sample, H, sing_diag_H)
       class(psimax), intent(inout) :: this
       real(r8), intent(inout)      :: sample(3*getNElec())
       real(r8), intent(inout)      :: H(3*getNElec(), 3*getNElec())
+      real(r8), intent(in), optional :: sing_diag_H
       type(singularity_particles)  :: sp
       real(r8)                     :: f, g(3*getNElec())
       real(r8)                     :: delta_x(3*getNElec())
@@ -229,7 +230,12 @@ contains
 
       ! correct for singularities
       delta_x = 0._r8  ! no step
-      call sp%create(SIZE(sample)/3, this%minimizer_p%sc_%n_singularities())
+      if (PRESENT(sing_diag_H)) then
+         call sp%create(SIZE(sample)/3, this%minimizer_p%sc_%n_singularities(), sing_diag_H)
+      else
+         call sp%create(SIZE(sample)/3, this%minimizer_p%sc_%n_singularities())
+      end if
+
       call this%minimizer_p%sc_%correct_for_singularities(sample, delta_x, sp, is_corrected, correction_only=.true.)
       call sp%Fix_gradients(g, H)
    end subroutine psimax_calculateHessian

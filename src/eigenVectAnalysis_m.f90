@@ -43,7 +43,7 @@ contains
             call pos(rw, xx)
 
             !calculate Hessian
-            call psimax_obj%calculateHessian(xx, H)
+            call psimax_obj%calculateHessian(xx, H, 2E+5_r8)
 
             !get eigenvalues and -vectors
             lwork = 3*SIZE(xx)-1
