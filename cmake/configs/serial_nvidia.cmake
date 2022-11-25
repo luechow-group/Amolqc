@@ -8,6 +8,6 @@ set(STANDARD ON)
 # OPTLEVEL = debug|no|high
 set(OPTLEVEL high)
 # MKL = OFF|ON
-set(MKL ON)
+set(MKL OFF)
 # COMPILER = mpiifort|mpifort|ifort|gfortran|pgfortran|nagfor|nvfortran etc.
-set(COMPILER ifort)
+set(COMPILER nvfortran)

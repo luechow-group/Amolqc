@@ -10,6 +10,9 @@ add_test(NAME RandomTests
          COMMAND randomTests)
 
 set_tests_properties(RandomTests
-        PROPERTIES LABELS "utils;moduletest;amolqc")
+        PROPERTIES LABELS "utils;moduletest;Amolqc")
 
-add_pFUnit_test("Normal" "basics;random")
+add_pFUnit_ctest(normal_test
+        TEST_SOURCES normal_tm.pf
+        LINK_LIBRARIES basics random
+        LABELS utils moduletest Amolqc pFUnit)

@@ -5,6 +5,7 @@ set(NOWARN_FLAGS "-w=all")
 set(PP_FLAGS "-fpp")
 set(OPENMP_FLAGS "-openmp")
 set(LINEINFO_FLAGS "-g -gline")
+set(STANDARD_FLAGS "")
 
 set(DEBUG_FLAGS "-C -C=alias -C=dangling")
 set(RELEASE_FLAGS "-O3")

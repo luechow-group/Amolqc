@@ -20,4 +20,4 @@ target_link_libraries(minimizersTests
 add_test(NAME MinimizersTests
          COMMAND minimizersTests)
 set_tests_properties(MinimizersTests
-        PROPERTIES LABELS "minimizers;moduletest;amolqc")
+        PROPERTIES LABELS "minimizers;moduletest;Amolqc")

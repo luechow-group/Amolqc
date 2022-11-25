@@ -3,7 +3,7 @@
 ! SPDX-License-Identifier: GPL-3.0-or-later
 
 module sorting_tm
-    use PFUNIT_MOD
+    use funit
     use kinds_m, only : i4, r8
     use sorting_m, only: sort
     implicit none

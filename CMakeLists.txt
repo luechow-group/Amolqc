@@ -32,20 +32,20 @@ include(cmake/rules/postRules.cmake)
 # set compile flags
 include(cmake/utils/setFlags.cmake)
 
+# allow for using add_test() and run tests with 'ctest'
+enable_testing()
+
+# add pFUnit support
+include(cmake/utils/pFUnit.cmake)
+
 # set path for executable amolqc
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 # add custom cmake functions
 include(cmake/utils/fortranFunctions.cmake)
 
-# allow for using add_test() and run tests with 'ctest'
-enable_testing()
-
 # add testsuite to tests
 include(cmake/testsuite/testsuite.cmake)
-
-# add pFUnit support
-include(cmake/utils/pFUnit.cmake)
 
 # add subdirectories
 add_subdirectory(utils)

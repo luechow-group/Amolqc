@@ -68,7 +68,11 @@ contains
         integer, intent(in) :: bytes
         integer(i8) :: i
         do i = 0, bytes - 1
+#ifndef NVHPC
             write(*,"(A)",advance="no") char(iand(shiftr(foo, i*8), 255_i8))
+#else
+            write(*,"(A)",advance="no") char(iand(rshift(foo, i*8), 255_i8))
+#endif
         enddo
 
     end subroutine
@@ -83,7 +87,11 @@ contains
         b = iand(b, k)
         call print_int(a, 6)
         call print_int(b, 6)
+#ifndef NVHPC
         rand = shiftl(shiftr(a, 48), 4) + shiftr(b, 48)
+#else
+        rand = lshift(rshift(a, 48), 4) + rshift(b, 48)
+#endif
         call print_int(rand, 1)
     end subroutine
     
@@ -116,13 +124,25 @@ contains
         do i=1,1
             a = iand(mrg_intran(), m)
             b = iand(mrg_intran(), m)
+#ifndef NVHPC
             rand = shiftl(a, 30) + b
+#else
+            rand = lshift(a, 30) + b
+#endif
             call print_int(rand, 7)
             c = iand(mrg_intran(), m)
             d = iand(mrg_intran(), m)
+#ifndef NVHPC
             rand = shiftl(c, 30) + d
+#else
+            rand = lshift(c, 30) + d
+#endif
             call print_int(rand, 7)
+#ifndef NVHPC
             rand = shiftl(shiftr(c, 26), 4) + shiftr(a, 26)
+#else
+            rand = lshift(rshift(c, 26), 4) + rshift(a, 26)
+#endif
             call print_int(rand, 1)
         enddo
     end subroutine
