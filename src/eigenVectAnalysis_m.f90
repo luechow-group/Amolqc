@@ -50,8 +50,8 @@ contains
             end do
             sample = xx
 
-            !correct for singularities
-            call psimax_obj%correctForSingularities(sample, H)
+            !calculate Hessian
+            call psimax_obj%calculateHessian(sample, H)
 
             !get eigenvalues and -vectors
             lwork = 3*SIZE(sample)-1

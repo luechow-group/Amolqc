@@ -72,7 +72,7 @@ module psiMax_m
       procedure :: iterations => psimax_iterations
       procedure :: write_results => psimax_writeResults
       procedure :: get_analyze_mode => psimax_getAnalyzeMode
-      procedure :: correctForSingularities => psimax_correctForSingularities
+      procedure :: calculateHessian => psimax_calculateHessian
    end type psimax
 
    ! counters variables:
@@ -215,7 +215,7 @@ contains
    end subroutine psimax_writeParams
 
 
-   subroutine psimax_correctForSingularities(this, sample, H)
+   subroutine psimax_calculateHessian(this, sample, H)
       class(psimax), intent(inout) :: this
       type(singularity_particles)  :: sp
       real(r8), intent(inout)      :: sample(3*getNElec())
@@ -231,14 +231,16 @@ contains
       n = getNElec()
       step_size = 0.2_r8
 
-      !correct for singularities
+      !calculate Hessian
       call this%fg%eval_fgh(sample, f, g, H)
+
+      !correct for singularities
       call sp%create(SIZE(sample)/3, this%minimizer_p%sc_%n_singularities())
       delta_x = 0._r8
       call this%minimizer_p%sc_%correct_for_singularities(sample, delta_x, sp, is_corrected, correction_only=.false.)
       call sp%Fix_gradients(g, H)
 
-   end subroutine psimax_correctForSingularities
+   end subroutine psimax_calculateHessian
 
 
    subroutine psimax_opt(this, rw, update_walker)
