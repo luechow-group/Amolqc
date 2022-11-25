@@ -24,15 +24,13 @@ contains
         type(RWSample), intent(inout) :: smpl
         type(psimax), intent(inout)   :: psimax_obj
         type(RandomWalker), pointer   :: rw
-        integer                       :: n, i, lwork, info, yml, k
-        real(r8)                      :: xx(3*getNElec()), sample(3*getNElec())
-        real(r8)                      :: x(getNElec()), y(getNElec()), z(getNElec())
+        integer                       :: i, lwork, info, yml, k
+        real(r8)                      :: xx(3*getNElec())
         real(r8)                      :: H(SIZE(xx),SIZE(xx))
         real(r8)                      :: lambda(SIZE(xx)), work2(3*SIZE(xx)-1)
 
         !initialize variables
         rw => getFirst(smpl)
-        n = getNElec()
 
         !create output document
         open(newunit=yml, file = 'eigenvect_analysis.yml')
@@ -42,20 +40,14 @@ contains
         !eigenvector analysis
         do
             !get sample
-            call pos(rw, x, y, z)
-            do i = 1, n
-                xx(3*i-2) = x(i)
-                xx(3*i-1) = y(i)
-                xx(3*i)   = z(i)
-            end do
-            sample = xx
+            call pos(rw, xx)
 
             !calculate Hessian
-            call psimax_obj%calculateHessian(sample, H)
+            call psimax_obj%calculateHessian(xx, H)
 
             !get eigenvalues and -vectors
-            lwork = 3*SIZE(sample)-1
-            call DSYEV('V', 'U', SIZE(sample), H, SIZE(sample), lambda, work2, lwork, info)
+            lwork = 3*SIZE(xx)-1
+            call DSYEV('V', 'U', SIZE(xx), H, SIZE(xx), lambda, work2, lwork, info)
             !call assert(info == 0, 'eigenVectAnalysis: Inversion failed!')
 
             !write eigenvalues to document
