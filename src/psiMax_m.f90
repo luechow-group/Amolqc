@@ -72,7 +72,7 @@ module psiMax_m
       procedure :: iterations => psimax_iterations
       procedure :: write_results => psimax_writeResults
       procedure :: get_analyze_mode => psimax_getAnalyzeMode
-      procedure :: correctForSingularities => psimax_correctForSingularities
+      procedure :: calculateHessian => psimax_calculateHessian
    end type psimax
 
    ! counters variables:
@@ -215,30 +215,30 @@ contains
    end subroutine psimax_writeParams
 
 
-   subroutine psimax_correctForSingularities(this, sample, H)
+   subroutine psimax_calculateHessian(this, sample, H, sing_diag_H)
       class(psimax), intent(inout) :: this
-      type(singularity_particles)  :: sp
       real(r8), intent(inout)      :: sample(3*getNElec())
-      real(r8)                     :: xx(3*getNElec())
-      real(r8), intent(inout)      :: H(:,:)
-      real(r8)                     :: g(SIZE(xx))
-      real(r8)                     :: f, delta_x(SIZE(xx))
-      real(r8)                     :: step_size
+      real(r8), intent(inout)      :: H(3*getNElec(), 3*getNElec())
+      real(r8), intent(in), optional :: sing_diag_H
+      type(singularity_particles)  :: sp
+      real(r8)                     :: f, g(3*getNElec())
+      real(r8)                     :: delta_x(3*getNElec())
       logical                      :: is_corrected
-      integer                      :: n
 
-      !initialize variables
-      n = getNElec()
-      step_size = 0.2_r8
-
-      !correct for singularities
+      ! calculate Hessian
       call this%fg%eval_fgh(sample, f, g, H)
-      call sp%create(SIZE(sample)/3, this%minimizer_p%sc_%n_singularities())
-      delta_x = 0._r8
-      call this%minimizer_p%sc_%correct_for_singularities(sample, delta_x, sp, is_corrected, correction_only=.false.)
-      call sp%Fix_gradients(g, H)
 
-   end subroutine psimax_correctForSingularities
+      ! correct for singularities
+      delta_x = 0._r8  ! no step
+      if (PRESENT(sing_diag_H)) then
+         call sp%create(SIZE(sample)/3, this%minimizer_p%sc_%n_singularities(), sing_diag_H)
+      else
+         call sp%create(SIZE(sample)/3, this%minimizer_p%sc_%n_singularities())
+      end if
+
+      call this%minimizer_p%sc_%correct_for_singularities(sample, delta_x, sp, is_corrected, correction_only=.true.)
+      call sp%Fix_gradients(g, H)
+   end subroutine psimax_calculateHessian
 
 
    subroutine psimax_opt(this, rw, update_walker)

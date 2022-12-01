@@ -339,6 +339,7 @@ $eigenvect_analysis
 no options. This command calculates the eigenvalues and -vectors of the Hessian for
 a given sample (.pos file) and writes the results into an eigenvect_analysis.yml file.
 
+$init_max_search() has to be called before to create the psiMax object.
 
 =====================================================================================
 
@@ -582,12 +583,15 @@ eigenvalue_threshold=1e-2 : only eigenvalues with absolute value larger than eig
                             counting the number of negative eigenvalues.
 not_to_minimize      : list of indices of coordinates, which should not be optimized (e.g. =3;6;9 in order to not
                        optimize the z coordinates of the 1st, 2nd, and 3rd electrons)
+minimize_this        : does the opposite of not_to_minimize
 minimize_grad_norm   : Instead of minimizing Phi, minimizes the magnitude of the gradient, in order to use the faster
                        steepest descent method to find saddle points. (Note: This option can be used with every
                        minimizer. However, it might not be sensible to use the Newton method.)
-max_electron_distance=dd : (Important: only implemented for the bfgs minimizer!) if given and the coordinates of an
-                           electron (either x, y, or z) exceed the given number, the minimization process will be
-                           aborted (not converged).
+max_electron_distance : (Important: only implemented for the bfgs minimizer!) Accepts either one double or
+                        three doubles (max_electron_distance=3.0 or max_electron_distance=1.0;2.0;3.0, for x, y, and z
+                        respectively. If only one value is given the max_electron_distance for the other coordinates is
+                        assumed to be the same). Checks if the coordinates of the electrons exceed the given value. If
+                        so the minimization process will be aborted.
 
 singularity correction parameters:
 correction_mode=[cut|umr|cut_all|umr_all|none]:
@@ -1119,6 +1123,10 @@ show_steps        : write block,step,E,var,stddev for each step to fort.900
 T_moves=[SIMPLE|SC]  : Only for DMC ECP calculations. For SIMPLE see DOI: 10.1103/PhysRevB.74.161102 and for SC
                        DOI: 10.1063/1.3380831. SIMPLE is available only comparisons and SC should be used for
                        productive calculations.
+
+fixed_electrons      : list of electrons, which should not be propagated (e.g. =3;6;9 in order to not
+                       move the electrons 3, 6, and 9 from the $init_walker section.) This is only implemented for the
+                       Reynolds and Umrigar propagator and is usefull for the systematic saddle point search.
 
 For an example usage of the accumulation, see examples/h_accumulate.in
 

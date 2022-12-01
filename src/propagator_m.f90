@@ -26,6 +26,7 @@ module propagator_m
   integer     :: mWeight=0            ! weighting strategy (none=0,Rey=1,Umr,Accept)
   integer     :: mMove=1              ! propagator (Rey=1,Umr)
   integer     :: mBlockDiscard=5           ! blocks to discard initially
+  integer, allocatable  :: fixedElec(:)
   integer     :: mBlockGetTauEff=2         ! blocks (before discard) used in DMC to calc tau_a
   real(r8)      :: mTau=0.d0            ! time step
   real(r8)      :: mDriftScal=1.d0      ! option to scal drift term in VMC
@@ -93,6 +94,8 @@ contains
     mAccRatio=0
     call reset(sTauaStat)
     call reset(mTMoveCount)
+
+    if (ALLOCATED(fixedElec)) DEALLOCATE(fixedElec)
     !!if (logmode >= 3) then
     !!  call createHistogram(mDBGWeights,0.5d0,1.5d0,20)
     !!  call reset(mDBGERef)
@@ -101,11 +104,12 @@ contains
   end subroutine propagator_reset
 
 
-  subroutine propagator_init(wgt,move,Tmove,dc,bgte,tau,ds,ar,rc,mt,wb)
+  subroutine propagator_init(wgt,move,Tmove,dc,bgte,tau,ds,ar,rc,mt,wb,fixed_ele)
   !-------------------------------------------------------------------!
     ! initialize propagator. Only most important parameters here
     ! For the rest create individual set functions if required
     integer, intent(in)            :: wgt,move,dc,bgte,wb
+    integer, allocatable, intent(in),optional :: fixed_ele(:)
     type(TMoveControl),intent(in)  :: Tmove
     real(r8), intent(in)             :: tau,ds
     logical, intent(in)            :: ar,rc
@@ -114,6 +118,10 @@ contains
 
     mWeight         = wgt
     mMove           = move
+
+    if (PRESENT(fixed_ele) .and. ALLOCATED(fixed_ele)) then
+        fixedElec = fixed_ele  ! allocate on assignment
+    end if
 
     if (Tmove%mode > 0 .and. move == 3) call abortp("propagator_init: T moves not allowed with two-level propagator")
 
@@ -667,8 +675,8 @@ contains
     real(r8), intent(out)               :: r2(:)         ! squared diffusion displacement
     logical,intent(out)               :: noTmove(:)
 
-    integer i,w,tmove
     real(r8) :: mp,tau
+    integer  :: i,w,tmove, electron
     real(r8) :: phiOld(size(rwb)),uOld(size(rwb))
     real(r8) :: diffx(ne),diffy(ne),diffz(ne)
     real(r8) :: x(ne),y(ne),z(ne),x1(ne),y1(ne),z1(ne)
@@ -704,6 +712,19 @@ contains
        call pos(rwb(w),x,y,z)
        call eConfigArray_set(ecOld,w,x,y,z)
        call drift(rwb(w),driftx,drifty,driftz)
+
+       if (ALLOCATED(fixedElec)) then
+           do i = 1, SIZE(fixedElec)
+               electron = fixedElec(i)
+               diffx(electron) = 0
+               diffy(electron) = 0
+               diffz(electron) = 0
+               driftx(electron) = 0
+               drifty(electron) = 0
+               driftz(electron) = 0
+           end do
+       end if
+
        x1 = x + mDriftScal*mTau*driftx + diffx
        y1 = y + mDriftScal*mTau*drifty + diffy
        z1 = z + mDriftScal*mTau*driftz + diffz
@@ -781,7 +802,7 @@ contains
     real(r8), intent(out)               :: vvr(:)         ! velocity ratio
     real(r8), intent(out)               :: vvnr(:)        ! new velocity ratio
 
-    integer                           :: i,nnu0
+    integer                           :: i,nnu0, electron
     real(r8)                            :: x(ne),y(ne),z(ne)
     real(r8)                            :: xOld(ne),yOld(ne),zOld(ne)
     real(r8)                            :: driftx(ne),drifty(ne),driftz(ne)
@@ -811,6 +832,14 @@ contains
        phiOld(w) = phi(rwb(w))
        uOld(w)   = ju(rwb(w))
     enddo
+
+    if (ALLOCATED(fixedElec)) then
+        do w=1,size(rwb)
+            xOld = x
+            yOld = y
+            zOld = z
+        end do
+    end if
 
     do w=1,size(rwb)
       call eConfigArray_get(ecOld,w,x,y,z)
@@ -913,6 +942,17 @@ contains
             z(i) = atoms(nnu0)%cz + dz
             r20 = r20 + dx**2 + dy**2 + dz**2
          endif
+         !unmove fixed electron
+         if (ALLOCATED(fixedElec)) then
+             if ( ANY(fixedElec == i) ) then
+                 x(i) = xOld(i)
+                 y(i) = yOld(i)
+                 z(i) = zOld(i)
+                 ddx = 0._r8
+                 ddy = 0._r8
+                 ddz = 0._r8
+             end if
+         end if
          tmp = (x(i)-ddx)**2 + (y(i)-ddy)**2  &
               +    (z(i)-ddz)**2
          tmp = exp(-tmp/(2d0*mTau))/(2d0*pi*mTau)**1.5d0
@@ -1004,6 +1044,17 @@ contains
             q1 = 0.5d0*erfc((zz1+vz*mTau)/sqrt(2d0*mTau))
             p1 = 1d0 - q1
          endif
+         !unmove fixed electron
+         if (ALLOCATED(fixedElec)) then
+             if ( ANY(fixedElec == i) ) then
+                 x(i) = xOld(i)
+                 y(i) = yOld(i)
+                 z(i) = zOld(i)
+                 ddx = 0._r8
+                 ddy = 0._r8
+                 ddz = 0._r8
+             end if
+         end if
          tmp = (xOld(i)-ddx)**2 + (yOld(i)-ddy)**2  &
               +    (zOld(i)-ddz)**2
          tmp =  exp(-tmp/(2d0*mTau))/(2d0*pi*mTau)**1.5d0
@@ -1023,7 +1074,16 @@ contains
          accratio(w) = 0d0
          if (logmode >= 5) write(iul,*) 'attempted xing'
       else
-         accratio(w) = (phi(rwb(w))/phiOld(w))**2 * exp( 2.d0*(ju(rwb(w))-uold(w)) )  * gf1/gf
+          if (ALLOCATED(fixedElec)) then
+              if (gf1==0)then
+                  accratio(w) = (phi(rwb(w))/phiOld(w))**2 * exp( 2.d0*(ju(rwb(w))-uold(w)) )
+              else
+                  accratio(w) = (phi(rwb(w))/phiOld(w))**2 * exp( 2.d0*(ju(rwb(w))-uold(w)) )
+              end if
+          else
+              accratio(w) = (phi(rwb(w))/phiOld(w))**2 * exp( 2.d0*(ju(rwb(w))-uold(w)) )  * gf1/gf
+          end if
+
       endif
 
       if (logmode >= 5) write(iul,*) ' Metrop.prob=',accratio(w),gf1,gf  &

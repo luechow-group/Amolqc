@@ -6,9 +6,9 @@ module minimizer_ws_factory_module
 
    use kinds_m, only: r8
    use error_m, only: error, assert
-   use parsing_m, only: getdbla, getstra, getinta, finda, getintarra
+   use parsing_m, only: getdbla, getstra, getinta, finda, getintarra, getdblarra
    use singularityCorrection_m, only: singularity_correction, NONE, CUTSTEP, UMRIGAR
-   use line_search_ws_simple_module, only: line_search_ws_simple
+   use line_search_ws_simple_m, only: line_search_ws_simple
    use line_search_weak_wolfe_module, only: line_search_weak_wolfe
    use minimizer_w_sing_module, only: minimizer_w_sing
    use minimizer_ws_steep_desc_module, only: minimizer_ws_steep_desc
@@ -27,11 +27,14 @@ contains
    function create_ws_minimizer(lines) result(minimizer_p)
       character(len=*) :: lines(:)
       class(minimizer_w_sing), pointer :: minimizer_p
-      real(r8) step_size, delta_max, step_max, gradient, sing_thresh, corr_thresh, alpha, cc, rho, c1, c2, val, distance
-      integer iflag, iflag1, iflag2, nlines, max_iter, mode, latency, switch_step
+      real(r8) step_size, delta_max, step_max, gradient, sing_thresh, corr_thresh, alpha, cc, rho, c1, c2, val
+      real(r8) tmp
+      real(r8), allocatable ::  distance(:)
+      integer iflag, iflag1, iflag2, iflag3, iflag4, nlines, max_iter, mode, latency, switch_step, i
       logical yn, scaling
       character(len=20) value, string, str
       integer, allocatable :: not_to_minimize(:)
+      integer, allocatable :: to_minimize(:)
       type(fire_parameters) :: params
       type(line_search_ws_simple)     :: lss
       type(line_search_weak_wolfe)    :: lsww
@@ -200,13 +203,41 @@ contains
          val = -HUGE(0._r8)
          call getdbla(lines, nlines, "convergence_value=", val, iflag)
          call minimizer_p%set_convergence_value(val)
-         distance = HUGE(0._r8)
-         call getdbla(lines, nlines, "max_electron_distance=", distance, iflag)
+         call getdblarra(lines, nlines, "max_electron_distance=", distance, iflag)
          call assert(iflag /= 0 .or. value == 'bfgs', &
                  &"minimizer input: max_electron_distance only implemented for bfgs!")
+         if (iflag == 0) then
+            if (SIZE(distance) == 1) then
+               tmp = distance(1)
+               deallocate(distance)
+               allocate(distance(3))
+               distance = tmp
+            else if (SIZE(distance) /= 3) then
+               call assert(.false., "minimizer input: max_electron_distance needs either 1 or 3 numbers as input!")
+            end if
+         else
+            allocate(distance(3))
+            distance = HUGE(0._r8)
+         end if
          call minimizer_p%set_max_electron_distance(distance)
-         call getintarra(lines, nlines, "not_to_minimize=", not_to_minimize, iflag)
-         if (iflag == 0) call minimizer_p%set_not_to_minimize(not_to_minimize)
+         call getintarra(lines, nlines, "not_to_minimize=", not_to_minimize, iflag3)
+         if (iflag3 == 0) then
+            call getintarra(lines, nlines, "minimize_this=", to_minimize, iflag4)
+            call minimizer_p%set_not_to_minimize(not_to_minimize)
+            call assert(iflag4 /= 0, "minimizer input: use either not_to_minimize or minimize_this!")
+         end if
+         call getintarra(lines, nlines, "minimize_this=", to_minimize, iflag4)
+         if (iflag4 == 0) then
+            call getintarra(lines, nlines, "not_to_minimize=", not_to_minimize, iflag3)
+            call minimizer_p%set_to_minimize(to_minimize)
+            call assert(iflag3 /= 0, "minimizer input: use either not_to_minimize or minimize_this!")
+         end if
+      end if
+
+      if (finda(lines, nlines, "minimize_grad_norm")) then
+         minimizer_p%value_convergence_ = .true.
+      else
+         minimizer_p%value_convergence_ = .false.
       end if
 
    end function create_ws_minimizer

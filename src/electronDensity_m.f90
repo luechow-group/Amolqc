@@ -108,17 +108,19 @@ contains
       f = -1 * f
    end function rho_f
 
-   subroutine rho_fg(this, x, f, g)
+   subroutine rho_fg(this, x, f, g, mask)
       class(fctn_rho), intent(in)  :: this
       real(r8), intent(in) :: x(:)
       real(r8), intent(out) :: f
       real(r8), intent(out) :: g(:)
+      logical, intent(in), optional :: mask(SIZE(x))
 
       call assert(SIZE(x) == 3 .and. SIZE(g) == 3, "rho_fg: illegal size")
 
       call rho(x, f, g)
       f = -1 * f
       g = -1 * g
+      if (PRESENT(mask)) where (mask) g = 0._r8
    end subroutine rho_fg
 
    function log_rho_f(this, x) result(f)
@@ -132,17 +134,19 @@ contains
       f = -LOG(f)
    end function log_rho_f
 
-   subroutine log_rho_fg(this, x, f, g)
+   subroutine log_rho_fg(this, x, f, g, mask)
       class(fctn_log_rho), intent(in)  :: this
       real(r8), intent(in) :: x(:)
       real(r8), intent(out) :: f
       real(r8), intent(out) :: g(:)
+      logical, intent(in), optional :: mask(SIZE(x))
 
       call assert(SIZE(x) == 3 .and. SIZE(g) == 3, "rho_fg: illegal size")
 
       call rho(x, f, g)
       g = -1._r8/f * g
       f = -LOG(f)
+      if (PRESENT(mask)) where (mask) g = 0._r8
    end subroutine log_rho_fg
 
    subroutine rho(position, value, gradient, orbitals)

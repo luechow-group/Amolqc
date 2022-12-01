@@ -10,7 +10,7 @@ module minimizer_ws_steep_desc_module
    use fctn_module, only: Function_t
    use singularityCorrection_m, only: singularity_correction
    use singularityParticles_m, only: singularity_particles
-   use line_search_ws_simple_module, only: line_search_ws_simple
+   use line_search_ws_m, only: line_search_ws
    use minimizer_w_sing_module, only: minimizer_w_sing
    implicit none
 
@@ -19,7 +19,7 @@ module minimizer_ws_steep_desc_module
 
 
    type, extends(minimizer_w_sing) :: minimizer_ws_steep_desc
-      type(line_search_ws_simple)  :: lss_
+      class(line_search_ws), allocatable  :: lss_
       real(r8)                 :: dt_ = 1.d0         ! gradient prefactor
       integer                      :: uphill_steps_ = 0
    contains
@@ -37,7 +37,7 @@ module minimizer_ws_steep_desc_module
 contains
 
    function constructor1(lss, sc, dt)
-      class(line_search_ws_simple), intent(in)        :: lss
+      class(line_search_ws), intent(in)        :: lss
       type(singularity_correction), intent(in)        :: sc
       real(r8), intent(in)                              :: dt
       type(minimizer_ws_steep_desc), pointer :: constructor1

@@ -1,4 +1,4 @@
-! Copyright (C) 2017-2018 Arne Luechow
+! Copyright (C) 2022 Michel V. Heinz
 !
 ! SPDX-License-Identifier: GPL-3.0-or-later
 
