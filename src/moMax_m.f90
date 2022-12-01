@@ -5,7 +5,7 @@
 module moMax_m
    use kinds_m, only: r8
    use error_m, only: assert, error
-   use global_m, only: iul, iull, getNElec, bohr2angs, baseName
+   use global_m, only: iul, iull, getNElec, bohr2ang, baseName
    use parsing_m, only: getinta, getdbla, ifinda, getstra
    use posList_m, only: posVal_t, pos_VList_t, isSmaller, isGreater
    use minimizer_w_sing_module, only: minimizer_w_sing
@@ -57,11 +57,12 @@ contains
    end function mo_f
 
 
-   subroutine mo_fg(this, x, f, g)
+   subroutine mo_fg(this, x, f, g, mask)
       class(fctn_mo), intent(in)  :: this
       real(r8), intent(in) :: x(:)
-      real(r8), intent(inout) :: f
-      real(r8), intent(inout) :: g(:)
+      real(r8), intent(out) :: f
+      real(r8), intent(out) :: g(:)
+      logical, intent(in), optional :: mask(SIZE(x))
 
       call assert(SIZE(x) == 3 .and. SIZE(g) == 3, "mo_fg: illegal size")
 
@@ -69,6 +70,7 @@ contains
       if (f > 0) then
          f = - f
          g = - g
+         if (PRESENT(mask)) where (mask) g = 0._r8
       end if
    end subroutine mo_fg
 
@@ -172,7 +174,7 @@ contains
          write(iul,'(/a,i5)') ' maxima of squared mo #', mo
          do i = 1, posList(mo)%size()
             pvp => posList(mo)%elem(i)
-            write(iul, '(i5,g16.6,a,3g15.4,a,i8)') i, -pvp%value, ' pos:', bohr2angs * pvp%pos, &
+            write(iul, '(i5,g16.6,a,3g15.4,a,i8)') i, -pvp%value, ' pos:', bohr2ang * pvp%pos, &
                ' count:', pvp%count
          end do
       end do
@@ -239,9 +241,9 @@ contains
       character(len=120), intent(in) :: lines(:)
       integer, intent(in) :: nl
       type(pos_VList_t), allocatable, intent(inout) :: posList(:)
-      real(r8) :: centroidScale, r(3), distThreshold, valueThreshold
+      real(r8) :: centroidScale, r(3), distThreshold
       integer :: i, iflag, m, gridSize, sampleSize, verbose, mo
-      logical :: converged, found
+      logical :: found
       class(minimizer_w_sing), pointer :: minimizer_p => null()
       type(fctn_mo)  :: fg
       type(posVal_t) :: pv
@@ -319,12 +321,12 @@ contains
       character(len=120), intent(in) :: lines(:)
       integer, intent(in) :: nl
       type(pos_VList_t), allocatable, intent(inout) :: posList(:) 
-      real(r8) :: r(3), maxPos(3), value 
+      real(r8) :: r(3), value
       real(r8) :: xStart, yStart, zStart, xStep, yStep, zStep, gridStep
       real(r8), allocatable :: vox(:,:,:)
-      integer :: i, ix, iy, iz, mo, verbose, xGridSize, yGridSize, zGridSize, iflag
+      integer :: ix, iy, iz, mo, verbose, xGridSize, yGridSize, zGridSize, iflag
       integer, parameter :: iu = 99
-      type(posVal_t) :: max
+      type(posVal_t) :: maxP
 
       verbose = 0
       call getinta(lines, nl, "verbose=", verbose, iflag)
@@ -339,17 +341,17 @@ contains
       gridStep = 0.02d0
       call getdbla(lines, nl, 'grid_step=', gridStep, iflag)
 
-      xStep = gridStep / bohr2angs
-      yStep = gridStep / bohr2angs
-      zStep = gridStep / bohr2angs
+      xStep = gridStep / bohr2ang
+      yStep = gridStep / bohr2ang
+      zStep = gridStep / bohr2ang
 
-      xStart = -(xGridSize/2) * gridStep / bohr2angs
-      yStart = -(yGridSize/2) * gridStep / bohr2angs
-      zStart = -(zGridSize/2) * gridStep / bohr2angs
+      xStart = -(xGridSize/2) * gridStep / bohr2ang
+      yStart = -(yGridSize/2) * gridStep / bohr2ang
+      zStart = -(zGridSize/2) * gridStep / bohr2ang
 
-      write(iul,'(a,g15.5,a,g15.5,a,i5)') 'xStart =', xStart*bohr2angs, ' xStep =', xStep*bohr2angs, ' xGridSize =', xGridSize
-      write(iul,'(a,g15.5,a,g15.5,a,i5)') 'yStart =', yStart*bohr2angs, ' yStep =', yStep*bohr2angs, ' yGridSize =', yGridSize
-      write(iul,'(a,g15.5,a,g15.5,a,i5)') 'zStart =', zStart*bohr2angs, ' zStep =', zStep*bohr2angs, ' zGridSize =', zGridSize
+      write(iul,'(a,g15.5,a,g15.5,a,i5)') 'xStart =', xStart*bohr2ang, ' xStep =', xStep*bohr2ang, ' xGridSize =', xGridSize
+      write(iul,'(a,g15.5,a,g15.5,a,i5)') 'yStart =', yStart*bohr2ang, ' yStep =', yStep*bohr2ang, ' yGridSize =', yGridSize
+      write(iul,'(a,g15.5,a,g15.5,a,i5)') 'zStart =', zStart*bohr2ang, ' zStep =', zStep*bohr2ang, ' zGridSize =', zGridSize
 
       allocate(vox(0:xGridSize, 0:yGridSize, 0:zGridSize))
 
@@ -365,7 +367,7 @@ contains
                do iz = 0, zGridSize
                   r(3) = zStart + iz * zStep
                   call mo_mo(r, mo, value)
-                  !!!write(iull, '(i5, 3g15.4, g16.6)') mo, bohr2angs*r, value
+                  !!!write(iull, '(i5, 3g15.4, g16.6)') mo, bohr2ang*r, value
                   vox(ix, iy, iz) = -value
                end do
             end do
@@ -386,8 +388,8 @@ contains
 
                      if (abs(vox(ix, iy, iz)) > mValueThreshold) then
                         r = [ xStart + ix * xStep, yStart + iy * yStep, zStart + iz * zStep ]
-                        max = posVal_t(r, vox(ix, iy, iz), 0)
-                        call posList(mo)%append(max)
+                        maxP = posVal_t(r, vox(ix, iy, iz), 0)
+                        call posList(mo)%append(maxP)
                      end if
                   end if
                end do
@@ -404,9 +406,9 @@ contains
       ! write MO function values for plotting
       character(len=120), intent(in) :: lines(:)
       integer, intent(in) :: nl
-      real(r8) :: r(3), maxPos(3), value 
+      real(r8) :: r(3), value
       real(r8) :: xStart, yStart, zStart, xStep, yStep, zStep, gridStep
-      integer :: i, io, ix, iy, iz, mo, verbose, xGridSize, yGridSize, zGridSize, iflag
+      integer :: io, ix, iy, iz, mo, xGridSize, yGridSize, zGridSize, iflag
       integer, parameter :: iu = 99
 
       xGridSize = 100
@@ -419,13 +421,13 @@ contains
       gridStep = 0.02d0
       call getdbla(lines, nl, 'grid_step=', gridStep, iflag)
 
-      xStep = gridStep / bohr2angs
-      yStep = gridStep / bohr2angs
-      zStep = gridStep / bohr2angs
+      xStep = gridStep / bohr2ang
+      yStep = gridStep / bohr2ang
+      zStep = gridStep / bohr2ang
 
-      xStart = -(xGridSize/2) * gridStep / bohr2angs
-      yStart = -(yGridSize/2) * gridStep / bohr2angs
-      zStart = -(zGridSize/2) * gridStep / bohr2angs
+      xStart = -(xGridSize/2) * gridStep / bohr2ang
+      yStart = -(yGridSize/2) * gridStep / bohr2ang
+      zStart = -(zGridSize/2) * gridStep / bohr2ang
 
       open(iu,file=trim(baseName)//'.plt', iostat=io)
       if (io/=0) call error('($plot_mos): opening file '//trim(baseName)//'.plt failed')
@@ -446,7 +448,7 @@ contains
                do iz = 0, zGridSize
                   r(3) = zStart + iz * zStep
                   call mo_mo(r, mo, value)
-                  write(iu,'(e18.8)')  value
+                  write(iu,'(ES18.8)')  value
                end do
             end do
          end do
@@ -460,12 +462,12 @@ contains
       ! write MO function values for plotting a given plane
       character(len=120), intent(in) :: lines(:)
       integer, intent(in) :: nl
-      real(r8) :: r(3), maxPos(3), value 
+      real(r8) :: r(3), value
       real(r8) :: xStart, yStart, xStep, yStep, gridStep, nucInPlaneThresh
       real(r8) :: ex(3), ey(3), ex0(3), ey0(3), rStart(3), normalOfPlane(3), A(3,3)
       real(r8) :: origin(3), point1(3), point2(3)
       real(r8), allocatable :: B(:, :), extraPoints(:,:)
-      integer :: i, io, idx, ix, iy, mo, verbose, xGridSize, yGridSize, iflag, nExtraPoints
+      integer :: io, idx, ix, iy, mo, xGridSize, yGridSize, iflag, nExtraPoints
       integer :: nRHS, ipiv(getNNuc()), info, countInPlane, ndim, n, n0
       integer, parameter :: iu = 99
 
@@ -506,9 +508,9 @@ contains
       gridStep = 0.02d0
       call getdbla(lines, nl, 'grid_step=', gridStep, iflag)
 
-      xStep = gridStep / bohr2angs
-      yStep = gridStep / bohr2angs
-      origin = origin / bohr2angs
+      xStep = gridStep / bohr2ang
+      yStep = gridStep / bohr2ang
+      origin = origin / bohr2ang
 
       xStart = -(xGridSize/2) * xStep
       yStart = -(yGridSize/2) * yStep
@@ -544,7 +546,7 @@ contains
       end do
       write(iu,'(i5,a)') countInPlane, ' nuclei in plane:'
       do n = 1, getNNuc()
-         write(iul,'(i5,3g15.5)') n, B(:, n) * bohr2angs
+         write(iul,'(i5,3g15.5)') n, B(:, n) * bohr2ang
          if (abs(B(1, n)) < nucInPlaneThresh) write(iu,'(2g15.5)') B(2, n), B(3, n)
       end do
 
@@ -555,7 +557,7 @@ contains
       end do
       write(iu,'(i5,a)') countInPlane, ' extra points in plane:'
       do n = 1, nExtraPoints
-         write(iul,'(i5,3g15.5)') n, B(:, n + n0) * bohr2angs
+         write(iul,'(i5,3g15.5)') n, B(:, n + n0) * bohr2ang
          if (abs(B(1, n + n0)) < nucInPlaneThresh) write(iu,'(2g15.5)') B(2, n + n0), B(3, n + n0)
       end do
 
@@ -569,7 +571,7 @@ contains
             do iy = 0, yGridSize
                r = rStart + ix * xStep * ex0 + iy * yStep * ey0
                call mo_mo(r, mo, value)
-               write(iu,'(e18.8)')  value
+               write(iu,'(ES18.8)')  value
             end do
          end do
       end do

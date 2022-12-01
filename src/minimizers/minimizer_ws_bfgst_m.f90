@@ -10,6 +10,7 @@ module minimizer_ws_bfgst_module
    use singularityParticles_m, only: singularity_particles
    use line_search_weak_wolfe_module, only: line_search_weak_wolfe
    use minimizer_w_sing_module, only: minimizer_w_sing
+   use error_m, only: abortp
    implicit none
 
    private
@@ -64,6 +65,9 @@ contains
       logical                    :: gmask(size(x))                  ! .true. for components of particles at a singularity
       logical                    :: is_corrected, new_sing
 
+      if (ALLOCATED(this%not_to_minimize_) .or. ALLOCATED(this%to_minimize_)) then
+         call abortp('not_to_minimize and minimize_this are not implemented for bfgst')
+      end if
       call sp%create(size(x)/3, this%sc_%n_singularities())
 
       verbose = this%verbose()
@@ -168,7 +172,7 @@ contains
                 " n_sing=", sp%n_sing(), " is_corrected=", is_corrected
          end if
 
-         if (this%is_gradient_converged(gmax)) then
+         if (this%is_gradient_converged(gmax) .or. this%is_value_converged(f)) then
             x = x_new
             g = g_new
             call this%set_converged(.true.)

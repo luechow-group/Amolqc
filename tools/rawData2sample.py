@@ -6,9 +6,12 @@
  SPDX-License-Identifier: GPL-3.0-or-later
 """
 
+import sys
+if sys.version_info[0] < 3:
+    sys.exit('This script requires Python 3')
+
 import numpy as np
 import os
-import sys
 
 i4 = np.int32
 r8 = np.float64

@@ -5,7 +5,7 @@
 module optimizeParams_m
 
    use global_m
-   use rWSample_m
+   use rwSample_m
    use elocAndPsiTermsLM_m
    use optParamsVarmin_m
    use optParamsVNL2SOL_m
@@ -41,7 +41,7 @@ contains
    character(len=9)      :: optType      ! 'jastrow'|'ci'
    character(len=20)     :: optMethod    ! 'varmin1' ...
    integer               :: optMode      ! code for different parameter sets for same optType
-   integer iter,oldlogmode,newlogmode,thislogmode,iflag
+   integer oldlogmode,thislogmode,iflag
    logical energyMin, varMin
 
    converged = .true.
@@ -55,7 +55,7 @@ contains
    if (varMin) then
       optMethod = 'varmin'
    else
-      optMethod = 'lm_newton'
+      optMethod = 'snr'
    end if
    call getstra(lines,nl,'method=',optMethod,iflag)
    optMode = 1
@@ -78,17 +78,20 @@ contains
    end if
 
    if (varMin) then
-      if (optMethod=='lm') then
+      if (optMethod=='lm' .or. optMethod=='snr' .or. optMethod=='gd') then
          call varmin1_optimizeSample(lines,nl,wfp_p,sample,converged)
-      else if (optMethod=='varmin') then
+      else if (optMethod=='varmin' .or. optMethod=='nl2sol') then
          call varmin2_optimizeSample(lines,nl,wfp_p,sample,converged)
       else
          call abortp('$optimize_parameters: method not available')
       end if
    else if (energyMin) then
-      if (optMethod=='eminlin') then
+      if (optMethod=='lin' .or. optMethod=='eminlin') then
          call eminlin_optimizeSample(lines,nl,wfp_p,sample,converged)
-      else if (optMethod=='newton' .or. optMethod=='scaled_newton' .or. optMethod=='lm_newton') then
+      else if (optMethod=='nr' .or. optMethod=='newton' &
+            .or. optMethod=='scaled_nr' .or. optMethod=='scaled_newton' &
+            .or. optMethod=='snr' .or. optMethod=='lm_newton' &
+            .or. optMethod=='lm') then
          call eminNR_optimizeSample(lines,nl,wfp_p,sample,converged)
       else if (optMethod=='popt') then
          call eminpopt_optimizeSample(lines,nl,wfp_p,sample,converged)

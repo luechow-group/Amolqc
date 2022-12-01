@@ -2,7 +2,7 @@
 rm -f *in *out*
 echo " parameter optimization tests (AE) except popt(mo+ci) ..."
 
-for i in varmin eminlin eminlm eminpopt
+for i in varmin eminlin eminlm eminsnr eminpopt
 do
   cp ../../templates/$i.in .
   $AMOLQCRUN $i

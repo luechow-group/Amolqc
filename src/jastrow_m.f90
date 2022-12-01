@@ -164,7 +164,7 @@ CONTAINS
         integer, intent(in) :: nl
         character(len = 120) :: newLines(500), jasLines(500)
 
-        integer iflag, io, in, nLines, njas, idx
+        integer iflag, nLines, njas, idx
         character(len = 9) :: jt
         character(len = 40) :: paramsWF
         character(len = 120) :: errMsg
@@ -394,7 +394,6 @@ CONTAINS
         ! this version uses RdataUpdate to keep track of auxiliary data for efficient updates
 
         type(RdataUpdate), intent(inout) :: Rdu             ! data structure for electron update calculations
-        integer iMode
 
         if (jastype(1:2) == 'sm') then
             call jassmInitWithUk(Rdu)
@@ -471,7 +470,6 @@ CONTAINS
         real(r8), intent(out) :: u
         real(r8), intent(out) :: uk(:)
         real(r8), intent(in) :: x(:), y(:), z(:)
-        real(r8) :: jud(3 * ne), julapl, julapli(ne) ! dummy
 
         if (jastype(1:2) == 'sm') then
             call jassmallOnlyUk(x, y, z, rai, rij, "none", u, uk)

@@ -23,7 +23,7 @@ contains
    function create_minimizer(lines) result(minimizer_p)
       character(len=*) :: lines(:)
       class(minimizer), pointer :: minimizer_p
-      real(r8) step_size, delta_max, gradient, alpha, cc, rho, c1, c2
+      real(r8) step_size, delta_max, gradient, alpha, cc, rho, c1, c2, val
       integer iflag, max_iter, v, nlines, iflag1
       logical yn
       character(len=20) value, str
@@ -99,6 +99,9 @@ contains
          if (iflag == 0) call minimizer_p%set_max_iterations(max_iter)
          call getdbla(lines, nlines, "convergence_gradient=", gradient, iflag)
          if (iflag == 0) call minimizer_p%set_convergence_gradient(gradient)
+         val = -HUGE(0._r8)
+         call getdbla(lines, nlines, "convergence_value=", val, iflag)
+         call minimizer_p%set_convergence_value(val)
          call getinta(lines, nlines, "verbose=", v, iflag)
          if (iflag == 0) call minimizer_p%set_verbose(v)
       end if

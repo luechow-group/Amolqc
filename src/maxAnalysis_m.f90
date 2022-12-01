@@ -38,11 +38,10 @@ contains
 
       character(len=120), intent(in) :: lines(:)
       integer, intent(in)            :: nl
-      character(len=10)              :: s
-      integer                        :: iflag,it,maxFull,iflag1,iflag2,iflag3,idx,nre,nrefs,i,j
+      integer                        :: iflag,maxFull,iflag1,iflag2,iflag3,idx,nre,nrefs,i,j
       integer                        :: initSuccess
       integer, pointer               :: ire(:,:) => null()
-      real(r8)                         :: st,distThr,tolDist2,tolMeanDist,tolSim,tolSame
+      real(r8)                         :: tolDist2,tolSim,tolSame
       real(r8)                         :: nucThresh,coreThresh,bondThresh
       logical                        :: doSortFreq
       character(len=3)               :: maxMode
@@ -61,15 +60,15 @@ contains
       call getdbla(lines,nl,'tol_fctn=',mFtol,iflag)      ! same function value if abs diff is smaller
       tolSim = 1.d-1
       call getdbla(lines,nl,'tol_sim=',tolSim,iflag)      ! similar structure if max distance is smaller
-      tolSim = tolSim / bohr2angs
+      tolSim = tolSim / bohr2ang
       mTolSim = tolSim
       tolSame = 1.d-2
       call getdbla(lines,nl,'tol_same=',tolSame,iflag)    ! same structure if max distance is smaller
-      tolSame = tolSame / bohr2angs
+      tolSame = tolSame / bohr2ang
       mTolSame = tolSame
-      tolDist2 = tolSim*bohr2angs
+      tolDist2 = tolSim*bohr2ang
       call getdbla(lines,nl,'tol_simmax=',tolDist2,iflag) ! type=pos: same position if distance is smaller
-      tolDist2 = tolDist2 / bohr2angs
+      tolDist2 = tolDist2 / bohr2ang
       mTolDist2 = tolDist2
 
       nucThresh = 0.01d0
@@ -213,17 +212,15 @@ contains
 
    subroutine maxana_writeParams(iu)
       integer, intent(in) :: iu
-      character(len=5)    :: s
-      character(len=10)   :: s1
-      character(len=120)   :: s2
+      character(len=240)   :: s2
 
       write(iu,'(A/)') '    maximum analysis parameters:'
 
       write(iu,'(1X,A21,3X,A3)') " maximum list mode =",mMaxMode
       write(iu,'(2(1X,A21,G12.2,3X))') " same max func tol =",mFtol
       write(iu,'(1X,A21,I6,9X,A21,I6)') 'nmax =',mKMax,' mmax=',mMMax
-      write(iu,'(2(1X,A21,F12.4,2X))') " tol_sim (A) =",mTolSim*bohr2angs," tol_same (A) =",mTolSame*bohr2angs
-      write(iu,'(2(1X,A21,F12.4,2X))') " tol_fctn =",mFtol," tol_simmax (A) =",mTolDist2*bohr2angs
+      write(iu,'(2(1X,A21,F12.4,2X))') " tol_sim (A) =",mTolSim*bohr2ang," tol_same (A) =",mTolSame*bohr2ang
+      write(iu,'(2(1X,A21,F12.4,2X))') " tol_fctn =",mFtol," tol_simmax (A) =",mTolDist2*bohr2ang
       write(iu,*)
       if (associated(mRC_p)) then
         call mRC_p%getInfoMessage(s2)

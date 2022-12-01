@@ -7,6 +7,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
 """
 
 import sys
+if sys.version_info[0] < 3:
+    sys.exit('This script requires Python 3')
+
 from .Utils import *
 
 
@@ -14,8 +17,6 @@ def xmvb_in(input_name, info_name, basis, wf_type):
     xmo_filename = input_name + '.xmo'
     info_filename = info_name
     orbital_format = 'gau'
-
-    bohr = 0.52917721067  # 2014 CODATA
 
     # opening files
     try:
@@ -37,7 +38,7 @@ def xmvb_in(input_name, info_name, basis, wf_type):
     charge = 0
     number_inactive_electrons = 0
 
-    atoms, charge, line = read_atoms(bohr, charge, info_file, line, number_atoms)
+    atoms, charge, line = read_atoms(charge, info_file, line, number_atoms)
 
     info_file.close()
 
@@ -307,7 +308,7 @@ def xmvb_in(input_name, info_name, basis, wf_type):
     xmo_file.close()
 
     wf = WaveFunction(input_name, orbital_format, basis, charge, multiplicity, atoms, orbitals,
-                      csfs, Jastrow(), total_symmetry, fragments)
+                      csfs, Jastrow(), total_symmetry, fragments, bohr=True)
 
     return wf
 
@@ -359,7 +360,7 @@ def set_det_coefficients(csfs, det_csf):
             sys.exit('Error: This should not happen, no csf with unique det found.')
 
 
-def read_atoms(bohr, charge, info_file, line, number_atoms):
+def read_atoms(charge, info_file, line, number_atoms):
     atoms = []
     while '.0' not in line:
         line = info_file.readline()
@@ -370,7 +371,7 @@ def read_atoms(bohr, charge, info_file, line, number_atoms):
         words = line.split()
         atom.atomic_number = [item.upper() for item in periodic_table].index(words[0])
         for j in range(3):
-            atom.position.append(float(words[j + 2].replace("D", "E")) * bohr)
+            atom.position.append(float(words[j + 2].replace("D", "E")))
         charge += int(float(words[1].replace("D", "E")))
         atoms.append(atom)
         line = info_file.readline()

@@ -114,7 +114,7 @@ CONTAINS
 
       integer i
       real(r8) psiv, vpot, psilapl
-      real(r8) jas, phi, jlapl, flapl, jgrad(3 * ne), fgrad(3 * ne), lapli(ne)
+      real(r8) jas, phi, jlapl, flapl, jgrad(3 * ne), fgrad(3 * ne)
       real(r8) expU
       type(eConfigArray) :: ec
 
@@ -188,8 +188,8 @@ CONTAINS
       logical, intent(out)    :: passed               ! .true. if abs_errors smaller than tolGrad and tolEloc
       integer i, k, pnts
       real(r8), pointer :: x(:), y(:), z(:)
-      real(r8) psiv, tmp, expU
-      real(r8) jas, phi, jlapl, flapl, jgrad(3 * ne), fgrad(3 * ne), lapli(ne)
+      real(r8) psiv, expU
+      real(r8) jas, phi, jlapl, flapl, jgrad(3 * ne), fgrad(3 * ne)
       real(r8) psi0(8, 3 * ne), fx(3 * ne), fxx(3 * ne), f1
       real(r8) psif(8, 3 * ne), ff1
       real(r8) psij(8, 3 * ne), fj1
@@ -469,11 +469,11 @@ CONTAINS
       real(r8), intent(in)    :: h0                   ! initial denominator in numerical derivatives
       real(r8), intent(in)    :: tolGrad, tolEloc     ! tolerance for max(abs_grad_error) and max(abs_eloc_error)
       logical, intent(out)    :: passed               ! .true. if abs_errors smaller than tolGrad and tolEloc
-      integer i, k, pnts, n, nMax
+      integer i, k, n, nMax
       real(r8), pointer :: x(:), y(:), z(:)
-      real(r8) psiv, tmp, expU, h, d2ydx2
-      real(r8) jas, phi, lapl, ulapl, flapl, jgrad(3 * ne), fgrad(3 * ne), lapli(ne)
-      real(r8) psi0(3, 3 * ne), fx(3 * ne), fxx(3 * ne), f1
+      real(r8) psiv, expU, h, d2ydx2
+      real(r8) jas, phi, lapl, ulapl, flapl, jgrad(3 * ne), fgrad(3 * ne)
+      real(r8) psi0(3, 3 * ne), f1
       real(r8) gradient(3 * ne), epsGradient(3 * ne),  epsLapl
 
       real(r8) psif(3, 3 * ne), ff1
@@ -742,11 +742,11 @@ CONTAINS
       logical, intent(out)    :: passed               ! .true. if abs_errors smaller than tolGrad and tolEloc
       integer i, j, k, n, nMax, iter, iteru, iterf, iterl, iterlu, iterlf
       real(r8), pointer :: x(:), y(:), z(:)
-      real(r8) psiv, tmp, expU, h, d2ydx2
+      real(r8) psiv, expU, h
       real(r8) jas, phi, lapl, ulapl, flapl, jgrad(3 * ne), fgrad(3 * ne), lapli(ne), flapli(ne), ulapli(ne)
       real(r8) psi0(3)
       real(r8) gradient, epsGradient, ugradient, epsUGradient, fgradient, epsFGradient
-      real(r8) epsLapl, epsULapl, epsFLapl, f1, ff1, fj1
+      real(r8) epsLapl, epsULapl, epsFLapl
 
       real(r8) psif(3)
       real(r8) psij(3)

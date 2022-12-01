@@ -6,7 +6,7 @@ module optParamsWBFGS_m
 
    use kinds_m, only: r8
    use global_m
-   use rWSample_m
+   use rwSample_m
    use elocAndPsiTermsWEBFGS_m
    use wfParameters_m
    use lbfgsb3_m, only: setulb
@@ -43,12 +43,12 @@ contains
 !     nmax  is the dimension of the largest problem to be solved.
 !     mmax  is the maximum number of limited memory corrections.
 !     lenwa is the corresponding real workspace required.
-   character*60     task, csave
+   character(len=60)     task, csave
    logical          lsave(4)
    integer          i,m,iprint
    integer          nbd(nmax), iwa(3*nmax), isave(44)
-   real(r8)           ff, factr, pgtol
-   real(r8)           xx(nmax), l(nmax), u(nmax), gg(nmax), dsave(29)
+   real(r8)           factr, pgtol
+   real(r8)           l(nmax), u(nmax), dsave(29)
    real(r8)           wa(lenwa)
 
    ! LBFGS-B settings

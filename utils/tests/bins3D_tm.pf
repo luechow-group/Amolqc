@@ -1,5 +1,5 @@
 module bins3D_tm
-   use PFUNIT_MOD
+   use funit
    use kinds_m, only: r8
    use bins3D_m, only: Bins3D_t, GetBins3D
 

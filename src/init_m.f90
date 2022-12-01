@@ -26,7 +26,7 @@ subroutine initAmolqc()
 
   character(len=6) :: name
   character(len=180) :: path
-  integer ierr,nn
+  integer ierr
 
   call myMPIInitialize(ierr)
   call getEnvironmentVariableName(name)
@@ -72,7 +72,7 @@ subroutine initFiles(lines,nl)
   logical fileExists
   character(len=2) cntstr
 
-  integer id,io,iflag,ierr,nn,length
+  integer io,ierr,length
 
 #ifdef MPI
   character (len=MPI_MAX_LIBRARY_VERSION_STRING) :: mpiVersion
@@ -144,7 +144,8 @@ subroutine initFiles(lines,nl)
       write(iul,'(A)')    '  Sebastian Manten, Christian Diedrich, Annika Bande, Tony C. Scott,'
       write(iul,'(A)')    '  Annett Schwarz, Rene Petz, Raphael Berner, Alexander Sturm,'
       write(iul,'(A)')    '  Marko Hermsen, Kaveh Haghighi Mood, Christoph Schulte,'
-      write(iul,'(A)')    '  Leonard Reuter, Michael A. Heuer, Jil Ludovicy'
+      write(iul,'(A)')    '  Leonard Reuter, Michael A. Heuer, Jil Ludovicy, Vladimir Terzi,'
+      write(iul,'(A)')    '  Michel V. Heinz'
  
 #ifdef VERSION
       write(iul,'(//2A)')  ' version:          ', VERSION

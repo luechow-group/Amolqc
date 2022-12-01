@@ -9,9 +9,6 @@
 
 MODULE waveFunction_m
   use kinds_m, only: r8
-#ifdef NAG
-  use, intrinsic :: f90_unix_io, only: flush
-#endif
   use error_m
   use parsing_m
   use atom_m
@@ -41,9 +38,9 @@ CONTAINS
 
     integer                       :: iflag,i,LAmode,r
     character(len=40)             :: wfFile
-    character(len=3)              :: s
     character(len=26)             :: s26
-    logical                       :: found,ltmp,readMode,writeMode,writeBasis
+    logical                       :: found,readMode,writeMode,writeBasis
+    real(r8)                      :: value
 
     call getinta(lines,nl,"jas_init=",i,iflag)
     if (iflag == 0) then
@@ -131,6 +128,26 @@ CONTAINS
        doReorderDets = .false.
     endif
 
+    directDet = finda(lines, nl, 'direct_det')
+
+    call getdbla(lines,nl,'det_inverse_threshold=', value , iflag)
+    if (iflag == 0) then
+#ifndef CHKNANUP
+      call error(" direct calculation of determinants requires -DCHKNANUP")
+#else
+      call setDetInverseThreshold(value)
+#endif
+    end if
+
+    call getdbla(lines,nl,'switch_direct_threshold=', value , iflag)
+    if (iflag == 0) then
+#ifndef CHKNANUP
+      call error(" direct calculation of determinants requires -DCHKNANUP")
+#else
+      call setSwitchDirectThreshold(value)
+#endif
+    end if
+
     found = finda(lines,nl,'task')
     if(found) then
       aomotask = .true.
@@ -216,6 +233,8 @@ CONTAINS
        end if
     endif
 
+
+
     call readWF(wfFile,ecp)
 
     endif ! readMode
@@ -252,12 +271,12 @@ CONTAINS
 #endif
     character(len=MAXLEN)  :: lines(MAXBLOCK)
     character(len=MAXLEN)  :: allLines(MAXLINES)
-    integer a,idx,i,ii,ii1,ii2,io,j,iflag,nl,nAllLines,idxsave
+    integer a,idx,i,j,iflag,nl,nAllLines,idxsave
     real(r8) rr
-    character text*3,s*10
-    logical form
-    logical ltmp,findf,ang,found,withSA,ignoreHAtoms,withBasis
+    character(len=10) s
+    logical ltmp,ang,found,withSA,ignoreHAtoms,withBasis
     logical absExists,simpleBasisExists
+    logical opened
 
     !! ---- Read Wavefunction file
 
@@ -338,7 +357,7 @@ CONTAINS
        write(iul,*) ' geometry (in angstrom):'
        call atoms_write(atoms,iul)
        write(iul,*)
-       call flush(iul)
+       flush(iul)
     end if
 
     ! the actual eloc initialization has to happen after the $ecp block
@@ -394,7 +413,8 @@ CONTAINS
     endif
     if (logmode>=3 .or. (MASTER.and.printAOs>0)) call aooutput(iul)
     if (logmode>= 2) write(iul,'(A/)') ' basis read ...'
-    call flush(iul)
+    inquire(iul, opened=opened)
+    if (opened) flush(iul)
 
 
     !! ---- $ecp block
@@ -411,7 +431,8 @@ CONTAINS
        if (ecp%isInitialised() .and. logmode >= 2) write(iul,*) ' ECPs read from ECP library ...'
     endif
     if (ecp%isInitialised() .and. logmode >= 2) call ecpoutput(iul,ecp)
-    call flush(iul)
+    inquire(iul, opened=opened)
+    if (opened) flush(iul)
 
     ! now that the core electrons have potentially been removed, initialize
     ! the eloc part
@@ -443,7 +464,7 @@ CONTAINS
        write(iul,'(/3a)') ' Jastrow factor of type ',trim(jastype),' read with:'
        call jas_shortoutput(iul)
        write(iul,*) ' Jastrow factor read ...'
-       call flush(iul)
+       flush(iul)
     end if
 
     !! ---- $mos block
@@ -454,7 +475,8 @@ CONTAINS
     call moinput(lines)
     if (logmode>=3 .or. printMOs>0) call mooutput(iul)
     if (logmode >= 2) write(iul,*) ' MOs read ...'
-    call flush(iul)
+    inquire(iul, opened=opened)
+    if (opened) flush(iul)
 
     ! CSF part
 
@@ -473,7 +495,8 @@ CONTAINS
     endif
     if (logmode >= 3 .or. printDet>0) call mdetoutput(iul)
     if (logmode >= 2) write(iul,*) ' CSFs read ...'
-    call flush(iul)
+    inquire(iul, opened=opened)
+    if (opened) flush(iul)
 
     ! PROPERTIES
     !call getstra(lines,nl,'proptype=',mProptype,iflag)
@@ -510,18 +533,12 @@ CONTAINS
   !---------------------------------------
 
   ! writeWF writes the current wave function to the file wfFile
-
-    integer, parameter :: ldim=500
     character(len=*), intent(inout) :: wfFile
     logical, intent(in)             :: writeBasis
     !!!!type(EcpType), intent(in)     :: ecp       ! in prevented by ecpwriteWF
     type(EcpType), intent(inout)     :: ecp
-    integer a,i,ii,ii1,ii2,io,iu,j,iflag,nl,k
-    real(r8) rr
-    character text*3,s*10
-    character(len=120) lines(ldim),line
-    logical form
-    logical ltmp,findf,finda,ang,found
+    integer io,iu
+    character(len=120) line
 
     if(.not. MASTER) return
     iu = 20
@@ -623,7 +640,7 @@ CONTAINS
     write(iu,*) 'amolqc trajectory data: atoms in xyz'
     do i=1,ncenter
        write(iu,'(A2,2X,3G13.6)')    &
-            atoms(i)%elem,atoms(i)%cx*bohr2angs,atoms(i)%cy*bohr2angs,atoms(i)%cz*bohr2angs
+            atoms(i)%elem,atoms(i)%cx*bohr2ang,atoms(i)%cy*bohr2ang,atoms(i)%cz*bohr2ang
     enddo
     write(iu,*) 'walker 1 trajectory for electron='
     write(iu,*) ne

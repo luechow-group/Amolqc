@@ -32,3 +32,7 @@ target_link_libraries(utils
         )
 
 add_subdirectory(tests)
+
+if(${WARNINGS})
+    set_file_compile_options(string_utility_module.f90 ${NOWARN_FLAGS})
+endif()

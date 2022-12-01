@@ -77,7 +77,7 @@ contains
     ii1 = 0                      ! electron counter ALPHA
     ii2 = nalpha                 ! electron counter BETA
     do a=1,ncenter
-       do i=1,nint(atoms(a)%za) - atoms(a)%pa  ! partial charges
+       do i=1,atoms(a)%za - atoms(a)%pa  ! partial charges
           ii = ii + 1            ! next electron
           if (mod(ii,2)==1) then ! alpha electron
              ii1    = ii1 + 1
@@ -180,7 +180,7 @@ contains
     do a=1,ncenter
        nCore = wf_getNCoreElecs(a)
        if (nCore > 0) then     ! we have a PP
-         zz = nint(atoms(a)%za) + nCore
+         zz = atoms(a)%za + nCore
          n = zz - atoms(a)%pa
          select case (nCore)
          case (2)            ! He core
@@ -381,7 +381,7 @@ contains
      real(r8) ax,bx,ay,by,az,bz,hx,hy,hz
      real(r8) value, r(3)
      integer, allocatable:: MOIdxList(:)       ! MO index list
-     integer a, i, ii, j, k, maxMOIdx, MOIdxLen, mo, lwork, ierr
+     integer i, ii, maxMOIdx, MOIdxLen, mo, lwork, ierr
      character(len=40)    :: str
 
      call assert(n>0 .and. moScale>0,'initLMOSampling: illegal argument')
@@ -403,9 +403,9 @@ contains
 
      if (logmode>=3) then
         write(iul,*) ' box:'
-        write(iul,'(2(g12.3))') ax*bohr2angs,bx*bohr2angs,ay*bohr2angs,by*bohr2angs, &
-                                az*bohr2angs,bz*bohr2angs
-        write(iul,'(3(g12.3))') hx*bohr2angs,hy*bohr2angs,hz*bohr2angs
+        write(iul,'(2(g12.3))') ax*bohr2ang,bx*bohr2ang,ay*bohr2ang,by*bohr2ang, &
+                                az*bohr2ang,bz*bohr2ang
+        write(iul,'(3(g12.3))') hx*bohr2ang,hy*bohr2ang,hz*bohr2ang
         write(iul,'(a,i6)') 'maxMOIdx = ',maxMOIdx
      end if
 
@@ -501,7 +501,7 @@ contains
         write(iul,*) ' mu for each MO in list:'
         do ii=1,MOIdxLen
            mo = MOIdxList(ii)
-           write(iul,'(2i5,3f10.3)') ii,mo,mMu(:,ii)*bohr2angs
+           write(iul,'(2i5,3f10.3)') ii,mo,mMu(:,ii)*bohr2ang
         end do
         write(iul,*) ' MO types:'
         do ii=1,MOIdxLen
@@ -523,7 +523,7 @@ contains
         cov(2,1) = cov(1,2)
         cov(3,1) = cov(1,3)
         cov(3,2) = cov(2,3)
-        if (logmode >= 3) write(iul,'(3f10.3)') ((cov(i,j)*bohr2angs,j=1,3),i=1,3)
+        if (logmode >= 3) write(iul,'(3f10.3)') ((cov(i,j)*bohr2ang,j=1,3),i=1,3)
         lwork = size(work)
         ev = cov   
         call dsyev('V', 'U', 3, ev, 3, lambda, work, lwork, ierr)
@@ -547,11 +547,11 @@ contains
 
      ! dynamic master/worker distribution of 3d gridpoint calculation
 
-     integer i,j,k,a,ii,count,counter,allTasks,idx(2),srcID,vmax,workercounter
+     integer i,j,k,a,ii,counter,allTasks,idx(2),srcID,vmax,workercounter
      integer, allocatable :: procIdx(:,:)
      real(r8), allocatable :: values(:),allValues(:)
 #ifdef MPI
-     integer                :: ierr
+     integer                :: ierr, count
      type(MPI_STATUS)       :: status
 #endif
 
@@ -708,7 +708,7 @@ contains
          write(iul,*) ' mu for each MO in list:'
          do ii=1,MOIdxLen
             mo = MOIdxList(ii)
-            write(iul,'(2i5,3f10.3)') ii,mo,mMu(:,ii)*bohr2angs
+            write(iul,'(2i5,3f10.3)') ii,mo,mMu(:,ii)*bohr2ang
          end do
          write(iul,*) ' MO types:'
          do ii=1,MOIdxLen
@@ -732,7 +732,7 @@ contains
          if (logmode >= 3) then
             write(iul,*) 'result ii,mo=',ii,MOIdxList(ii)
             write(iul,*) ' cov matrices:'
-            write(iul,'(3f10.3)') ((cov(i,j)*bohr2angs,j=1,3),i=1,3)
+            write(iul,'(3f10.3)') ((cov(i,j)*bohr2ang,j=1,3),i=1,3)
          end if
          lwork = size(work)
          ev = cov   
@@ -767,7 +767,7 @@ contains
          write(iul,*) ' after broadcast: mu and m for each MO in list:'
          do ii=1,MOIdxLen
             mo = MOIdxList(ii)
-            write(iul,'(2i5,3f10.3)') ii,mo,mMu(:,ii)*bohr2angs
+            write(iul,'(2i5,3f10.3)') ii,mo,mMu(:,ii)*bohr2ang
          end do
          do ii=1,MOIdxLen
             mo = MOIdxList(ii)

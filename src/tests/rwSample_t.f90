@@ -10,7 +10,7 @@ program test
   use elocData_m
   use waveFunction_m
   use randomWalker_m
-  use rWSample_m
+  use rwSample_m
 
   implicit none
   

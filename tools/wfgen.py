@@ -7,10 +7,14 @@
 """
 
 import sys
+if sys.version_info[0] < 3:
+    sys.exit('This script requires Python 3')
+
 from Wfgen.xmvb2wf import xmvb_in
 from Wfgen.mol2wf import molpro_in
 from Wfgen.orca2wf import orca_in
 from Wfgen.amolqc2wf import amolqc_in
+from Wfgen.gamess2wf import gamess_in
 
 if len(sys.argv) == 1:
     sys.exit('''
@@ -26,8 +30,9 @@ if len(sys.argv) == 1:
     
     Detailled read input schemes:
         Molpro: wfgen.py molpro file.out file.molden basis wftype
-        orca:   wfgen.py orca file.mkl file.out basis wftype
+        Orca:   wfgen.py orca   file.mkl file.out    basis wftype
                 note: generate mkl file from gbw file with orca_2mkl
+        Gamess: wfgen.py gamess file.out file.dat    basis wftype
         XMVB:   wfgen.py xmvb   file.xmo INFO        basis wftype
         Amolqc: wfgen.py amolqc file.wf
     
@@ -40,6 +45,7 @@ if len(sys.argv) == 1:
         sort_ci            - sorts the CI vector by coefficient
         convert            - converts csf type to det type
         cut_ci [threshold] - cuts csf CI vector at given threshold
+        keep_weight [perc] - cuts the CI vector only keeping the given percentage as weight
         add_symmetry       - adds symmetry (eg. delta for C2v)
         symm_combine       - combines csfs based on symmetry (molpro only)
         coeff_combine      - combines csfs with equal (diff < 1E-6) coeffs
@@ -52,12 +58,14 @@ if len(sys.argv) == 1:
                              of determinants/csfs, where given orbitals are not
                              doubly occupied
         punch_moopt        - punches the orbital optimization section for Amolqc input
-                             and deletes all orbitals, that are not required
+                             and can delete all orbitals, that are not required
         max_dets           - prints the maximum number of determinants per csf
         share_dets         - prints indices of csfs that 'share' determinants
         replace_orbs       - replaces orbital indices in determinants
         reorder_atoms      - reorders atoms (and orbitals accordingly)
         separate_electrons - separates electrons (e.g. for pi-only calculations)
+        averaged_occupation- gives the average orbital occupation (det wf only)
+        punch_selection    - punches molpro selection input
         
     ''')
 
@@ -96,6 +104,16 @@ elif program == 'orca':
     if wf_type not in ['sd', 'csf']:
         sys.exit("Error: wave function type '" + wf_type + "' is unknown!")
     wf = orca_in(mkl_name, orcaout_name, basis, wf_type)
+
+elif program == 'gamess':
+    arguments = 6
+    input_name = sys.argv[2]
+    dat_name = sys.argv[3]
+    basis = sys.argv[4]
+    wf_type = sys.argv[5]
+    if wf_type not in ['sd', 'csf']:
+        sys.exit("Error: wave function type '" + wf_type + "' is unknown!")
+    wf = gamess_in(input_name, dat_name, basis, wf_type)
     
 elif program == 'amolqc':
     arguments = 3
@@ -172,6 +190,14 @@ while i < len(sys.argv) - arguments:
         i += 1
         index = int(sys.argv[i + arguments])
         wf.print_csf(index)
+    elif command == 'averaged_occupation':
+        wf.averaged_occupation()
+    elif command == 'punch_selection':
+        wf.punch_selection()
+    elif command == 'keep_weight':
+        i += 1
+        percentage = float(sys.argv[i + arguments])
+        wf.keep_weight(percentage)
     else:
         sys.exit('Error: command '+command+' unknown!')
     i += 1

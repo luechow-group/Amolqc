@@ -6,7 +6,7 @@ module optParamsLBFGS_m
 
    use kinds_m, only: r8
    use global_m
-   use rWSample_m
+   use rwSample_m
    use elocAndPsiTermsEBFGS_m
    use wfParameters_m
    use qmc_m, only: qmc_init, qmc_run
@@ -35,7 +35,6 @@ contains
    character(len=120), intent(in)       :: lines(nl)
    type(WFParamDef), pointer              :: wfp
    integer iflag
-   logical                       :: found,finda
    real(r8)                        :: eRef
 
    mOptMode = 1
@@ -77,7 +76,7 @@ contains
    real(r8), allocatable                  :: p(:),p1(:),p2(:)       ! parameter vector
    real(r8), allocatable                  :: delta_p(:) ! change of parameter vector
    real(r8), allocatable                  :: g(:)       ! gradient
-   real(r8) e0,var
+   real(r8) e0
    real(r8), allocatable                  :: fi(:),ELi(:),fiEL(:)
 
    integer, parameter :: nmax=1024
@@ -87,12 +86,12 @@ contains
 !     nmax  is the dimension of the largest problem to be solved.
 !     mmax  is the maximum number of limited memory corrections.
 !     lenwa is the corresponding real workspace required.
-   character*60     task, csave
+   character(len=60)     task, csave
    logical          lsave(4)
-   integer          i,n,m,iprint
+   integer          i,m,iprint
    integer          nbd(nmax), iwa(3*nmax), isave(44)
    real(r8)           ff, factr, pgtol
-   real(r8)           xx(nmax), l(nmax), u(nmax), gg(nmax), dsave(29)
+   real(r8)           l(nmax), u(nmax), dsave(29)
    real(r8)           wa(lenwa)
    np = ElocAndPsiTermsEBFGS_nParams(mEPsiTEBFGS)
    WFP => ElocAndPsiTermsEBFGS_getWFP(mEPsiTEBFGS)
@@ -187,7 +186,7 @@ contains
 
       else if (res(1)==2) then ! task(1:5)=='NEW_X'
          if (MASTER) then
-            if (dsave(13) .le. 1.d-10*(1.0d0 + abs(ff))) then
+            if (dsave(13) <= 1.d-10*(1.0d0 + abs(ff))) then
                task='STOP: THE PROJECTED GRADIENT IS SUFFICIENTLY SMALL'
             else if (isave(34) >= mOptMaxIter) then
                task='STOP: TOTAL NO. of f AND g EVALUATIONS EXCEEDS LIMIT'
@@ -198,7 +197,7 @@ contains
             endif
             write (998,'(2(a,i5,4x),a,1p,d12.5,4x,a,1p,d12.5)') 'Iterate', &
                    isave(30),'nfg =',isave(34),'e0 =',e0,'|proj g| =',dsave(13)
-            if (task(1:4) .eq. 'STOP') then
+            if (task(1:4) == 'STOP') then
                write (iul,*) 'L-BFGS: task=',task
                write (iul,*) 'Final parameters p='
                write (iul,'(10G13.5)') (p(i), i = 1, np)

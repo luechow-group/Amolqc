@@ -387,9 +387,6 @@ contains
 
       integer :: a, b
       character(len = 80) :: basinSearch
-      real(r8), dimension(:, :), allocatable :: elecsA, elecsB
-      real(r8) :: vee, vcl, vxc
-      real(r8) :: intee, intcl, intxc
       integer :: iflagA, iflagB, iflag
       real(r8) :: start, finish
 

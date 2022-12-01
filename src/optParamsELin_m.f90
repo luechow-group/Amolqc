@@ -11,7 +11,7 @@ module optParamsELin_m
    use global_m
    use subloop_m, only: subloop
    use sorting_m, only: quickSortIndex
-   use rWSample_m
+   use rwSample_m
    use elocAndPsiTermsLin_m
    use wfParameters_m
    use waveFunction_m, only: writeWF
@@ -36,18 +36,15 @@ contains
    type(WFParamDef), pointer            :: WFP
    type(RWSample), intent(inout)        :: sample  ! (fixed) sample for optimization
    logical, intent(out)                 :: converged
-   integer                              :: nParams, np, subSampleSize, npCI,npJ,npMO
+   integer                              :: np, subSampleSize, npCI,npJ,npMO
    real(r8), allocatable                  :: p(:),p0(:)       ! parameter vector
    real(r8), allocatable                  :: delta_p(:,:) ! change of parameter vector (allow several)
    real(r8), allocatable                  :: H(:,:),S(:,:)  ! gradient and Hessian
    real(r8)                               :: e0, var, minVar, minE, lambda(6), lambdaOpt
    real(r8), allocatable                  :: fi(:),ELi(:),fiEL(:),fifj(:,:),fifjEL(:,:),fiELj(:,:)
-   integer                              :: lwork,iter,i,j,info,idxMin,maxDP, iflag, eqIter, eqStep, optIter
+   integer                              :: i,j,idxMin,maxDP, iflag, eqIter, eqStep, optIter
    integer                              :: nSize,root
-   integer, allocatable                 :: ipiv(:)
-   real(r8), allocatable                  :: work(:)
    type(ElocAndPsiTermsLin)             :: EPsiTLin
-   type(ElocAndPsiTermsLin),pointer     :: EPsiTLinptr
    real(r8)                               :: targetE, targetVar,cffac,dmax,maxVar,lambdaMax
    character(len=80)                    :: subName, fname
    logical                              :: doWriteWF,subSample,manualEv,proJ,manualLambda,max_prj
@@ -538,7 +535,7 @@ contains
          real(r8)  :: lambdaOpt ! calculated optimal step length
          integer, intent(in), optional :: subSampleSize
          integer n,cfIdx
-         real(r8) d,cfmin,cf,var,cfa(4),a(4),lambdaa(4)
+         real(r8) d,cfmin,cf,var,cfa(4),a(4),lambdaa(4),cfs(6),x1,x2,x3,y1,y2,y3,r1,r2,r3
 
 
          if (NPCI >0 .and. npJ==0 .and. npMO==0) then
@@ -555,8 +552,9 @@ contains
 
             cfmin = abs(e0-targetE) + cffac* abs(var0-targetVar)
             cfIdx = 6
+            cfs(cfIdx) = cfmin
 
-               if (logmode >= 2) write(iul,'(A,F15.5)') &
+            if (logmode >= 2) write(iul,'(A,F15.5)') &
                      ' lambda=1.0 with cf=',cfmin
                do n=1,size(lambda)-1
 
@@ -577,6 +575,7 @@ contains
                   var = ElocAndPsiTermsLin_varALL(EPsiTLin)
 
                   cf = abs(e0-targetE) + cffac* abs(var-targetVar)
+                  cfs(n) = cf
                   if (logmode >= 2) write(iul,'(I5,A,F10.2,A,F15.5,A,F15.5,A,F15.5)') &
                      n,': lambda=',lambda(n),' Emean =',e0,' var = ',var,' cf = ',cf
                   if (cf < cfmin) then
@@ -587,7 +586,20 @@ contains
                end do
 
                if (lambda(cfIdx) < dmax/d) then
-                  lambdaOpt = lambda(cfIdx)
+                  if (cfIdx > 1 .and. cfIdx < 6) then
+                     x1 = lambda(cfIdx - 1)
+                     x2 = lambda(cfIdx)
+                     x3 = lambda(cfIdx + 1)
+                     y1 = cfs(cfIdx - 1)
+                     y2 = cfs(cfIdx)
+                     y3 = cfs(cfIdx + 1)
+                     r1 = x1 * (y3 - y2)
+                     r2 = x2 * (y1 - y3)
+                     r3 = x3 * (y2 - y1)
+                     lambdaOpt = (x3 * r3 + x2 * r2 + x1 * r1) / (2 * (r1 + r2 + r3))
+                  else
+                     lambdaOpt = lambda(cfIdx)
+                  end if
                   if (logmode >= 2) write(iul,'(a,f10.2)') ' choosing min cost function: lambda=',lambdaOpt
                else
                   lambdaOpt = dmax/d
@@ -673,7 +685,7 @@ contains
    real(r8)             :: alphar(n),alphai(n),beta(n),work(1,8*n),vr(n,n),vl(n,n)
    real(r8)             :: ev(n),evi(n),mav
    integer            :: info
-   integer            :: i,j,iOpt,idx(n)
+   integer            :: i,idx(n)
 
    call assert(size(H,1) == n,'rightEigenvector: wrong dimension 1')
 

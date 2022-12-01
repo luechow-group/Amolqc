@@ -9,11 +9,15 @@ if (${STATUS} STREQUAL NOTFOUND)
     message( FATAL_ERROR "Flags for ${CMAKE_Fortran_COMPILER_ID} are not specified in cmake/flags")
 endif()
 
-set(FLAGS "${PP_FLAGS}")
+set(FLAGS "${PP_FLAGS} ${ALWAYS_FLAGS}")
 
 # sets -DMPI preprocessing flag
 if(${MPI})
     set(FLAGS "${FLAGS} -DMPI")
+endif()
+
+if(${STANDARD})
+    set(FLAGS "${FLAGS} ${STANDARD_FLAGS}")
 endif()
 
 # sets warning flags
@@ -27,6 +31,11 @@ if(${LINEINFO})
     set(FLAGS "${FLAGS} ${LINEINFO_FLAGS}")
 else()
     set(DEBUG_FLAGS "${DEBUG_FLAGS} ${LINEINFO_FLAGS}")
+endif()
+
+if(NOT ${ADDITIONAL_FLAGS} STREQUAL "")
+    set(FLAGS "${FLAGS} ${ADDITIONAL_FLAGS}")
+    message("set additional flags: ${ADDITIONAL_FLAGS}")
 endif()
 
 # sets final fortran flags

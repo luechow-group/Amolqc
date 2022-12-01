@@ -3,7 +3,7 @@
 ! SPDX-License-Identifier: GPL-3.0-or-later
 
 module statistic_tm
-    use PFUNIT_MOD
+    use funit
     use kinds_m, only: r8
     use statistic_m, only: Statistic_t, StatisticData_t, &
             operator (+), operator (==), assignment (=)

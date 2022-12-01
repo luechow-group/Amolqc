@@ -74,7 +74,6 @@ contains
       class(refContainerStructPerm), pointer :: rcsp_p
       class(refContainerPos), pointer    :: rcp_p
       class(refContainerDom), pointer    :: rcd_p
-      real(r8) dist2thr
 
       if (typ=="sim") then
          allocate(rcsi_p)
@@ -241,14 +240,13 @@ contains
       real(r8)                         :: fgrad(getNElec(),3)
       real(r8)                         :: nucThresh,coreThresh,bondThresh,hh,r(3)
       real(r8), pointer                :: eval(:)=>null(),evec(:,:)=>null()
-      integer                        :: a, i, j, jj, iflag, iter, n, nrl, verb, iflag1, iflag2, iflag3
+      integer                        :: a, i, j, jj, iflag, n, nrl, verb, iflag1, iflag2, iflag3
       integer                        :: naNuc, nbNuc    ! alpha, beta elecs at nucleus (not varied)
       integer                        :: aNucElec(getNNuc()), bNucElec(getNNuc()) ! nuc a -> elec i (at nuc)
       integer                        :: slist(getNElec())   ! slist(i) == a : elec i is at nuc a (0: not at nuc)
       integer                        :: refpar(2)
       type(refContainerSimple) :: refs
       type(reference), pointer       :: rp,rp0
-      type(refl_vlist)               :: rl
       type(refl_vlist), pointer      :: p,p0
       logical writeEV,calcDiff,withExcl
       character(len=20)              :: resultStr
@@ -450,8 +448,7 @@ contains
       character(len=120)             :: line
       character(len=20)              :: words(20)
       integer, parameter :: iu=14
-      integer io,nWords,exclMode
-      integer, allocatable           :: exclist(:)
+      integer io
       real(r8) x(ne),y(ne),z(ne)
       type(reference) :: r
       class(referenceContainer), pointer  :: rc_p => null()         ! list of stored references
@@ -631,7 +628,6 @@ contains
       logical                        :: doSpaceWarpTransform
       type(refContainerSimple)       :: refs
       type(reference), pointer       :: rp
-      type(refl_vlist)               :: rl
       type(refl_vlist), pointer      :: p
 
       call abortp("reference_optimize: requires update to minimizer class")

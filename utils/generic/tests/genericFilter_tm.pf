@@ -3,7 +3,7 @@
 ! SPDX-License-Identifier: GPL-3.0-or-later
 
 module genericFilter_tm
-    use PFUNIT_MOD
+    use funit
     use kinds_m, only : r8
     use genericFilter_m, only: Std_deviation, Generic_filter
     implicit none

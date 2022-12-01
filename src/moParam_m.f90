@@ -60,7 +60,7 @@ contains
                                            !         optArray(0:,4) = |len, m'1, m'2, .. m'_len]
                                            ! meaning: all rotations \kappa_lm and all \kappa_l'm', ...
    integer, allocatable :: MOSymmetriseList(:,:)
-   integer np,i,j1,j2,k,l,l0,nClass,len,p,orb,iflag, nSym
+   integer np,i,j1,j2,k,l,l0,m,nClass,len,orb,iflag, nSym, counter
    integer p1, e1, e2
    integer entryVec(0:mMaxPairs)
    logical found
@@ -89,12 +89,28 @@ contains
    if (MASTER .and. logmode >= 2) write(iul,'(a,i3,a)') ' reading ',nClass,' classes of orbital rotations'
    allocate(optArray(0:norb,2*nClass))
    optArray = 0
+   m = 1
+   counter = 0
    do l=1,2*nClass,2
       if (l0+l+1 > nl) call abortp("$optimize_parameters: illegal format in MO parameter description")
-      read(lines(l0+l),*) len
-      read(lines(l0+l),*) (optArray(i,l),i=0,len)
-      read(lines(l0+l+1),*) len
-      read(lines(l0+l+1),*) (optArray(i,l+1),i=0,len)
+      m = l + counter
+      read(lines(l0+m),*) len
+      if (len > 30) then
+         read(lines(l0+m),*) (optArray(i,l),i=0,30)
+         read(lines(l0+m+1),*) (optArray(i,l),i=31,len)
+         counter = counter + 1
+      else
+         read(lines(l0+m),*) (optArray(i,l),i=0,len)
+      end if
+      m = l + counter
+      read(lines(l0+m+1),*) len
+      if (len > 30) then
+         read(lines(l0+m+1),*) (optArray(i,l+1),i=0,30)
+         read(lines(l0+m+2),*) (optArray(i,l+1),i=31,len)
+         counter = counter + 1
+      else
+         read(lines(l0+m+1),*) (optArray(i,l+1),i=0,len)
+      end if
    enddo
 
    do i=1,nl
@@ -230,7 +246,7 @@ contains
 
    logical, optional, intent(in) :: doElecDerivs    ! if true calculate mokgrad/moklapl in addition to mok
    integer i,ii,j,jj,k,ll,mm,n,na,nb,p,lpos,mpos,orb,ierr,detssize
-   real(r8) tmp,tmp0,tmp1,tmp2,tmp3,tmp4,tmp5,coeff,d,darr(size(detsRepLst,1))
+   real(r8) tmp0,tmp1,tmp2,tmp3,tmp4,tmp5,coeff,d,darr(size(detsRepLst,1))
    real(r8) ,allocatable ::  tmparr1(:,:),tmparr2(:,:),tmparr3(:,:),tmparr4(:,:)!keep results to avoid unnecessary calculations
    real(r8), allocatable :: excitedMO(:), tmpdet(:,:), tmpdeti(:,:), tmpdetx(:,:),tmpdety(:,:),tmpdetz(:,:),tmpdet2(:,:)
    integer, allocatable :: mclistexcit(:)
@@ -843,7 +859,7 @@ do p=1,moParams
          if (detsRepLst(n,1)==0) then
             darr(n) = deter(1,n)
             excitedMO(1:na) = mat(newmo,1:na,1)
-            if(ie .le. nalpha) then
+            if(ie <= nalpha) then
                call invdetcalc(excitedMO,na,na,detiaOne(1:na,pos,nn),darr(n))
                 else
                call invdetcalc(excitedMO,na,na,detia(1:na,pos,nn),darr(n))
@@ -962,7 +978,7 @@ do p=1,moParams
       real(r8) X(norb,norb), X2(norb,norb), W(norb,norb), R(norb,norb), W1(norb,norb)
       real(r8) lambda(norb), tau(norb), work(4*norb)
       real(r8) zero, one
-      character*1 uplo1,uplo2
+      character(len=1) uplo1,uplo2
       real(r8), parameter :: EPS = 1.d-8
 
       ! overwrite current MO matrix
@@ -1109,7 +1125,6 @@ do p=1,moParams
   !-------------------------------------!
      integer, intent(in)   :: optMode       ! optimization mode  ! ignored !
      real(r8), intent(inout) :: p(:)         ! parameter vector
-     integer k,k0
 
      call assert(size(p) == size(p_save),"orbital optimization: illegal parameter vector length")
      p = p_save

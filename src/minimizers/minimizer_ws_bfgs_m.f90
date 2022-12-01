@@ -9,7 +9,7 @@ module minimizer_ws_bfgs_module
    use fctn_module, only: Function_t
    use singularityCorrection_m, only: singularity_correction
    use singularityParticles_m, only: singularity_particles
-   use line_search_ws_simple_module, only: line_search_ws_simple
+   use line_search_ws_m, only: line_search_ws
    use minimizer_w_sing_module, only: minimizer_w_sing
    implicit none
 
@@ -18,7 +18,7 @@ module minimizer_ws_bfgs_module
 
    type, extends(minimizer_w_sing) :: minimizer_ws_bfgs
       private
-      type(line_search_ws_simple)     :: lss_
+      class(line_search_ws), allocatable     :: lss_
       logical                         :: scale_initial_H_ = .false.  ! .t. recommended by Nocedal
       real(r8)                    :: step_size_ = 0.d0
       integer                         :: latency_ = 0
@@ -36,10 +36,10 @@ module minimizer_ws_bfgs_module
 contains
 
    function constructor(lss, sc, yn, step_size, latency, switch_step)
-      class(line_search_ws_simple), intent(in)        :: lss
+      class(line_search_ws), intent(in)        :: lss
       type(singularity_correction), intent(in)        :: sc
       logical, intent(in)                             :: yn
-      real(r8), optional, intent(in)                    :: step_size
+      real(r8), optional, intent(in)                  :: step_size
       integer, optional, intent(in)                   :: latency
       integer, optional, intent(in)                   :: switch_step
       type(minimizer_ws_bfgs), pointer :: constructor
@@ -68,10 +68,11 @@ contains
       real(r8)                     :: v(size(x)), v1(size(x))    ! aux vectors
       real(r8)                     :: curv, rho
       real(r8), allocatable        :: sings(:,:)
-      integer                    :: i, iter, verbose, iul, n, ls_iter, info, nr_eval
+      real(r8)                     :: xyz(SIZE(x)/3, 3)
+      integer                    :: i, iter, verbose, iul, n, ls_iter, info, nr_eval, max_d_flag
       integer                    :: steps_since_correct
       type(singularity_particles):: sp
-      logical                    :: gmask(size(x))      ! .true. for components of particles at a singularity
+      logical                    :: gmask(size(x)), mask(size(x))   ! .true. for components of particles at a singularity
       logical is_corrected, new_sing
 
       if (asserts) then
@@ -91,8 +92,17 @@ contains
 
       n = size(x)
 
-      call fn%eval_fg(x, f, g)
       nr_eval = 1
+
+      ! before the first step, check for singularities, but with zero step and set particles to singularities
+      p = 0._r8
+      call this%sc_%correct_for_singularities(x, p, sp, is_corrected, correction_only=.true.)
+      mask = sp%At_singularity()
+      call fn%eval_fg(x, f, g, mask)
+
+      where ( sp%At_singularity() ) g = 0.d0
+
+      call this%restrict_gradient(g)
 
       if (verbose > 0) then 
          write(iul,"(a,g20.10)") " initial position with function value f=", f
@@ -169,7 +179,11 @@ contains
          end if
 
          !! line search with distance restriction
+         call this%restrict_gradient(g)
+
          call this%lss_%find_step(fn, this%sc_, x, f, g, p, x_new, g_new, ls_iter, is_corrected, sp)
+         call this%restrict_gradient(g_new)
+
 
          if (debug) call assert(all(abs(x)<huge(1.d0)), "minimizer_ws_bfgs_minimize: illegal x coords after find_step")
 
@@ -208,7 +222,20 @@ contains
                 " n_sing=", sp%n_sing(), " is_corrected=", is_corrected, " steps_since_correct=", steps_since_correct
          end if
 
+
          if (this%is_gradient_converged(gmax)) then
+            if (this%value_convergence_) then
+               call this%set_converged(.false.)
+               exit
+            else
+               x = x_new
+               g = g_new
+               call this%set_converged(.true.)
+               exit
+            end if
+         end if
+
+         if (this%is_value_converged(f) .and. this%value_convergence_) then
             x = x_new
             g = g_new
             call this%set_converged(.true.)
@@ -286,6 +313,21 @@ contains
 
          x = x_new
          g = g_new
+
+         max_d_flag = 0
+
+         if (MAXVAL(ABS(x_new)) > MINVAL(this%max_electron_distance())) then
+            xyz = RESHAPE(x_new, [SIZE(x_new)/3,3])
+            do i = 1, 3
+               if (MAXVAL(ABS(xyz(:,i))) > MINVAL(this%max_electron_distance())) then
+                  max_d_flag = 1
+                  call this%set_converged(.false.)
+                  exit
+               end if
+            end do
+            if (max_d_flag == 1) exit
+         end if
+
       end do
 
       if (verbose > 0) then

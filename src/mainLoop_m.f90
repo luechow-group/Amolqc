@@ -13,15 +13,12 @@ contains
 subroutine mainloop
 
    use kinds_m, only: r8
-#ifdef NAG
-   use, intrinsic :: f90_unix_io, only: flush
-#endif
    use global_m
    use error_m
    use parsing_m, only: getNextBlock, getinta, finda
    use utils_m, only: getToken,getTimeString,readFileParallel,expandMacro,printHeader,getFormattedHeader
    use init_m, only: initAmolqc,initFiles,initGen,finalizeAmolqc
-   use rWSample_m, only: RWSample, writeSampleCommand, compareSample, recalculateSample, &
+   use rwSample_m, only: RWSample, writeSampleCommand, compareSample, recalculateSample, &
        getFirst, isNext, getNext, getSampleSize
    use randomWalker_m, only: RandomWalker, setNumberOfElectrons, setNumberOfCenters, setEpart
    use qmcSample_m, only: sample, initInitialWalker, displaceInitialWalker
@@ -39,6 +36,7 @@ subroutine mainloop
    use rhoMax_m, only: rhoMax_t
    use moMax_m, only: moMax_run, moMax_plot, moMax_plot_plane
    use maximizeSample_m, only: maximizeSample, maximizeWalker
+   use eigenVectAnalysis_m
    use maximizeSampleRho_m, only: maximizeSampleRho, maximizeWalkerRho
    use maxRawData_m, only: maxraw_init
    use maxAnalysis_m, only: maxana_init
@@ -55,23 +53,23 @@ subroutine mainloop
 
    integer, parameter :: MAXLINES=1000
 
-   character(len=120)          :: token
+   character(len=120)          :: token,subName
    character(len=MAXLEN)       :: inLines(MAXLINES)=''
    character(len=MAXLEN)       :: blockLines(MAXLINES)=''
    character(len=MAXLEN)       :: macroLines(MAXLINES)=''
-   character(len=180)          :: macropath,macrofile,subName
-   character(len=15)           :: si = ' =======>      '
-   character(len=14)           :: sf = '      <======='
+   character(len=180)          :: macropath,macrofile
    type(RWSample)              :: smpl
    type(psimax)                :: psimax_obj
    type(rhoMax_t)              :: rhoMax
    type(RhoGrid_t)             :: rhoGrid
-   integer                     :: bs,idx,nbl,nil,i,iuf,io,nnew,iflag,fileExistsInt
+   integer                     :: idx,nbl,nil,i,iflag,fileExistsInt
    integer                     :: loopIdx,loopIter,currentLoopIter,subIdx,subLine
    integer                     :: mLines
    real(r8)                    :: start,startCPU,endCPU
    real(r8)                    :: tstart,tstartCPU,tendCPU,sendbuf(1),recvbuf(1),t
-   logical                     :: wfRead,found,exitLoop,fileExists,subMode,converged,wout, is_converged
+   logical                     :: wfRead,found,exitLoop,fileExists,converged,wout
+
+   logical :: opened
 
    call initFiles(inLines,nil)
    call getAmolqcPath(macropath)
@@ -175,6 +173,9 @@ subroutine mainloop
       case('maximize_sample')
          if (wout) call printHeader(iul, getFormattedHeader(token, 'get psi^2 maxima of sample'))
          call maximizeSample(smpl, psimax_obj, wout)
+      case('eigenvect_analysis')
+         if (wout) call printHeader(iul, getFormattedHeader(token, 'get eigenvalues and eigenvectors of sample'))
+         call eigenVectAnalysis(smpl, psimax_obj)
       case('maximize_sample_rho')
          if (wout) call printHeader(iul, getFormattedHeader(token, 'get rho maxima of sample'))
          call maximizeSampleRho(smpl, rhoMax)
@@ -266,7 +267,7 @@ subroutine mainloop
             subLine = subLine + 1
             subLines(subLine,subIdx) = inLines(idx+subLine-1)
          end do
-         if (wout) write(iul,'(/a)') si//' $subroutine: storing subroutine '//trim(subName)//sf
+         if (wout) call printHeader(iul, getFormattedHeader('subroutine', 'storing subroutine' // trim(subName)))
       
       ! loop commands
       case('begin_loop')
@@ -344,7 +345,8 @@ subroutine mainloop
             write(iul,'(3A,F18.2,A//)') ' cpu time (master) for ',trim(token),' : ', &
             endCPU-startCPU,' s'
          end if
-         call flush(iul)
+         inquire(iul, opened=opened)
+         if (opened) flush(iul)
       end if
 
    end do

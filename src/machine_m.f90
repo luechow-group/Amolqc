@@ -4,9 +4,6 @@
 
 ! collection of machine-dependent utility routines
 module machine_m
-#ifdef NAG
-  use, intrinsic :: f90_unix_env, only: getenv, iargc, getarg
-#endif
   use global_m
   use error_m, only: error
   use mpiInterface_m, only: myMPIBcastInteger, myMPIBcastString
@@ -26,10 +23,10 @@ subroutine myGetArg(n,s,ierr)
 
   ierr = 0
   if (mytid==0) then
-     if (iargc() < n) then
+     if (COMMAND_ARGUMENT_COUNT() < n) then
         ierr = 1
      else
-        call getarg(n,s)
+        call GET_COMMAND_ARGUMENT(n,s)
      endif
   endif
   call myMPIBcastInteger(ierr,1)
@@ -46,10 +43,10 @@ subroutine myGetArgLocal(n,s,ierr)
   integer, intent(out)             :: ierr ! error code: 1=no argument
 
   ierr = 0
-  if (iargc() < n) then
+  if (COMMAND_ARGUMENT_COUNT() < n) then
      ierr = 1
   else
-     call getarg(n,s)
+     call GET_COMMAND_ARGUMENT(n,s)
   endif
 
 end subroutine myGetArgLocal
@@ -61,7 +58,7 @@ subroutine myGetHost(hostn)
   ! returns the hostname in 'hostn'
   character(len=*) :: hostn
 
-  call getenv('HOSTNAME',hostn)
+  call GET_ENVIRONMENT_VARIABLE('HOSTNAME',hostn)
   !call hostnm(hostn)    ! SGI, Alpha
   !ihost = hostnm_(hostn)   ! AIX
 end subroutine myGetHost
@@ -74,7 +71,7 @@ subroutine myGetEnv(name,value)
   character(len=*) name, value
 
   if (mytid==0) then
-    call getenv(name,value)
+    call GET_ENVIRONMENT_VARIABLE(name,value)
     if (value == "") then
       call error('environment variable '//trim(name)//' is not set/empty.')
     end if

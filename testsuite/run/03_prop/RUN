@@ -15,7 +15,7 @@ do
      rm -f $i.in $i.out
    else
      export FAILED=1
-     echo "    $i propagators test \033[31mfailed.\033[39m."
+     echo -e "    $i propagators test \033[31mfailed.\033[39m"
      echo "    Check $PWD/$i.out for more information."
    fi
 done

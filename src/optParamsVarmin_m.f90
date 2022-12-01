@@ -11,7 +11,7 @@ module optParamsVarmin_m
    use kinds_m, only: r8
    use global_m
    use subloop_m, only: subloop
-   use rWSample_m
+   use rwSample_m
    use elocAndPsiTermsLM_m
    use wfParameters_m
    use parsing_m
@@ -42,10 +42,10 @@ contains
    integer                              :: np
    real(r8), allocatable                  :: p(:)       ! parameter vector
    real(r8), allocatable                  :: delta_p(:) ! change of parameter vector
-   real(r8), allocatable                  :: g(:),b(:),H(:,:)  ! gradient and Hessian
+   real(r8), allocatable                  :: g(:),b(:),H(:,:),H0(:,:),Imat(:,:)  ! gradient and Hessian
    real(r8) emean, var, eOld, varOld, lambda,varRef,varRefOld,optERef,optLMlambda
    real(r8)                               :: eRef
-   integer lwork,iter,i,j,info,eqIter,eqStep,lmIter,optIter
+   integer lwork,iter,i,info,eqIter,eqStep,lmIter,optIter,NRMode
    logical eRefPresent, fixed
    integer, allocatable                 :: ipiv(:)
    real(r8), allocatable                  :: work(:)
@@ -75,7 +75,12 @@ contains
    np = ElocAndPsiTermsLM_nParams(EPsiTLM)
    WFP => ElocAndPsiTermsLM_getWFP(EPsiTLM)
    call assert(np>0,'varmin1_optimizeSample: no parameters')
-   allocate(p(np),delta_p(np),b(np),g(np),H(np,np),ipiv(np),work(np*np))
+   allocate(p(np),delta_p(np),b(np),g(np),H(np,np),H0(np,np),Imat(np,np),ipiv(np),work(np*np))
+   Imat = 0;
+   do i=1,np
+      Imat(i,i) = 1.d0
+   end do
+
    eqStep = 1
    do
     if(doWriteWF) call getPlusOptIter(optIter)
@@ -94,11 +99,12 @@ contains
          optERef=eOld
          ! In cases that user do not specify E_ref using sample emean as first E_ref
          ! is not usualy so 0.02 is added to improve initial value.
-         if (eqStep==0) optERef=optERef*1.02
+         if (eqStep==0) optERef=optERef*1.02_r8
 
      else
       if (.not.fixed .and. eqStep>0) optERef=eOld
      end if
+     EPsiTLM%EPTB%eRef = optERef
      varOld = ElocAndPsiTermsLM_varALL(EPsiTLM)
      varRefOld = ElocAndPsiTermsLM_varRefALL(EPsiTLM)
 
@@ -112,7 +118,7 @@ contains
         end if
      end if
 
-     do iter=1,lmIter
+!     do iter=1,lmIter
 
         g = ElocAndPsiTermsLM_VxALL(EPsiTLM)
         H = ElocAndPsiTermsLM_VxyALL(EPsiTLM)
@@ -127,25 +133,86 @@ contains
         endif
 
         if (MASTER) then
-           do i=1,np
-              H(i,i) = H(i,i)*(1+lambda)
-           enddo
+
+           H0 = H
+
+           if (NRMode == 1) then ! snr
+
+              H = H0 + lambda*Imat
+
+              if (logmode >= 2) write(iul,'(/a)') ' find Newton step:'
+              do iter=1,10
+                 call dpotrf('L',np,H,np,info)  ! Cholesky decomposition
+                 if (info == 0) then
+                    write(iul,'(i3,a,f15.6,a)') iter,':  lambda = ',lambda, ' Hessian positive definite'
+                 else if (info > 0) then
+                    write(iul,'(i3,a,f15.6,a)') iter,':  lambda = ',lambda, ' Hessian not positive definite'
+                 else
+                    write(iul,*) ' !!! WARNING !!! Cholesky decomp error'
+                 end if
+                 if (info > 0) then !! not positive definite
+                    lambda = 4*lambda
+                    H = H0 + lambda*Imat
+                 else
+                    exit
+                 end if
+              end do
+              H = H0 + lambda*Imat
+
+           else if (NRMode == 2) then ! lm
+
+              H = H0
+              do i=1,np
+                 H(i,i) = H(i,i)*(1+lambda)
+              enddo
+
+              if (logmode >= 2) write(iul,'(/a)') ' find Newton step:'
+              do iter=1,10
+                 call dpotrf('L',np,H,np,info)  ! Cholesky decomposition
+                 if (info == 0) then
+                    write(iul,'(i3,a,f15.6,a)') iter,':  lambda = ',lambda, ' Hessian positive definite'
+                 else if (info > 0) then
+                    write(iul,'(i3,a,f15.6,a)') iter,':  lambda = ',lambda, ' Hessian not positive definite'
+                 else
+                    write(iul,*) ' !!! WARNING !!! Cholesky decomp error'
+                 end if
+                 if (info > 0) then !! not positive definite
+                    lambda = 4*lambda
+                    H = H0
+                    do i=1,np
+                       H(i,i) = H(i,i)*(1+lambda)
+                    enddo
+                 else
+                    exit
+                 end if
+              end do
+              H = H0
+              do i=1,np
+                 H(i,i) = H(i,i)*(1+lambda)
+              enddo
+           end if
+
            p = wfparams_get(WFP)
-           lwork = np*np
-           b = -g
-           call DSYSV('L',np,1,H,np,ipiv,b,np,work,lwork,info)
-           if (info/=0 .and. logmode>=2) write(iul,*) 'DSYSV failed: INFO=',info
+           if (NRMode == 1 .or. NRMode == 2) then
+              lwork = np*np
+              b = -g
+              call DSYSV('L',np,1,H,np,ipiv,b,np,work,lwork,info)
+              if (info/=0 .and. logmode>=2) write(iul,*) 'DSYSV failed: INFO=',info
 
-           if (logmode >= 3) then
-              write(iul,*) ' DSYSV result b:'
-              write(iul,'(10F10.4)') b
-           endif
+              if (logmode >= 3) then
+                 write(iul,*) ' DSYSV result b:'
+                 write(iul,'(10F10.4)') b
+              endif
 
-           delta_p = b
+              delta_p = b
+           else if (NRMode == 3) then ! gd
+              delta_p = - lambda * g
+           end if
+
            p = p + delta_p
 
            if (logmode >= 2) then
-              write(iul,'(a,i5)') ' new parameter vector in iteration ',iter
+!              write(iul,'(a,i5)') ' new parameter vector in iteration ',iter
               write(iul,'(10F10.4)') p
            endif
         endif
@@ -159,14 +226,14 @@ contains
         var = ElocAndPsiTermsLM_varALL(EPsiTLM)
         varRef = ElocAndPsiTermsLM_varRefALL(EPsiTLM)
 
-        if (varRef < varRefOld) then
-           lambda = lambda / 10.d0
-        else
-           lambda = lambda * 10.d0
-        endif
+!        if (varRef < varRefOld) then
+!           lambda = lambda / 10.d0
+!        else
+!           lambda = lambda * 10.d0
+!        endif
         if (logmode >= 2) write(iul,'(3(A,F13.5),A,G11.3)') ' Emean =',emean,' var = ',var,' varRef = ',varRef, &
            ' new lambda:', lambda
-     end do
+!     end do
 
      call setCurrentResult(emean,0.d0,var)
      call wfparams_set(WFP,p,.true.) ! normalization for ci coeffs
@@ -195,8 +262,8 @@ contains
       subroutine internal_readInput()
       !-----------------------------!
       integer iflag
-      logical                       :: found
       character(len=3)              :: s
+      character(len=40) optMethod
 
       fixed = .true.
       eRef=0.0
@@ -219,6 +286,20 @@ contains
       endif
       if (fixed .and. .not.eRefPresent) call abortp('lm: Please specify E_ref.')
       if (fixed) optERef = eRef
+
+      NRMode = 1
+      call getstra(lines,nl,'method=',optMethod,iflag)
+      if (iflag==0) then
+         if (optMethod=='snr') then
+            NRMode = 1
+         else if (optMethod=='lm') then
+            NRMode = 2
+         else if (optMethod=='gd') then
+            NRMode = 3
+         else
+            call abortp("$optimize_parameters: illegal newton method name")
+         end if
+      end if
 
       lmIter = 3
       call getinta(lines,nl,'max_iter=',lmIter,iflag)

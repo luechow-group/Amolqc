@@ -16,7 +16,6 @@ module elocAndPsiTermsLM_m
 
 
    type, public :: ElocAndPsiTermsLM
-      private
       type(ElocAndPsiTermsBase) :: EPTB
       real(r8), pointer :: vxSum(:) => null()
       real(r8), pointer :: vxySum(:,:) => null()
@@ -206,7 +205,7 @@ contains
    type(ElocAndPsiTermsLM), intent(inout) :: this
    real(r8) :: ElocAndPsiTermsLM_VxyALL(this%EPTB%wfp%nParams,this%EPTB%wfp%nParams)
    integer nData(1),nTotalData(1),np,np2
-   real(r8) VxySum(this%EPTB%wfp%nParams,this%EPTB%wfp%nParams),VxyTotalSum(this%EPTB%wfp%nParams,this%EPTB%wfp%nParams)
+   real(r8) VxyTotalSum(this%EPTB%wfp%nParams,this%EPTB%wfp%nParams)
    real(r8) total(this%EPTB%wfp%nParams**2),vector(this%EPTB%wfp%nParams**2)
    np = this%EPTB%wfp%nParams
    np2 = np**2

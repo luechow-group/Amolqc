@@ -19,11 +19,12 @@ module fPsi2_m
 
 contains
 
-   subroutine fpsi2_fg(this, x, f, g)
+   subroutine fpsi2_fg(this, x, f, g, mask)
       class(fctn_psi2), intent(in)  :: this
       real(r8), intent(in) :: x(:)      ! electron vector (without elecs at cores)
-      real(r8), intent(inout) :: f      ! function value
-      real(r8), intent(inout) :: g(:)   ! gradient
+      real(r8), intent(out) :: f      ! function value
+      real(r8), intent(out) :: g(:)   ! gradient
+      logical, intent(in), optional :: mask(SIZE(x))
       type(eConfigArray)  :: eca
       real(r8), allocatable :: xx(:), yy(:), zz(:)
       integer n, i, error_code
@@ -59,6 +60,7 @@ contains
          g(3*i)   = - 2.d0 * elzDrift(i, 1)
       end do
       call eConfigArray_destroy(eca)
+      if (PRESENT(mask)) where (mask) g = 0._r8
    end subroutine fpsi2_fg
 
 

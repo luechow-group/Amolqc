@@ -16,6 +16,8 @@
 
 
 module hungarian_m
+    use kinds_m
+
     implicit none
 contains
           !---------------------------------------!
@@ -38,16 +40,16 @@ contains
         IMPLICIT NONE
 
         INTEGER, INTENT(IN)   :: mode
-        REAL,INTENT(INOUT)  :: a(:,:)
+        REAL(r8),INTENT(INOUT)  :: a(:,:)
         INTEGER, INTENT(IN)   :: n
         INTEGER, INTENT(IN)   :: m
         INTEGER, INTENT(OUT)  :: k(:)
-        REAL,INTENT(OUT)     :: sum
+        REAL(r8),INTENT(OUT)     :: sum
 
         LOGICAL  :: lsw
         INTEGER  :: i, icbl, icl, icl0, iflag, imax, imin, ipp, irl, irs
-        integer  :: j, j1, jsv, new
-        REAL     :: rmin
+        INTEGER  :: j, j1, jsv, new
+        REAL(r8)     :: rmin
         INTEGER, ALLOCATABLE  :: iw(:,:)
 
         IF (n < 1 .OR. m < 1) THEN

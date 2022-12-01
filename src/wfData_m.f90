@@ -84,8 +84,12 @@ MODULE wfData_m
   integer :: printDet = 0                 ! print level for dets
   logical :: useLAlib_mos = .true.        ! use LA library (BLAS/LAPACK) in mos
   logical :: fastmdet = .false.           ! use fast excited determinant calculation
+  logical :: directDet = .false.          ! use (inefficient) direct LU calculation of all determinants
   logical :: doReorderDets = .true.       ! reorder determinants to max coincidence with 1st det
   logical :: repeatedDetsOpt = .true.     ! optimize calculation of repeated determinants 
+
+  real(r8) :: mDetInverseThreshold = 1.0e-12_r8     ! det threshold for avoiding inverse for gradient/laplacian
+  real(r8) :: mSwitchDirectThreshold = 1.0e-12_r8   ! det threshold for avoiding inverse update
 
 !------------- Properties----------------------
 
@@ -113,6 +117,24 @@ CONTAINS
   integer pure function getNOrb()
      getNOrb = norb
   end function getNOrb
+
+  real(r8) pure function getDetInverseThreshold()
+     getDetInverseThreshold = mDetInverseThreshold
+  end function getDetInverseThreshold
+  
+  subroutine setDetInverseThreshold(value)
+     real(r8), intent(in) :: value
+     mDetInverseThreshold = value 
+  end subroutine setDetInverseThreshold
+
+  real(r8) pure function getSwitchDirectThreshold()
+     getSwitchDirectThreshold = mSwitchDirectThreshold
+  end function getSwitchDirectThreshold
+  
+  subroutine setSwitchDirectThreshold(value)
+     real(r8), intent(in) :: value
+     mSwitchDirectThreshold = value 
+  end subroutine setSwitchDirectThreshold
 
 
   !------------------------------------!

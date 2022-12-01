@@ -1,5 +1,3 @@
-image: registry.git.rwth-aachen.de/luechow-group/amolqc:combined
-
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
@@ -10,15 +8,44 @@ stages:
 before_script:
   - export AMOLQC=/builds/luechow-group/Amolqc
 
-GNU parallel build:
+
+GNU serial build:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.3.0
   stage: build
   script:
-  - ./configure.sh openmpi_lapack.cmake
+    - ./configure.sh serial_gnu.cmake
+    - mkdir -p cmake-build-gnu-serial
+    - cd cmake-build-gnu-serial
+    - cmake ..
+    - make -j 12
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-gnu-serial"
+    paths:
+      - cmake-build-gnu-serial/
+    policy: pull-push
+
+GNU serial test:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.3.0
+  stage: test
+  needs: ["GNU serial build"]
+  script:
+    - cd cmake-build-gnu-serial
+    - ctest -E StatisticsTests -L Amolqc --output-on-failure -j 12
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-gnu-serial"
+    paths:
+      - cmake-build-gnu-serial/
+    policy: pull
+
+GNU parallel build:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.3.0
+  stage: build
+  script:
+  - ./configure.sh openmpi.cmake
   - mkdir -p cmake-build-gnu-parallel
   - cd cmake-build-gnu-parallel
   - cmake ..
-  - make -j4
-  - chown -R user ../cmake-build-gnu-parallel
+  - make -j 12
   cache:
     key: "$CI_COMMIT_REF_SLUG-gnu-parallel"
     paths:
@@ -26,55 +53,28 @@ GNU parallel build:
     policy: pull-push
 
 GNU parallel test:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/gnu:11.3.0
   stage: test
-  dependencies:
-  - GNU parallel build
+  needs: ["GNU parallel build"]
   script:
   - cd cmake-build-gnu-parallel
-  - su user -c "ctest -E StatisticsTests --output-on-failure -j2"
+  - ctest -E StatisticsTests -LE serial -L Amolqc --output-on-failure -j 6
   cache:
     key: "$CI_COMMIT_REF_SLUG-gnu-parallel"
     paths:
     - cmake-build-gnu-parallel/
     policy: pull
 
-
-GNU serial build:
-  stage: build
-  script:
-  - ./configure.sh serial_gnu.cmake
-  - mkdir -p cmake-build-gnu-serial
-  - cd cmake-build-gnu-serial
-  - cmake ..
-  - make -j4
-  cache:
-    key: "$CI_COMMIT_REF_SLUG-gnu-serial"
-    paths:
-    - cmake-build-gnu-serial/
-    policy: pull-push
-
-GNU serial test:
-  stage: test
-  dependencies:
-  - GNU serial build
-  script:
-  - cd cmake-build-gnu-serial
-  - ctest -E StatisticsTests --output-on-failure -j4
-  cache:
-    key: "$CI_COMMIT_REF_SLUG-gnu-serial"
-    paths:
-    - cmake-build-gnu-serial/
-    policy: pull
-
 Intel serial build:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.1
   stage: build
   script:
-  - source /opt/intel/parallel_studio_xe_2019/psxevars.sh intel64
+  - . /opt/intel/oneapi/setvars.sh
   - ./configure.sh serial_intel.cmake
   - mkdir -p cmake-build-intel-serial
   - cd cmake-build-intel-serial
   - cmake ..
-  - make -j4
+  - make -j 12
   cache:
     key: "$CI_COMMIT_REF_SLUG-intel-serial"
     paths:
@@ -82,50 +82,129 @@ Intel serial build:
     policy: pull-push
 
 Intel serial test:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.1
   stage: test
-  dependencies:
-  - Intel serial build
+  needs: ["Intel serial build"]
   script:
-  - source /opt/intel/parallel_studio_xe_2019/psxevars.sh intel64
+  - . /opt/intel/oneapi/setvars.sh
   - cd cmake-build-intel-serial
-  - ctest -E StatisticsTests --output-on-failure -j4
+  - ctest -E StatisticsTests -L Amolqc --output-on-failure -j 12
   cache:
     key: "$CI_COMMIT_REF_SLUG-intel-serial"
     paths:
     - cmake-build-intel-serial/
     policy: pull
 
-GNU make serial build:
+Intel parallel build:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.1
   stage: build
   script:
-  - export MATHLIBS=/usr/lib/x86_64-linux-gnu
-  - mkdir -p make-build-gnu-serial
-  - cp -r src make-build-gnu-serial
-  - cp -r utils make-build-gnu-serial
-  - cp -r bib make-build-gnu-serial
-  - cp -r make make-build-gnu-serial
-  - cp -r testsuite make-build-gnu-serial
-  - cp Makefile make-build-gnu-serial
-  - cp configure.sh make-build-gnu-serial
-  - cd make-build-gnu-serial
-  - ./configure.sh serial_gnu.mk
-  - make -j4
+    - . /opt/intel/oneapi/setvars.sh
+    - ./configure.sh intelmpi.cmake
+    - mkdir -p cmake-build-intel-parallel
+    - cd cmake-build-intel-parallel
+    - cmake ..
+    - make -j 12
   cache:
-    key: "$CI_COMMIT_REF_SLUG-gnu-serial-make"
+    key: "$CI_COMMIT_REF_SLUG-intel-parallel"
     paths:
-    - make-build-gnu-serial/
+      - cmake-build-intel-parallel/
     policy: pull-push
 
-GNU make serial test:
+Intel parallel test:
+  image: registry.git.rwth-aachen.de/luechow-group/amolqc/intel:2021.7.1
   stage: test
-  dependencies:
-  - GNU make serial build
+  needs: ["Intel parallel build"]
   script:
-  - export MATHLIBS=/usr/lib/x86_64-linux-gnu
-  - cd make-build-gnu-serial
-  - make tests
+    - . /opt/intel/oneapi/setvars.sh
+    - cd cmake-build-intel-parallel
+    - ctest -E StatisticsTests -LE serial -L Amolqc --output-on-failure -j 6
   cache:
-    key: "$CI_COMMIT_REF_SLUG-gnu-serial-make"
+    key: "$CI_COMMIT_REF_SLUG-intel-parallel"
     paths:
-    - make-build-gnu-serial/
+      - cmake-build-intel-parallel/
     policy: pull
+
+#Nvidia serial build:
+#  image: registry.git.rwth-aachen.de/luechow-group/amolqc/nvhpc:22.9
+#  stage: build
+#  script:
+#    - ./configure.sh serial_nvidia.cmake
+#    - mkdir -p cmake-build-nvidia-serial
+#    - cd cmake-build-nvidia-serial
+#    - cmake ..
+#    - make -j 12
+#  cache:
+#    key: "$CI_COMMIT_REF_SLUG-nvidia-serial"
+#    paths:
+#      - cmake-build-nvidia-serial/
+#    policy: pull-push
+#
+#Nvidia serial test:
+#  image: registry.git.rwth-aachen.de/luechow-group/amolqc/nvhpc:22.9
+#  stage: test
+#  needs: ["Nvidia serial build"]
+#  script:
+#    - cd cmake-build-nvidia-serial
+#    - ctest -E StatisticsTests -L Amolqc --output-on-failure -j 12
+#  cache:
+#    key: "$CI_COMMIT_REF_SLUG-nvidia-serial"
+#    paths:
+#      - cmake-build-nvidia-serial/
+#    policy: pull
+#
+#Nvidia parallel build:
+#  image: registry.git.rwth-aachen.de/luechow-group/amolqc/nvhpc:22.9
+#  stage: build
+#  script:
+#    - ./configure.sh openmpi.cmake
+#    - mkdir -p cmake-build-nvidia-parallel
+#    - cd cmake-build-nvidia-parallel
+#    - cmake ..
+#    - make -j 12
+#  cache:
+#    key: "$CI_COMMIT_REF_SLUG-nvidia-parallel"
+#    paths:
+#      - cmake-build-nvidia-parallel/
+#    policy: pull-push
+#
+#Nvidia parallel test:
+#  image: registry.git.rwth-aachen.de/luechow-group/amolqc/nvhpc:22.9
+#  stage: test
+#  needs: ["Nvidia parallel build"]
+#  script:
+#    - cd cmake-build-nvidia-parallel
+#    - ctest -E StatisticsTests -LE serial -L Amolqc --output-on-failure -j 6
+#  cache:
+#    key: "$CI_COMMIT_REF_SLUG-nvidia-parallel"
+#    paths:
+#      - cmake-build-nvidia-parallel/
+#    policy: pull
+#
+#NAG serial build:
+#  image: registry.git.rwth-aachen.de/luechow-group/amolqc/nag:7.1
+#  stage: build
+#  script:
+#    - ./configure.sh serial_nag.cmake
+#    - mkdir -p cmake-build-nag-serial
+#    - cd cmake-build-nag-serial
+#    - cmake ..
+#    - make -j 12
+#  cache:
+#    key: "$CI_COMMIT_REF_SLUG-nag-serial"
+#    paths:
+#      - cmake-build-nag-serial/
+#    policy: pull-push
+#
+#NAG serial test:
+#  image: registry.git.rwth-aachen.de/luechow-group/amolqc/nag:7.1
+#  stage: test
+#  needs: ["NAG serial build"]
+#  script:
+#    - cd cmake-build-nag-serial
+#    - ctest -E StatisticsTests -L Amolqc --output-on-failure -j 12
+#  cache:
+#    key: "$CI_COMMIT_REF_SLUG-nag-serial"
+#    paths:
+#      - cmake-build-nag-serial/
+#    policy: pull

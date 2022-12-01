@@ -5,10 +5,10 @@
 
 module maximizeSample_m
    use kinds_m, only: r8
-   use parsing_m
+   use parsing_m, only: getinta, getloga
    use global_m
    use mpiInterface_m, only: myMPIReduceSumInteger
-   use rWSample_m, only: rWSample, getSampleSize, getFirst, isNext, getNext, getWalker
+   use rwSample_m, only: rWSample, getSampleSize, getFirst, isNext, getNext, getWalker
    use psiMax_m, only: psimax
    use randomWalker_m, only: RandomWalker
 
@@ -43,7 +43,7 @@ contains
       na_all = na
       call myMPIReduceSumInteger(na, na_all, 4)
       if (wout) then
-         write(iul,'(a,2(i6,a))') " maximization of ", na_all(1), " electron configurations with", na_all(2), " converged"
+         write(iul,'(a,2(i8,a))') " maximization of ", na_all(1), " electron configurations with ", na_all(2), " converged"
          if (na_all(2) > 0) then
             write(iul,'(a,2(i6,a))') " mean # of function evaluations: ", na_all(3) / na_all(2)
             write(iul,'(a,2(i6,a))') " mean # of iterations          : ", na_all(4) / na_all(2)
@@ -60,9 +60,15 @@ contains
       logical, intent(in) :: wout
       type(RandomWalker), pointer :: rwp
       integer :: walkerIndex, iflag
+      logical :: update_walker
+
       call getinta(lines,nl,'index=',walkerIndex,iflag)
+
+      call getloga(lines,nl,'update_walker=',update_walker,iflag)
+      if (iflag /= 0) update_walker = .true.
+
       rwp => getWalker(smpl,walkerIndex)
-      call psimax_obj%opt(rwp, update_walker=.true.)
+      call psimax_obj%opt(rwp, update_walker=update_walker)
       if (wout) then
          if (psimax_obj%is_converged()) then
             write(iul,'(a,i6,a)') " maximization of electron configuration #", walkerIndex, " did converge"

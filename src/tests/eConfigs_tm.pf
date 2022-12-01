@@ -3,7 +3,7 @@
 ! SPDX-License-Identifier: GPL-3.0-or-later
 
 module eConfigs_tm
-   use PFUNIT_MOD
+   use funit
    use kinds_m, only: r8
    use eConfigs_m, only: EConfigArray, eConfigArray_get, eConfigArray_size, eConfigArray_set, eConfigArray_new,&
            eConfigArray_destroy

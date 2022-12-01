@@ -4,8 +4,11 @@
 SPDX-License-Identifier: GPL-3.0-or-later
 """
 
-import numpy as np
 import sys
+if sys.version_info[0] < 3:
+    sys.exit('This script requires Python 3')
+
+import numpy as np
 
 from .Utils import *
 from fractions import Fraction
@@ -64,9 +67,35 @@ def orca_in(mkl_name, out_name, basis, wf_type):
     csfs = []
     total_symmetry = None
     symmetry_list = []
+    ecp = True
+    replaced_electrons = []
 
     with open(out_name, 'r') as outfile:
         line = outfile.readline()
+
+        # check if ECP was used
+        while 'ECP PARAMETER INFORMATION' not in line:
+            line = outfile.readline()
+            if 'ORCA SCF' in line:
+                ecp = False
+                break
+
+        # adapt number of electrons for ECP
+        if ecp:
+            for _ in range(3):
+                line = outfile.readline()
+            while 'Group' in line:
+                words = line.split()
+                replaced_electrons.append(words[6])
+                line = outfile.readline()
+
+            line = outfile.readline()
+            number_replaced_electrons = 0
+            while 'Atom' in line:
+                words = line.split()
+                number_replaced_electrons += int(replaced_electrons[int(words[5]) - 1])
+                line = outfile.readline()
+            number_electrons -= number_replaced_electrons
 
         # check if UseSym was used in the orca calculation
         symmetry = True

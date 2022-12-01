@@ -71,8 +71,8 @@ contains
     end function get_density_repulsion
 
     subroutine coulomb_density(lines, nl)
-        character(len=120), intent(in) :: lines(nl)
         integer, intent(in) :: nl
+        character(len=120), intent(in) :: lines(nl)
         integer :: in_mc_steps = -1, iflag
 
         call getinta(lines,nl,'mc_steps=',in_mc_steps,iflag)

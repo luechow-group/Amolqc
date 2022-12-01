@@ -17,22 +17,22 @@
   Arne Luechow, RWTH Aachen University, 52056 Aachen, Germany
 
  with contributions from:
-  Sebastian Manten, Christian Diedrich, Annika Bande, Tony Scott,
+  Sebastian Manten, Christian Diedrich, Annika Bande, Tony C. Scott,
   Annett Schwarz, Rene Petz, Raphael Berner, Alexander Sturm,
-  Christopher Pezley, Lennart Scharf, Marko Hermsen, Kaveh Haghighi Mood,
-  Christoph Schulte, Sebastian Klahm, Michael Andree Heuer, Leonard Reuter,
-  Jil Ludovicy
+  Marko Hermsen, Kaveh Haghighi Mood, Christoph Schulte,
+  Leonard Reuter, Michael A. Heuer, Jil Ludovicy, Vladimir Terzi,
+  Michel V. Heinz
 
 
- version:          version-6.7-dev-1076-g2adf09
- compiler version: Intel(R) Fortran Intel(R) 64 Compiler for applications running on Intel(R) 64, Version 18.0.3.222 Build 20180410
+ version:          v7.0.1-151-g3bcd97-dirty
+ compiler version: Intel(R) Fortran Intel(R) 64 Compiler Classic for applications running on Intel(R) 64, Version 2021.7.0 Build 20220726_000000
  compiler options: -fpp -warn none -O3
- mpi version:      Intel(R) MPI Library 2017 Update 4 for Linux* OS
+ mpi version:      Intel(R) MPI Library 2021.7 for Linux* OS
 
 
 
- run started on tcrocks.pc.rwth-aachen.de at 2020-04-22T21:34:26.419+02:00 on    2 processor(s)
- using path: /home/reuter/Amolqc
+ run started on  at 2022-11-04T16:52:26.826+01:00 on    2 processor(s)
+ using path: /home/vterzi/Development/Amolqc
  
 ==============================> reading input <=================================
  
@@ -42,7 +42,8 @@ $sample(create, start=density, generate=random, size=1)
 $qmc(vmc, steps=300, block_len=100, accept_ratio=0.5, discard_all)
 $init_max_analysis(max_mode=str, kmax=5, mmax=5, tol_sim=0.2, tol_same=0.01)
 $init_max_search(method=bfgs, max_distance=0.1, step_size=0.1,switch_step=50, max_iter=1000,
-  convergence_gradient=0.0001, singularity_threshold=0.005, correction_threshold=0.1, correction_mode=cut)
+ convergence_gradient=0.0001, singularity_threshold=0.005, correction_threshold=0.1,
+ correction_mode=cut, negative_eigenvalues=-1)
 $qmc(vmc, steps=1000, block_len=200, discard=0, step_stride=10)
  
 ==========> $gen - initializing RNG and setting general parameters <============
@@ -233,7 +234,10 @@ H    0.00000  -0.76012  -0.47059
 
   FINAL RESULT:
  total energy (mean E_loc)    =     -76.27713 +/- 0.05148 E_h
- block average energy         =     -76.27713 E_h
+ kinetic energy               =      70.76920 +/- 1.78989 E_h
+ e-n potential energy         =    -192.89036 +/- 1.50988 E_h
+ e-e potential energy         =      36.68688 +/- 0.62268 E_h
+ n-n potential energy         =       9.15716 E_h
  variance (of E_loc)          =       1.45863 +/- 0.12299 E_h^2
  block average variance       =       1.44803 E_h^2
  tau (adapted)                =        0.0957 fixed at step         1000
@@ -256,12 +260,11 @@ H    0.00000  -0.76012  -0.47059
           5        0.0566910      0.0102651
           6        0.0620555      0.0160227
           7        0.0599818      0.0226710
-          8        0.0573348      0.0331023
-          9        0.0522015      0.0522015
+          8        0.0573348      0.0331022
+          9        0.0522014      0.0522014
 
  WARNING: stddev and global N_corr may be unreliable
   (number of blocks not discarded < 20)
- 
  Summary for maxima search:
  
  # minimizer calls                      :     200
@@ -277,39 +280,39 @@ H    0.00000  -0.76012  -0.47059
     1 structure with best value=   -18.192282    # found:     46
         1     -18.192282        5
         2     -18.192282        5
-        3     -18.158957        8
-        4     -18.158957        7
-        5     -18.158957       21
+        3     -18.158956        8
+        4     -18.158956        7
+        5     -18.158956       21
     2 structure with best value=   -18.192282    # found:     23   min dist to     1  max/mean dist:     0.151     0.078
         1     -18.192282        4
         2     -18.192282        9
-        3     -18.158957        4
-        4     -18.158957        3
-        5     -18.158957        3
-    3 structure with best value=   -17.714447    # found:     59   min dist to     1  max/mean dist:     0.685     0.119
-        1     -17.714447       10
-        2     -17.714447       20
-        3     -17.714447       13
-        4     -17.714447       16
-    4 structure with best value=   -17.714447    # found:     50   min dist to     1  max/mean dist:     0.685     0.119
-        1     -17.714447       10
-        2     -17.714447       16
-        3     -17.714447        6
-        4     -17.714447       18
+        3     -18.158956        4
+        4     -18.158956        3
+        5     -18.158956        3
+    3 structure with best value=   -17.714446    # found:     59   min dist to     1  max/mean dist:     0.685     0.119
+        1     -17.714446       10
+        2     -17.714446       20
+        3     -17.714446       13
+        4     -17.714446       16
+    4 structure with best value=   -17.714446    # found:     50   min dist to     1  max/mean dist:     0.685     0.119
+        1     -17.714446       10
+        2     -17.714446       16
+        3     -17.714446        6
+        4     -17.714446       18
     5 structure with best value=   -17.332470    # found:      2   min dist to     4  max/mean dist:     0.697     0.185
         1     -17.332470        2
 
- wall clock time for   qmc :               0.25 s
- cpu time (master) for qmc :               0.25 s
+ wall clock time for   qmc :               0.35 s
+ cpu time (master) for qmc :               0.33 s
 
 
 
 
- wall clock time for run         :   0d 00:00:00.259
- total cpu time for run (core-h) :            0.0001
+ wall clock time for run         :   0d 00:00:00.366
+ total cpu time for run (core-h) :            0.0002
  cpu time per mpi process (h)    :            0.0001
 
-Amolqc run finished on 2020-04-22T21:34:26.679+02
+Amolqc run finished on 2022-11-04T16:52:27.195+01
 
 Bye!
 

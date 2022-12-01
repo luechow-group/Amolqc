@@ -90,7 +90,7 @@ contains
       real(r8), intent(in)            :: x(:), y(:), z(:)
       real(r8), intent(in), optional  :: rai(:,:), rij(:,:)
 
-      integer n,i,j
+      integer n
       call assert(.not.associated(this%x),"RdataUpdate_new: Rdata already allocated")
       call assert(size(x)==ne,"RdataUpdate_new: size(x) must much electron number")
       n = size(x)
@@ -125,7 +125,7 @@ contains
       real(r8), intent(in), optional  :: rai(:,:), rij(:,:)
       integer, intent(in)           :: npJ1, npJ2, npCI, npMO
 
-      integer n,i,j
+      integer n
       call assert(.not.associated(this%x),"RdataUpdate_new: Rdata already allocated")
       call assert(size(x)==ne,"RdataUpdate_new: size(x) must much electron number")
       n = size(x)
@@ -189,7 +189,7 @@ contains
       real(r8), intent(in)            :: x(:), y(:), z(:)
       real(r8), intent(in), optional  :: rai(:,:), rij(:,:)
 
-      integer n,i,j
+      integer n
       call assert(associated(this%x),"RdataUpdate_new: Rdata not allocated")
       call assert(size(x)==ne,"RdataUpdate_new: size(x) must match electron number")
       n = size(x)

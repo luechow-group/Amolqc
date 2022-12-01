@@ -23,9 +23,6 @@ MODULE cuspOpt_m
     !     --------------
 
     use kinds_m, only : i4, r8
-#ifdef NAG
-    use, intrinsic :: f90_unix_io, only : flush
-#endif
     use global_m
     use cspline_m, only: csplx, csnpmax, csalpha, csplnpnt
     use nl2sol_i, only: nl2sno
@@ -108,6 +105,8 @@ CONTAINS
         real(r8) x11, x12, x13, y1, y1fd, x21, x22, x23, y2, y2fd
         real(r8) k1, k2, k3, k4, k5
 
+        logical opened
+
         save point1sav, point2sav
 
         if (np /= csplnpnt) then
@@ -148,7 +147,7 @@ CONTAINS
             !        ! first and last point in optimization
             if (a > 0d0) then
                 point1 = k0
-                point2 = (csplnpnt - 1) * p2 / (csalpha + p2) + 1
+                point2 = INT((csplnpnt - 1) * p2 / (csalpha + p2) + 1)
                 point1sav = point1  ! speichere Punkte fuer 2S-Funktion
                 point2sav = point2
             else
@@ -187,7 +186,7 @@ CONTAINS
 
             !        ! find optimal range for transition of 2nd derivative of function
             !        ! to 2nd derivative of STO
-            spoint = (csplnpnt - 1) * p1 / (csalpha + p1) + 1
+            spoint = INT((csplnpnt - 1) * p1 / (csalpha + p1) + 1)
             varlocmin = 1d100
             do l = 21, spoint
                 varloc = 0d0
@@ -213,7 +212,7 @@ CONTAINS
             p1 = p1 - transgap
             p2 = p1 + translen
             point1 = k0
-            point2 = (csplnpnt - 1) * p2 / (csalpha + p2)
+            point2 = INT((csplnpnt - 1) * p2 / (csalpha + p2))
 
             !        ! note: b is discarded!
             if (mytid==0 .and. logmode>1) then
@@ -234,8 +233,8 @@ CONTAINS
                 write(iul, '(4(G12.6,2X))') a, c, p1, p2
             endif
 
-            point1 = (csplnpnt - 1) * p1 / (csalpha + p1)
-            point2 = (csplnpnt - 1) * p2 / (csalpha + p2)
+            point1 = INT((csplnpnt - 1) * p1 / (csalpha + p1))
+            point2 = INT((csplnpnt - 1) * p2 / (csalpha + p2))
 
             if (mytid == 0 .and. logmode>2) then
                 write(iul, '(1X,A,1X,I5,1X,I5)')&
@@ -274,7 +273,7 @@ CONTAINS
         dp = y1 - x13 * ap - x12 * bp - x11 * cp
 
         if (mytid==0 .and. logmode>2) then
-            write(iul, '(A,4(1X,D16.10))')&
+            write(iul, '(A,4(1X,ES16.10))')&
                     ' coeffs of transition polynomial:', ap, bp, cp, dp
         endif
 
@@ -316,7 +315,7 @@ CONTAINS
                         - cp / 6d0 * csplx(point2)**3 - dp / 2d0 * csplx(point2)**2&
                         + tmp2 * csplx(point2) + y(point2)
             endif
-            if (logmode > 5) write(iul, '(I5,2X,7(D16.8,2X))')&
+            if (logmode > 5) write(iul, '(I5,2X,7(ES16.8,2X))')&
                     k, csplx(k), yold(k), y(k), yfdold(k), yfd(k), ysdold(k), ysd(k)
         enddo
 
@@ -336,12 +335,13 @@ CONTAINS
         !        dx = csplx(l) - csplx(j)
         !        yfd(l)=  csplb(k,j)+2*dx*csplc(k,j) + 3*dx*dx*cspld(k,j)
         !        ysd(l)=             2   *csplc(k,j) + 6*dx   *cspld(k,j)
-        !        if (logmode .ge. 3) write(iul,'(I5,2X,7(D16.8,2X))')
+        !        if (logmode >= 3) write(iul,'(I5,2X,7(ES16.8,2X))')
         !     .          l,csplx(l),yold(l),y(l),yfdold(l),yfd(l),ysdold(l),ysd(l)
         !      enddo
         !
         if (mytid == 0) then
-            call flush(iul)
+            inquire(iul, opened=opened)
+            if (opened) flush(iul)
         endif
 
     END SUBROUTINE cuspcorrect
@@ -355,13 +355,12 @@ CONTAINS
         ! func1a calculates the sum of squared deviations for
         ! an exponential function (parameters x0) from the stored
         ! data points
-
-        real(r8) x0(n0), a, b, c, func
         integer n0, k
+        real(r8) x0(n0), a, b, c, func
 
         a = x0(1)
         c = x0(2)
-        if (n0.eq.3) then
+        if (n0==3) then
             b = x0(3)
         else
             b = 0d0

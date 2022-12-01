@@ -237,10 +237,9 @@ contains
       integer, intent(in)                   :: iu     ! unit to write to
       character(len=*), intent(in)          :: str    ! output string "Ref" or "Max"
       type(reference), pointer              :: rp
-      type(refl_vlist)                      :: rl
       type(refl_vlist), pointer             :: p
       integer, allocatable                  :: idx(:)
-      integer i,j,io,totalCount,outIdx
+      integer i,j,totalCount,outIdx
       real(r8) f,meanDist,maxDist
       integer, parameter :: MAXSHOW = 15
 
@@ -273,7 +272,7 @@ contains
          if (i>1) then
             call this%calcDistances(rp,ALLPERM,i-1,outIdx,meanDist,maxDist,idx)
             write(iu,'(i5,a,f13.6,a,i7,a,i5,a,2f10.3)') i,' structure with best value=',f,'    # found:',totalCount, &
-                                          "   min dist to ",outIDx,"  max/mean dist:",maxDist*bohr2angs,meanDist*bohr2angs
+                                          "   min dist to ",outIDx,"  max/mean dist:",maxDist*bohr2ang,meanDist*bohr2ang
          else
             write(iu,'(i5,a,f13.6,a,i7)') i,' structure with best value=',f,'    # found:',totalCount
          end if

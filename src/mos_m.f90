@@ -103,8 +103,9 @@ CONTAINS
         ! moinput reads MO related input (the MO coeffs in cmo) from file unit iu.
         !
         character(len = *), intent(in) :: lines(:)! input lines
-        integer i, ii, j, jj, alstat, idx
-        character fmt*19
+        integer i, ii, j, jj, alstat, idx, nbas_check
+        character(len=19) fmt
+        character(len=:), allocatable :: words(:)
 
         !     // Read in number of MO's
         read(lines(2), *) norb
@@ -125,7 +126,22 @@ CONTAINS
         !     // note the different order of f functions in Gaussian and Turbomole/Gamess
         idx = 4
         if (evfmt=='tmx' .or. evfmt=='gau') then
-            fmt = '(5D15.8)'
+            ! check if # basis functions in wf file deviates from # basis functions for basis set (first orbital only)
+            nbas_check = 0
+            idx = 5
+            do
+                words = Py_split(lines(idx))
+                if (words(1) == '2' .or. TRIM(lines(idx)) == '$end') exit
+                nbas_check = nbas_check + 5
+                idx = idx + 1
+            end do
+            ! checking last line of first orbital
+            idx = idx - 1
+            nbas_check = nbas_check - ( 5 - (LEN(TRIM(lines(idx))) + 1) / 15 )
+            call assert(nbas_check == nbas, 'moinput: inconsistent number of individual basis functions')
+
+            idx = 4
+            fmt = '(5ES15.8)'
             do i = 1, norb
                 read(lines(idx), *) ii
                 jj = 0; idx = idx + 1
@@ -135,8 +151,22 @@ CONTAINS
                     if (jj>=nbas) exit
                 end do
             end do
-        else if (evfmt .eq. 'gms') then
-            fmt = '(5X,5E15.8)'
+        else if (evfmt == 'gms') then
+            ! check if # basis functions in wf file deviates from # basis functions for basis set (first orbital only)
+            nbas_check = 0
+            do
+                words = Py_split(lines(idx))
+                if (words(1) == '2' .or. TRIM(lines(idx)) == '$end') exit
+                nbas_check = nbas_check + 5
+                idx = idx + 1
+            end do
+            ! checking last line of first orbital
+            idx = idx - 1
+            nbas_check = nbas_check - ( 5 - (LEN(TRIM(lines(idx))) + 1) / 15 )
+            call assert(nbas_check == nbas, 'moinput: inconsistent number of individual basis functions')
+
+            idx = 4
+            fmt = '(5X,5ES15.8)'
             do i = 1, norb
                 jj = 0
                 do
@@ -145,7 +175,7 @@ CONTAINS
                     if (jj>=nbas) exit
                 end do
             end do
-        else if (evfmt .eq. 'fre' .or. evfmt .eq. 'mol') then
+        else if (evfmt == 'fre' .or. evfmt == 'mol') then
             do i = 1, norb
                 read(lines(idx), *) ii
                 jj = 0; idx = idx + 1
@@ -210,19 +240,19 @@ CONTAINS
 
         allocate(cmoa(nbas * norb), stat = alstat)
         allocate(nmos(nbas), mo_o(nbas * norb), stat = alstat)
-        if (alstat.ne.0) call abortp('(moinput):allocation error')
+        if (alstat/=0) call abortp('(moinput):allocation error')
 
         al = 1
         moc = 0
 
         do bf = 1, nbasf
-            if (bl(bf).eq.'S') then
+            if (bl(bf)=='S') then
                 nd = 0
-            elseif (bl(bf).eq.'P') then
+            elseif (bl(bf)=='P') then
                 nd = 2
-            elseif (bl(bf).eq.'D') then
+            elseif (bl(bf)=='D') then
                 nd = 5
-            elseif (bl(bf).eq.'F') then
+            elseif (bl(bf)=='F') then
                 nd = 9
             else
                 call abortp('(getaos): wrong GTO')
@@ -231,7 +261,7 @@ CONTAINS
                 cnt = 0
                 do j = 1, norb
                     tmp = cmo(al + d, j)
-                    if (abs(tmp).gt.thr) then
+                    if (abs(tmp)>thr) then
                         moc = moc + 1
                         cnt = cnt + 1
                         mo_o(moc) = j
@@ -264,7 +294,7 @@ CONTAINS
         integer alstat, j
 
         allocate(cmoa(nbas * norb), stat = alstat)
-        if (alstat.ne.0) call abortp('(moinput):allocation error')
+        if (alstat/=0) call abortp('(moinput):allocation error')
 
         !cc reorder MO coefficients --- afterwords they are seemingly completely messed up...
         !cc but in the correct order for aomo_calc
@@ -273,13 +303,13 @@ CONTAINS
         moc = 0
 
         do bf = 1, nbasf
-            if (bl(bf).eq.'S') then
+            if (bl(bf)=='S') then
                 nd = 0
-            elseif (bl(bf).eq.'P') then
+            elseif (bl(bf)=='P') then
                 nd = 2
-            elseif (bl(bf).eq.'D') then
+            elseif (bl(bf)=='D') then
                 nd = 5
-            elseif (bl(bf).eq.'F') then
+            elseif (bl(bf)=='F') then
                 nd = 9
             else
                 call abortp('(getaos): wrong GTO')
@@ -305,18 +335,18 @@ CONTAINS
         !
         integer iu
         integer i, j, bidx, bidxmax, max, min
-        character fmt*19
+        character(len=19) fmt
 
         write(iu, '(i4)') norb
         write(iu, *)
         if (evfmt=='tmx' .or. evfmt=='gau') then
-            fmt = '(5D15.8)'
+            fmt = '(5ES15.8)'
             do i = 1, norb
                 write(iu, '(i4)') i
                 write(iu, fmt) (cmo(j, i), j = 1, nbas)
             enddo
-        else if (evfmt .eq. 'gms') then
-            fmt = '(I2,I3,1P,5E15.8)'
+        else if (evfmt == 'gms') then
+            fmt = '(I2,I3,1P,5ES15.8)'
             bidxmax = CEILING(nbas / real(5))
             bidx = 1
             max = 0
@@ -325,7 +355,7 @@ CONTAINS
                 if (bidx>bidxmax) bidx = 1
                 min = max + 1
                 max = max + 5
-                if (max.GE.nbas) then
+                if (max>=nbas) then
                     max = nbas
                 endif
                 write(iu, fmt) i, bidx, (cmo(j, i), j = min, max)
@@ -337,7 +367,7 @@ CONTAINS
                 endif
                 if(i>norb) exit
             enddo
-        else if (evfmt .eq. 'fre' .or. evfmt=='mol') then
+        else if (evfmt == 'fre' .or. evfmt=='mol') then
             do i = 1, norb
                 write(iu, *) i
                 write(iu, *) (cmo(j, i), j = 1, nbas)
@@ -363,7 +393,7 @@ CONTAINS
         ! variables:
         integer i, j, n
         real(r8)  zero, one
-        character*1 uplo1, uplo2
+        character(len=1) uplo1, uplo2
 
         !     ! Calculate all MO's and derivatives for all or one electron(s)
         !     ! for all electron configurations
@@ -447,7 +477,7 @@ CONTAINS
         ! variables:
         integer i, j
         real(r8)  zero, one
-        character*1 uplo1, uplo2
+        character(len=1) uplo1, uplo2
 
         mMOElecConfigs = 1
 

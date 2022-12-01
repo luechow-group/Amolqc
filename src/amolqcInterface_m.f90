@@ -39,9 +39,8 @@ contains
    end function c_to_f_string
 
    subroutine amolqc_init() bind(c)
-      integer dummy, seed
-      character(len=80) :: lines(1)
-      character(len=40) :: fname
+      integer seed
+      real(r8) :: dummy
 
       call initAmolqc()
 
@@ -57,7 +56,7 @@ contains
       integer(c_int) :: natoms   ! # of atoms
       character(kind=c_char), dimension(*), intent(in) :: filename
       character(len=80) :: lines(1)
-      integer :: i, nl
+      integer :: nl
 
       nl = 1
       lines(1) = "$wf(read, file='"//trim(c_to_f_string(filename))//"')"

@@ -5,6 +5,10 @@
 SPDX-License-Identifier: GPL-3.0-or-later
 """
 
+import sys
+if sys.version_info[0] < 3:
+    sys.exit('This script requires Python 3')
+
 from sys import exit, stdout
 import itertools as it
 
@@ -15,7 +19,7 @@ from .data import multiplication_table, periodic_table
 
 class WaveFunction:
     def __init__(self, input_name, orbital_format, basis, charge, multiplicity, atoms, orbitals,
-                 csfs, jastrow, symmetry=None, symmetry_list=None):
+                 csfs, jastrow, symmetry=None, symmetry_list=None, bohr=False):
         self.title = input_name  # string
         self.orbital_format = orbital_format  # string
         self.basis = basis  # string
@@ -28,12 +32,17 @@ class WaveFunction:
         self.jastrow = jastrow
         self.symmetry_list = symmetry_list
         self.separated_electrons = 0
+        self.bohr = bohr  # logical
 
     def write(self):
         self.title = self.title.split('/')[-1]
         wf_filename = self.title + '.wf'
         out = open(wf_filename, 'w')
-        self.write_general_section(out)
+
+        if self.bohr:
+            self.write_general_section(out, self.bohr)
+        else:
+            self.write_general_section(out)
 
         # geometry
         self.write_geometry_section(out)
@@ -62,11 +71,15 @@ class WaveFunction:
         self.jastrow.write(out)
         out.write('$end' + '\n')
 
-    def write_general_section(self, out):
+    def write_general_section(self, out, bohr=False):
+        if self.orbital_format == 'fre':
+            self.orbital_format = 'gau'  # orbitals in 'fre' format will be transformed to 'gau' format
         out.write('$general' + '\n'
                   + ' title=' + self.title + '\n'
                   + ' evfmt=' + self.orbital_format + ', basis=' + self.basis + ', jastrow=' + self.jastrow.type + '\n'
                   + ' charge= ' + str(self.charge) + ', spin= ' + str(self.multiplicity))
+        if bohr:
+            out.write(', geom=bohr')
         if self.atomic_charges():
             out.write(', atomic_charges')
         if self.separated_electrons != 0:
@@ -131,6 +144,33 @@ class WaveFunction:
         vec.write(' $END' + '\n')
         vec.close()
 
+    def orbital_molpro_sort_index(self, i):
+        index, irrep = self.orbitals[i].symmetry.split('.')
+        return int(index) + int(irrep)*1000000
+
+    def punch_selection(self):
+        active_orbitals = self.get_active_orbitals()
+        active_orbitals.sort(key=lambda x: self.orbital_molpro_sort_index(x - 1))
+        self.sort_ci()
+        configurations = []
+
+        for csf in self.csfs:
+            for det in csf.determinants:
+                configuration = [0]*len(active_orbitals)
+                for i, active_orbital in enumerate(active_orbitals):
+                    configuration[i] += det.orbital_list.count(active_orbital)
+                    configuration[i] += det.orbital_list.count(-active_orbital)
+                configuration = tuple(configuration)
+                if configuration not in configurations:
+                    configurations.append(configuration)
+
+        print(f'{len(configurations)} configurations')
+        for configuration in configurations:
+            print('con', end='')
+            for occ in configuration:
+                print(f',{occ}', end='')
+            print('')
+
     def sort_dets(self):
         if len(self.csfs) == 1 and len(self.csfs[0].determinants) == 1:
             print('Warning: sort_dets does nothing for single determinant wave functions.')
@@ -156,6 +196,16 @@ class WaveFunction:
                 else:
                     new_csf.determinants.append(new_det)
         self.csfs.append(new_csf)
+
+    def convert_to_bohr(self):
+        if self.bohr:
+            print('Warning: atom positions are already in Bohr, convert_to_bohr does nothing')
+        else:
+            bohr2ang = 0.529177210903
+            for i in range(len(self.atoms)):
+                for j in range(3):
+                    self.atoms[i].position[j] /= bohr2ang
+            self.bohr = True
 
     def sort_ci(self):
         if len(self.csfs) == 1 and len(self.csfs[0].determinants) == 1:
@@ -194,6 +244,15 @@ class WaveFunction:
                     break
             for _ in range(len(self.csfs[0].determinants) - i):
                 del self.csfs[0].determinants[i]
+
+    def keep_weight(self, percentage):
+        self.sort_ci()
+        to_keep = 0
+        weight_sum = 0.0
+        while weight_sum <= percentage/100 and to_keep < len(self.csfs):
+            weight_sum += self.csfs[to_keep].coefficient**2
+            to_keep += 1
+        self.csfs = self.csfs[:to_keep]
 
     def symm_combine(self):
         if len(self.csfs) == 1:
@@ -352,29 +411,92 @@ class WaveFunction:
         virtual_orbitals = self.get_virtual_orbitals()
         active_orbitals = self.get_active_orbitals()
 
-        # get orbital_rotations
-        orbital_rotations = []
-        orbital_rotations += self.get_orbital_rotations(inactive_orbitals, active_orbitals)
-        orbital_rotations += self.get_orbital_rotations(inactive_orbitals, virtual_orbitals)
-        orbital_rotations += self.get_orbital_rotations(active_orbitals, virtual_orbitals)
+        query_all_symm = input('Are all orbital symmetries used for the MO opt? [Y/n] ')
+        if query_all_symm.lower() in ['n', 'no']:
+            print('''
+            Give the indices of irreps that should kept, separated by comma: ''')
+            print(self.symmetry)
+            for i in range(len(self.symmetry_list)):
+                print(str(i + 1) + ': ' + self.symmetry_list[i])
+            kept_symmetries = input('Group of kept irreps: ').split(",")
 
-        # identifying orbitals, that are in no orbital_rotation
-        orbital_mask = [True]*len(self.orbitals)
-        for i in range(len(self.orbitals)):
+            kept_orbitals = []
+            for i in range(len(self.orbitals)):
+                if (self.orbitals[i].symmetry.split(".")[1] in kept_symmetries):
+                   kept_orbitals.append(i+1)
+
+            # adapt orbital indices for kept orbitals
+            kept_inactive_orbitals =[]
+            kept_active_orbitals = []
+            kept_virtual_orbitals = []
+            for i in range(len(kept_orbitals)):
+                if kept_orbitals[i] in inactive_orbitals:
+                    kept_inactive_orbitals.append(kept_orbitals[i])
+                elif kept_orbitals[i] in active_orbitals:
+                    kept_active_orbitals.append(kept_orbitals[i])
+                else:
+                    kept_virtual_orbitals.append(kept_orbitals[i])
+
+
+            # get orbital_rotations
+            orbital_rotations = []
+            orbital_rotations += self.get_orbital_rotations(kept_inactive_orbitals, kept_active_orbitals,kept_symmetries)
+            orbital_rotations += self.get_orbital_rotations(kept_inactive_orbitals, kept_virtual_orbitals,kept_symmetries)
+            orbital_rotations += self.get_orbital_rotations(kept_active_orbitals, kept_virtual_orbitals,kept_symmetries)
+        elif query_all_symm.lower() in ['y', 'yes', '']:
+            # get orbital_rotations
+            orbital_rotations = []
+            orbital_rotations += self.get_orbital_rotations(inactive_orbitals, active_orbitals)
+            orbital_rotations += self.get_orbital_rotations(inactive_orbitals, virtual_orbitals)
+            orbital_rotations += self.get_orbital_rotations(active_orbitals, virtual_orbitals)
+        else:
+            exit('pleaser answer y or n')
+
+        query = input('Should non-required orbitals be deleted? [y/N] ')
+        if query.lower() in ['y', 'yes']:
+            print("!!! Warning: the orbital indices are changed. The command 'write' has to be used to get the correct "
+                  "wf !!!")
+            if query_all_symm.lower() in ['n', 'no']:
+                orbital_mask = [True]*len(self.orbitals)
+                for i in range(len(virtual_orbitals)):
+                    for orbital_rotation in orbital_rotations:
+                        if (i+int(len(inactive_orbitals))+int(len(active_orbitals))+1 in orbital_rotation.orbital_group[0]) or\
+                                (i+int(len(inactive_orbitals))+int(len(active_orbitals))+1 in orbital_rotation.orbital_group[1]):
+                            break
+                    else:  # no break
+                        orbital_mask[i+int(len(inactive_orbitals))+int(len(active_orbitals))] = False
+                index_mask = [index for index, required in enumerate(orbital_mask) if required]
+
+            else:
+                # identifying orbitals, that are in no orbital_rotation
+                orbital_mask = [True]*len(self.orbitals)
+                for i in range(len(self.orbitals)):
+                    for orbital_rotation in orbital_rotations:
+                        if (i+1 in orbital_rotation.orbital_group[0]) or (i+1 in orbital_rotation.orbital_group[1]):
+                            break
+                    else:  # no break
+                        orbital_mask[i] = False
+                index_mask = [index for index, required in enumerate(orbital_mask) if required]
+
+            # removing non-required orbitals
+            self.orbitals = [orbital for orbital, required in zip(self.orbitals, orbital_mask) if required]
+
+            # adapting orbital_rotations
             for orbital_rotation in orbital_rotations:
-                if (i+1 in orbital_rotation.orbital_group[0]) or (i+1 in orbital_rotation.orbital_group[1]):
-                    break
-            else:  # no break
-                orbital_mask[i] = False
-        index_mask = [index for index, required in zip(range(len(self.orbitals)), orbital_mask) if required]
+                for i in [0, 1]:
+                    orbital_rotation.orbital_group[i] = [index_mask.index(orb-1)+1
+                                                         for orb in orbital_rotation.orbital_group[i]]
 
-        # removing non-required orbitals
-        self.orbitals = [orbital for orbital, required in zip(self.orbitals, orbital_mask) if required]
-
-        # adapting orbital_rotations
-        for orbital_rotation in orbital_rotations:
-            for i in [0, 1]:
-                orbital_rotation.orbital_group[i] = [index_mask.index(orb-1)+1 for orb in orbital_rotation.orbital_group[i]]
+            # adapting csfs
+            for i, csf in enumerate(self.csfs):
+                for j, det in enumerate(csf.determinants):
+                    for k, orbital in enumerate(det.orbital_list):
+                        self.csfs[i].determinants[j].orbital_list[k] =\
+                        orbital // abs(orbital) * (index_mask.index(abs(orbital)-1) + 1)
+        elif query.lower() in ['n', 'no', '']:
+            pass
+        else:
+            exit('pleaser answer y or n')
 
         file.write('orbital_rotation_list=\n')
         file.write(str(len(orbital_rotations)) + '\n')
@@ -619,17 +741,20 @@ class WaveFunction:
             # print(self.symmetry_list)
             print(str(counter) + ' orbitals have been added to ' + self.symmetry_list[-1])
 
-    def get_orbital_rotations(self, group1_orbitals, group2_orbitals):
+    def get_orbital_rotations(self, group1_orbitals, group2_orbitals, kept_symmetries=None):
+        if not kept_symmetries:
+            kept_symmetries = self.symmetry_list
         orbital_rotations = []
-        for i, irrep in enumerate(self.symmetry_list):
+        for i, irrep in enumerate(kept_symmetries):
             group1 = []
             group2 = []
+
             for index in group1_orbitals:
                 if self.orbitals[index - 1].symmetry.split('.')[1] == str(i+1):
-                    group1.append(index)
+                   group1.append(index)
             for index in group2_orbitals:
                 if self.orbitals[index - 1].symmetry.split('.')[1] == str(i+1):
-                    group2.append(index)
+                   group2.append(index)
             if len(group1) != 0 and len(group2) != 0:
                 orbital_rotation = OrbitalRotation()
                 orbital_rotation.orbital_group.append(group1)
@@ -743,3 +868,24 @@ class WaveFunction:
 
         for i, atom in enumerate(self.atoms):
             self.atoms[i].charge = charges[atom.atomic_number]
+
+    def averaged_occupation(self):
+        averaged_occ = []
+
+        for i in range(len(self.orbitals)):
+            sum = 0
+            for j in range(len(self.csfs[0].determinants)):
+                occupation = 0
+                for k in range(len(self.csfs[0].determinants[0].orbital_list)):
+                    if abs(int(self.csfs[0].determinants[j].orbital_list[k])) == i+1:
+                        occupation += 1
+
+                weighted_occ = (self.csfs[0].determinants[j].coefficient) ** 2 * occupation
+                sum += weighted_occ
+
+            averaged_occ.append(sum)
+
+        print(averaged_occ)
+
+
+

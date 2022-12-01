@@ -105,16 +105,10 @@ subroutine jasinput_ic(lines,nl)
   ! read Jastrow related input from 'lines'
   character(len=*), intent(in) :: lines(:)! lines array
   integer, intent(in)          :: nl      ! actual # of lines
-  integer :: a, i, j, k, l, m, nlin, stat, idx, start, ii, nWords, ggnum, pos
-  integer :: offset, tmp
+  integer :: a, i, m, stat, idx, nWords
+  integer :: offset
   character :: t
-  character(len=4) :: orbs
   character(len=10) :: word(20)
-  logical  :: new_order
-  integer, allocatable :: old_order(:)
-  real(r8), allocatable :: gl_oldorder(:)
-  logical  :: tnew_order
-  integer, allocatable :: told_order(:)
 
   diffeecusp=.FALSE.
   idx = 2
@@ -210,7 +204,7 @@ subroutine jasinput_ic(lines,nl)
           endif
           a = a+1
           offset = offset+1
-        else if (ncdiff-a .ge. 2) then
+        else if (ncdiff-a >= 2) then
           read(lines(idx+offset), *, iostat=stat) scaleEN(a+1),scaleEN(a+2)
           if (stat /= 0) then
             ! use same parameter for all nuclei types if read fails
@@ -243,7 +237,7 @@ subroutine jasinput_ic(lines,nl)
           endif
           a = a+1
           offset = offset+1
-        else if (ncdiff-a .ge. 2) then
+        else if (ncdiff-a >= 2) then
           read(lines(idx+offset), *, iostat=stat) scaleEN(a+1),scaleEN(a+2)
           if (stat /= 0) then
             ! use same parameter for all nuclei types if read fails
@@ -271,7 +265,7 @@ subroutine jasinput_ic(lines,nl)
           endif
           a = a+1
           offset = offset+1
-        else if (ncdiff-a .ge. 2) then
+        else if (ncdiff-a >= 2) then
           read(lines(idx+offset), *, iostat=stat) powerEN(a+1),powerEN(a+2)
           if (stat /= 0) then
             ! use same parameter for all nuclei types if read fails
@@ -310,17 +304,9 @@ subroutine jas_addAnisoTerms_ic(lines,nl)
   ! add anisotropic AO terms to current Jastrow: read input from 'lines'
   character(len=*), intent(in) :: lines(:)! lines array
   integer, intent(in)          :: nl      ! actual # of lines
-  integer :: a, i, j, k, l, m, nlin, stat, idx, start, ii, nWords, ggnum, pos
-  integer :: tmp
-  character(len=10) :: word(20)
-  logical :: tchanged_een =.false., tchanged_eenn =.false.
-  logical :: new_order = .false.
-  integer, allocatable :: old_order(:)
 
   call JasAniso%add(lines,nl,useAOJasTerms)
   call setNumParams()
-
-
 end subroutine jas_addAnisoTerms_ic
 
 !=======================================================================
@@ -376,10 +362,10 @@ subroutine jasoutput_ic()
 
   select case(distType)
   case(DIST_SM, DIST_DOUBLEEXP)
-    write(iul, "(2D15.7)") scaleEE, (scaleEN(a),a=1,ncdiff)
+    write(iul, "(2ES15.7)") scaleEE, (scaleEN(a),a=1,ncdiff)
   case(DIST_NEEDS)
-    write(iul, "(2D15.7)") scaleEE, (scaleEN(a),a=1,ncdiff)
-    write(iul, "(2D15.7)") powerEE, (powerEN(a),a=1,ncdiff)
+    write(iul, "(2ES15.7)") scaleEE, (scaleEN(a),a=1,ncdiff)
+    write(iul, "(2ES15.7)") powerEE, (powerEN(a),a=1,ncdiff)
   case default
     call abortp("Unknown Jastrow distance type in jasoutput")
   end select
@@ -394,7 +380,7 @@ subroutine jasoutput_ic_new(iu)
 ! writes jastrow data to log unit iu in input format
 ! used for writeWF
   integer, intent(in) :: iu
-  integer :: a, i, m, start
+  integer :: a, i, m
   character(len=120) :: tline
 
   write(iu, "(I4)") nclast
@@ -407,7 +393,7 @@ subroutine jasoutput_ic_new(iu)
 
   if(unum > 0) then
     do m = 2, umax
-      write(iu, "(D15.7)", advance="no") alpha(m)
+      write(iu, "(ES15.7)", advance="no") alpha(m)
     enddo
     write(iu, *)
   endif
@@ -415,7 +401,7 @@ subroutine jasoutput_ic_new(iu)
   if(xnum > 0) then
     do i = 1, ncdiff
       do m = 2, xmax
-        write(iu, "(D15.7)", advance="no") beta(m, i)
+        write(iu, "(ES15.7)", advance="no") beta(m, i)
       enddo
       write(iu, *)
     enddo
@@ -424,7 +410,7 @@ subroutine jasoutput_ic_new(iu)
   if(fnum > 0) then
     do m = 1, fpnum
       do i = 1, ncdiff
-        write(iu, "(D15.7)", advance="no") gamma(m, i)
+        write(iu, "(ES15.7)", advance="no") gamma(m, i)
       enddo
       write(iu, *)
     enddo
@@ -436,10 +422,10 @@ subroutine jasoutput_ic_new(iu)
 
   select case(distType)
   case(DIST_SM, DIST_DOUBLEEXP)
-    write(iu, "(2D15.7)") scaleEE, (scaleEN(a),a=1,ncdiff)
+    write(iu, "(2ES15.7)") scaleEE, (scaleEN(a),a=1,ncdiff)
   case(DIST_NEEDS)
-    write(iu, "(2D15.7)") scaleEE, (scaleEN(a),a=1,ncdiff)
-    write(iu, "(2D15.7)") powerEE, (powerEN(a),a=1,ncdiff)
+    write(iu, "(2ES15.7)") scaleEE, (scaleEN(a),a=1,ncdiff)
+    write(iu, "(2ES15.7)") powerEE, (powerEN(a),a=1,ncdiff)
   case default
     call abortp("Unknown Jastrow distance type in jasoutput")
   end select
@@ -452,7 +438,6 @@ subroutine jas_shortoutput_ic(iu)
 !-------------------------------!
   ! writes jastrow data to log unit iu in input format
   integer, intent(in) :: iu
-  integer :: a, i, m, start
 
   select case(distType)
   case (DIST_SM)
@@ -671,9 +656,7 @@ recursive subroutine putVectorIC(optMode, p)
 !------------------------------------------!
   integer, intent(in) ::  optMode       ! optimization mode
   real(r8), intent(in)  ::  p(:)          ! parameter vector
-  integer             ::  start, aostart
-  real(r8)              ::  average
-  integer             ::  i,j,k,l,tmpidx1,tmpidx2, aniso_count
+  integer             ::  start, aostart, aniso_count
   real(r8), allocatable :: aniso_p(:)
 
   start = 1
@@ -737,18 +720,16 @@ subroutine jasicInit(Rdu,mode)
    ! values of correlation terms
    real(r8) :: uTerm, xTerm, fTerm, gTerm
 
-   ! sum in x, u and f-term, derivative, nabla
-   real(r8) :: sumr, sumrd, sumrn
-   ! position of parameter for param derivatives
-   integer :: pos
+   ! sum in x, u and f-term
+   real(r8) :: sumr
    ! parameter value to satisfy e-e cusp condition
    real(r8) :: eeCusp
 
    ! commonly used terms
-   real(r8) :: b, r, s, v, tmpn(3), tmpl, scale, power, f, za, Fsum, Gsum
+   real(r8) :: b, r, scale, power, Fsum, Gsum
 
    ! loop variables
-   integer :: a, c, i, j, t, al, bl, g, m, k, l
+   integer :: a, c, i, j, t
 
    !!!write(iul,'(a)') 'DBG:jasicInit:start'
 
@@ -930,10 +911,10 @@ subroutine eenHardcodedInit(Rdu,fTerm)
    real(r8), intent(inout) :: fTerm
 
    real(r8) :: rComb(2)   !!! ???
-   real(r8) :: tmp, tmpd, tmpn(6), tmpl
+   real(r8) :: tmp
    real(r8) :: terms(fpnum), termsn(6, fpnum), termsl(2, fpnum)
-   real(r8) :: nfterms(fmax), nftermsd(2, fmax), nftermsn(6, fmax), nftermsl(2, fmax)
-   integer :: a, c, g, i, j, m, t
+   real(r8) :: nfterms(fmax), nftermsn(6, fmax), nftermsl(2, fmax)
+   integer :: a, c, g, i, j, t
 
    do a = 1, nclast
       c = atoms(a)%sa
@@ -1129,18 +1110,16 @@ subroutine jasicInitWithUk(Rdu)
    ! values of correlation terms
    real(r8) :: uTerm, xTerm, fTerm, gTerm
 
-   ! sum in x, u and f-term, derivative, nabla
-   real(r8) :: sumr, sumrd, sumrn
-   ! position of parameter for param derivatives
-   integer :: pos
+   ! sum in x, u and f-term
+   real(r8) :: sumr
    ! parameter value to satisfy e-e cusp condition
    real(r8) :: eeCusp
 
    ! commonly used terms
-   real(r8) :: b, r, s, v, tmpn(3), tmpl, scale, power, f, za, Fsum, Gsum
+   real(r8) :: b, r, scale, power, Fsum, Gsum
 
    ! loop variables
-   integer :: a, c, i, j, t, al, bl, g, m, k, l
+   integer :: a, c, i, j, t, k
    integer :: offsetJ1, offsetJ2
 
    !!!write(iul,'(a)') 'DBG:jasicInit:start'
@@ -1357,10 +1336,10 @@ subroutine eenHardcodedInitWithUk(Rdu,fTerm)
    real(r8), intent(inout) :: fTerm
 
    real(r8) :: rComb(2)   !!! ???
-   real(r8) :: tmp, tmpd, tmpn(6), tmpl
+   real(r8) :: tmp
    real(r8) :: terms(fpnum), termsn(6, fpnum), termsl(2, fpnum)
-   real(r8) :: nfterms(fmax), nftermsd(2, fmax), nftermsn(6, fmax), nftermsl(2, fmax)
-   integer :: a, c, g, i, j, m, t, k
+   real(r8) :: nfterms(fmax), nftermsn(6, fmax), nftermsl(2, fmax)
+   integer :: a, c, g, i, j, t, k
 
    do a = 1, nclast
       c = atoms(a)%sa
@@ -1563,18 +1542,16 @@ subroutine jasicUpdate(Rdu, ie)
    ! values of correlation terms
    real(r8) :: uTerm, xTerm, fTerm
 
-   ! sum in x, u and f-term, derivative, nabla
-   real(r8) :: sumr, sumrd, sumrn
-   ! position of parameter for param derivatives
-   integer :: pos
+   ! sum in x, u and f-term
+   real(r8) :: sumr
    ! parameter value to satisfy e-e cusp condition
    real(r8) :: eeCusp
 
    ! commonly used terms
-   real(r8) :: b, r, s, v, tmpn(3), tmpl, scale, power, f, za, Fsum, Gsum
+   real(r8) :: b, r, scale, power, Fsum, Gsum
 
    ! loop variables
-   integer :: a, c, i, j, t, al, bl, g, m, k, l
+   integer :: a, c, i, j, t
 
    !uTerm = 0d0   ! -> F
    !xTerm = 0d0   ! -> G
@@ -1834,10 +1811,10 @@ subroutine eenHardcodedUpdate(Rdu,ie)
    integer, intent(in) :: ie                  ! electron to update
 
    real(r8) :: rComb(2)   !!! ???
-   real(r8) :: tmp, tmpd, tmpn(6), tmpl
+   real(r8) :: tmp
    real(r8) :: terms(fpnum), termsn(6, fpnum), termsl(2, fpnum)
-   real(r8) :: nfterms(fmax), nftermsd(2, fmax), nftermsn(6, fmax), nftermsl(2, fmax)
-   integer :: a, c, g, i, j, m, t
+   real(r8) :: nfterms(fmax), nftermsn(6, fmax), nftermsl(2, fmax)
+   integer :: a, c, g, i, j, t
 
    i = ie ! ie only !
 
@@ -2200,20 +2177,18 @@ subroutine jasicUpdateWithUk(Rdu, ie)
    ! values of correlation terms
    real(r8) :: uTerm, xTerm, fTerm
 
-   ! sum in x, u and f-term, derivative, nabla
-   real(r8) :: sumr, sumrd, sumrn
-   ! position of parameter for param derivatives
-   integer :: pos
+   ! sum in x, u and f-term
+   real(r8) :: sumr
    ! parameter value to satisfy e-e cusp condition
    real(r8) :: eeCusp
 
    ! commonly used terms
    !real(r8) :: b, r, s, v, tmpn(3), tmpl, scale, power, f, za, Fsum, Gsum, Fksum(unum+fnum+geennum+geennnum)
-   real(r8) :: b, r, s, v, tmpn(3), tmpl, scale, power, f, za
+   real(r8) :: b, r, scale, power
    real(r8) :: Fsum, Gsum, Fksum(unum+fnum+anisoJ2_count)
 
    ! loop variables
-   integer :: a, c, i, j, t, al, bl, g, m, k, l
+   integer :: a, c, i, j, t, k
    integer :: offsetJ1, offsetJ2
 
    !uTerm = 0d0   ! -> F
@@ -2541,10 +2516,10 @@ subroutine eenHardcodedUpdateWithUk(Rdu,ie)
    integer, intent(in) :: ie                  ! electron to update
 
    real(r8) :: rComb(2)   !!! ???
-   real(r8) :: tmp, tmpd, tmpn(6), tmpl
+   real(r8) :: tmp
    real(r8) :: terms(fpnum), termsn(6, fpnum), termsl(2, fpnum)
-   real(r8) :: nfterms(fmax), nftermsd(2, fmax), nftermsn(6, fmax), nftermsl(2, fmax)
-   integer :: a, c, g, i, j, m, t, k
+   real(r8) :: nfterms(fmax), nftermsn(6, fmax), nftermsl(2, fmax)
+   integer :: a, c, g, i, j, t, k
 
    i = ie ! ie only !
 
@@ -3007,10 +2982,10 @@ subroutine jasicall(x, y, z, rai, rij, optType, ju, jud, julapl, julapli, uuk, w
   real(r8) :: eeCusp
 
   ! commonly used terms
-  real(r8) :: b, r, s, v, tmpn(3), tmpl, scale, power, f, za
+  real(r8) :: b, r, s, v, tmpn(3), tmpl, scale, power
 
   ! loop variables
-  integer :: a, c, i, j, t, al, bl, g, m, k, l, offset, nntemp
+  integer :: a, c, i, j, t, m, nntemp
 
   !aniso
   real(r8), allocatable :: gk(:),gkgrad(:,:),gklapl(:),gklapli(:,:)
@@ -3788,7 +3763,7 @@ subroutine eenGeneric(fTerm, fDeriv, fLapli, deriveLinParams, calcDerivs)
             l = p - k
             !   g = params + k - 2
 
-            !   if (p .ge. 6 .and. k .gt. 2) then
+            !   if (p >= 6 .and. k > 2) then
             !     do x = 2, k - 1
             !       g = g + (p - x) / 2 - 1;
             !     enddo
@@ -4713,10 +4688,10 @@ subroutine eenHardcodedNoDerivs(fTerm)
 
   real(r8) :: rComb(2)
 
-  real(r8) :: tmp, tmpd, tmpn(6), tmpl
+  real(r8) :: tmp
   real(r8) :: terms(fpnum), termsn(6, fpnum), termsl(2, fpnum)
-  real(r8) :: nfterms(fmax), nftermsd(2, fmax), nftermsn(6, fmax), nftermsl(2, fmax)
-  integer :: a, c, g, i, j, m, t
+  real(r8) :: nfterms(fmax), nftermsn(6, fmax), nftermsl(2, fmax)
+  integer :: a, c, g, i, j, t
 
   do a = 1, nclast
     c = atoms(a)%sa
@@ -4900,9 +4875,9 @@ subroutine eenHardcodedWithUk(fTerm, deriveLinParams)
 
   real(r8) :: rComb(2)
 
-  real(r8) :: tmp, tmpd, tmpn(6), tmpl
+  real(r8) :: tmp
   real(r8) :: terms(fpnum), termsn(6, fpnum), termsl(2, fpnum)
-  real(r8) :: nfterms(fmax), nftermsd(2, fmax), nftermsn(6, fmax), nftermsl(2, fmax)
+  real(r8) :: nfterms(fmax), nftermsn(6, fmax), nftermsl(2, fmax)
   integer :: a, c, g, i, j, m, t
 
   do a = 1, nclast
@@ -5099,7 +5074,6 @@ end subroutine deallocateTerms
 
 
 subroutine setNumParams()
-  integer :: temp1, temp2
   if(umax > 0 .and. kmax >= umax) then
     unum = umax - 1
   else if(umax == 0) then

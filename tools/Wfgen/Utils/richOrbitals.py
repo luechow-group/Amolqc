@@ -6,8 +6,12 @@
 SPDX-License-Identifier: GPL-3.0-or-later
 """
 
+import sys
+if sys.version_info[0] < 3:
+    sys.exit('This script requires Python 3')
+
 #
-import sys, getopt
+import getopt
 from .data import periodic_table
 from .atom import Atom
 from .basisFunction import BasisFunction

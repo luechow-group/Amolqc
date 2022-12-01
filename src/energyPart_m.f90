@@ -157,7 +157,7 @@ contains
       real(r8)            :: ee_tmp(ne,ne),ne_tmp(ncenter,ne),kin_tmp(ne)
       real(r8)            :: weight
       real(r8), allocatable :: Eintra(:),Einter(:,:)
-      integer           :: i,j,ii,jj,a,n
+      integer           :: i,j,jj,a,n
 
       if (present(dIdx)) then
          n = dIdx
@@ -376,7 +376,6 @@ contains
    subroutine chemGroup_write(self,iu)
       class(chemGroup), intent(in) :: self
       integer, intent(in)          :: iu
-      integer i
       write(iu,'(a,100i3)') "chemGroup "//self%typ//" - nucs:",self%nucs
       write(iu,'(a,100i3)') "               - elec:",self%elecs
    end subroutine
@@ -414,7 +413,7 @@ contains
       type(chemGroup), intent(in) :: other
       real(r8)                      :: ekin(:),vne(:,:),Vee(:,:)
       real(r8) sum
-      integer i,j,a,b
+      integer i,j,a
       sum = 0
       do a=1,size(self%nucs)
          do i=1,size(other%elecs)

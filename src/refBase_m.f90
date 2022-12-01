@@ -165,7 +165,7 @@ contains
 
    subroutine refc_getInfoMessage(this,s)
       class(referenceContainer), intent(in) :: this
-      character(len=120), intent(out)        :: s
+      character(len=240), intent(out)        :: s
       s = this%infoMessage
    end subroutine refc_getInfoMessage
 
@@ -308,8 +308,7 @@ contains
       type(refl_vlist)                    :: rl
       type(reference)                     :: r
       real(r8)                              :: x(getNElec()),y(getNElec()),z(getNElec())
-      integer                             :: nElec,i,n
-      character(len=20)                   :: words(10)
+      integer                             :: nElec,i
 
       read(lines(idx),*) nElec
       if (nElec/=getNElec()) call abortp('reading ref file: incorrect # elecs ')
@@ -341,7 +340,6 @@ contains
       logical, intent(in)                      :: doSpaceWarpTransform
       integer i,j,idx,nRef,nElec,n,nw,nn,mm,iRef,maxRef,count
       real(r8) f
-      character(len=120)                       :: line
       character(len=40)                        :: words(10)
       logical startReading,stopReading
 
@@ -412,7 +410,6 @@ contains
       character(len=*), intent(in)          :: fname  ! file to write to
       character(len=*), intent(in)          :: str    ! output string "Ref" or "Max"
       type(reference), pointer              :: rp
-      type(refl_vlist)                      :: rl
       type(refl_vlist), pointer             :: p
       integer                               :: naNuc, nbNuc    ! alpha, beta elecs at nucleus (not varied)
       integer, allocatable                  :: idx(:)
@@ -506,14 +503,12 @@ contains
       character(len=*), intent(in)          :: fname  ! file to write to (without .ref!!!)
       character(len=*), intent(in)          :: str    ! output string "Ref" or "Max"
       type(reference), pointer              :: rp
-      type(refl_vlist)                      :: rl
       type(refl_vlist), pointer             :: p
       integer                               :: naNuc, nbNuc    ! alpha, beta elecs at nucleus (not varied)
       integer                               :: aNucElec(getNNuc()), bNucElec(getNNuc()) ! nuc a -> elec i (at nuc)
       integer, allocatable                  :: idx(:)
       integer i,n,m,io
       real(r8) thresh
-      character(len=3) nstr
       integer, parameter            :: iu = 13
 
       thresh = 0.002d0     ! could be input parameter

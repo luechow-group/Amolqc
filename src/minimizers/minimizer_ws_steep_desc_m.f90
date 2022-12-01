@@ -10,7 +10,7 @@ module minimizer_ws_steep_desc_module
    use fctn_module, only: Function_t
    use singularityCorrection_m, only: singularity_correction
    use singularityParticles_m, only: singularity_particles
-   use line_search_ws_simple_module, only: line_search_ws_simple
+   use line_search_ws_m, only: line_search_ws
    use minimizer_w_sing_module, only: minimizer_w_sing
    implicit none
 
@@ -19,7 +19,7 @@ module minimizer_ws_steep_desc_module
 
 
    type, extends(minimizer_w_sing) :: minimizer_ws_steep_desc
-      type(line_search_ws_simple)  :: lss_
+      class(line_search_ws), allocatable  :: lss_
       real(r8)                 :: dt_ = 1.d0         ! gradient prefactor
       integer                      :: uphill_steps_ = 0
    contains
@@ -37,7 +37,7 @@ module minimizer_ws_steep_desc_module
 contains
 
    function constructor1(lss, sc, dt)
-      class(line_search_ws_simple), intent(in)        :: lss
+      class(line_search_ws), intent(in)        :: lss
       type(singularity_correction), intent(in)        :: sc
       real(r8), intent(in)                              :: dt
       type(minimizer_ws_steep_desc), pointer :: constructor1
@@ -66,7 +66,7 @@ contains
       real(r8)                     :: g(size(x)), g_new(size(x)), x_new(size(x))
       real(r8)                     :: delta_x(size(x))
       real(r8)                     :: gmax, dt
-      integer                    :: iter, verbose, iul, i, ls_iter, n_eval
+      integer                    :: iter, verbose, iul, ls_iter, n_eval
       type(singularity_particles):: sp
       logical                    :: is_corrected
 
@@ -81,6 +81,12 @@ contains
 
       call fn%eval_fg(x, f, g)
       n_eval = 1
+
+      ! before the first step, check for singularities, but with zero step and set particles to singularities
+      delta_x = 0._r8
+      call this%restrict_gradient(g)
+      call this%sc_%correct_for_singularities(x, delta_x, sp, is_corrected, correction_only=.false.)
+      where ( sp%At_singularity() ) g = 0.d0
 
       if (verbose > 0) then 
          write(iul,"(a,g20.10)") " initial position with function value f=", f
@@ -98,6 +104,7 @@ contains
          if (verbose > 3) write(iul,"(a,i6)") " iter=", iter
 
          dt = this%dt_
+         call this%restrict_gradient(g)
          delta_x = - dt * g
          f_old = f
          ls_iter = 5
@@ -110,7 +117,7 @@ contains
 
          x = x_new
          g = g_new
-
+         call this%restrict_gradient(g)
          where ( sp%At_singularity() ) g = 0.d0
 
          gmax = maxval(abs(g))
@@ -123,7 +130,7 @@ contains
             end if
          end if
 
-         if (this%is_gradient_converged(gmax) .or. (sp%n_sing() == size(x)/3)) then
+         if (this%is_gradient_converged(gmax) .or. (sp%n_sing() == size(x)/3) .or. this%is_value_converged(f)) then
             call this%set_converged(.true.)
             exit
          end if

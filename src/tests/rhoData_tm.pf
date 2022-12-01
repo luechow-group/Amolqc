@@ -3,7 +3,7 @@
 ! SPDX-License-Identifier: GPL-3.0-or-later
 
 module rhoData_tm
-   use PFUNIT_MOD
+   use funit
    use kinds_m, only: r8
    use rhoData_m, only:  rhoData_t, operator(+), assignment(=)
    use wfData_m, only: getNNuc, ncenter, atoms

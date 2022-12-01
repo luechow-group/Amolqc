@@ -5,4 +5,4 @@ $qmc(vmc, move=umr, steps=60, block_len=20, persist=9, accept_ratio=0.5, discard
 $sample(remove_outliers)
 $sample(change_size, new_size=5, last)
 $qmc(vmc, mover=umr, steps=500, block_len=100, accept_ratio=0.5, discard=0)
-$eloctest(h=1.d-2, verbose=3, points=4, extrap_derivs, tol_grad=1.d-6, tol_eloc=1.d-4)
+$eloctest(h=1.d-2, verbose=3, points=4, extrap_derivs, tol_grad=1.d-6, tol_eloc=2.d-4)

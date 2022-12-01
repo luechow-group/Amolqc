@@ -45,7 +45,7 @@ contains
       class(rhoMax_t), intent(inout) :: this
       character(len=120), intent(in) :: lines(:)
       integer, intent(in) :: nl
-      real(r8) :: assignThresh, printThresh
+      real(r8) :: assignThresh, printThresh, preAssignThresh
       integer, allocatable :: fragments(:)
       integer :: i, iflag
 
@@ -71,6 +71,9 @@ contains
 
       if (finda(lines, nl, "use_log")) this%use_log = .true.
 
+      call getdbla(lines, nl, "assign_pre_thresh=", preAssignThresh, iflag)
+      if (iflag /= 0) preAssignThresh = 0.01
+
       if (asserts) call assert(SIZE(fragments) == getNNuc(), 'rhoMax_init: invalid fragments array size.')
 
       if (this%use_log) then
@@ -79,7 +82,7 @@ contains
          allocate(this%fg, source=fctn_rho())
       end if
 
-      this%rhoData = rhoData_t(assignThresh, printThresh, fragments)
+      this%rhoData = rhoData_t(assignThresh, printThresh, fragments, preAssignThresh)
 
       this%initialized = .true.
 
@@ -155,7 +158,7 @@ contains
          write(iull,'(3f15.6)') r
       end if
 
-      basin = this%rhoData%getBasin(r)
+      basin = this%rhoData%getBasin(r, preAssign=.true.)
       if (basin /= 0) then  ! electron is already within %rhoData%assignThresh of a nuc
          rTemp = atom_getPosition(atoms(basin))
          converged = .true.

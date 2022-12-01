@@ -8,16 +8,17 @@ module minimizer_ws_fire_module
    use fctn_module, only: Function_t
    use singularityCorrection_m, only: singularity_correction
    use singularityParticles_m, only: singularity_particles
-   use line_search_ws_simple_module, only: line_search_ws_simple
+   use line_search_ws_m, only: line_search_ws
    use minimizer_w_sing_module, only: minimizer_w_sing
    use minimizer_fire_module, only: fire_parameters, PASS, BACKTRACK
+   use error_m, only: abortp
    implicit none
 
    private
    public :: minimizer_ws_fire, fire_parameters, PASS, BACKTRACK
 
    type, extends(minimizer_w_sing) :: minimizer_ws_fire
-      type(line_search_ws_simple)  :: lss_
+      class(line_search_ws), allocatable   :: lss_
       type(fire_parameters) :: params_
    contains
       procedure :: minimize => minimizer_ws_fire_minimize
@@ -32,7 +33,7 @@ module minimizer_ws_fire_module
 contains
 
    function constructor1(lss, sc, params)
-      class(line_search_ws_simple), intent(in)    :: lss
+      class(line_search_ws), intent(in)   :: lss
       type(singularity_correction), intent(in)    :: sc
       type(fire_parameters), intent(in)           :: params
       type(minimizer_ws_fire), pointer :: constructor1
@@ -52,9 +53,13 @@ contains
       real(r8)                     :: x_old(size(x)), force_old(size(x)), velocity_old(size(x))
       real(r8)                     :: force0(size(x)), g_old(size(x))
       real(r8)                     :: alpha, tau, mass, gmax, vel, proj
-      integer                    :: iter, verbose, iul, latency, i, ls_iter
+      integer                    :: iter, verbose, iul, latency, ls_iter
       type(singularity_particles):: sp, sp_old
       logical is_corrected
+
+      if (ALLOCATED(this%not_to_minimize_) .or. ALLOCATED(this%to_minimize_)) then
+         call abortp('not_to_minimize and minimize_this are not implemented for fire')
+      end if
 
       call sp%create(size(x)/3, this%sc_%n_singularities())
 
@@ -110,7 +115,7 @@ contains
             end if
          end if
 
-         if (this%is_gradient_converged(gmax)) then
+         if (this%is_gradient_converged(gmax) .or. this%is_value_converged(f)) then
             call this%set_converged(.true.)
             exit
          end if

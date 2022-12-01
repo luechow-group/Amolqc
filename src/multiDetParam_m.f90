@@ -122,7 +122,7 @@ CONTAINS
      integer, intent(in)         :: optMode       ! optimization mode
      real(r8), intent(in)          :: p(:)         ! parameter vector
      logical,optional,intent(in) :: normCI   ! normalize ci coeefs after optimization
-     integer k,k0
+     integer k0
 
      if (optMode==3) then
         k0 = 1
@@ -139,7 +139,7 @@ CONTAINS
   !-------------------------------------!
      integer, intent(in)   :: optMode       ! optimization mode
      real(r8), intent(inout) :: p(:)         ! parameter vector
-     integer k,k0
+     integer k0
 
      if (optMode==3) then
         k0 = 1

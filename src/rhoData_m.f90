@@ -24,7 +24,7 @@ module rhoData_m
       integer :: n !number of partitions
       integer :: nSamples ! number of total samples
       type(partition_t), allocatable :: partitions(:)
-      real(r8) :: assignThresh
+      real(r8) :: assignThresh, preAssignThresh
       real(r8) :: printThresh
       integer, allocatable :: fragments(:)
    contains
@@ -49,17 +49,18 @@ module rhoData_m
    end interface rhoData_t
 
 contains
-   subroutine rhoData_init(this, assignThresh, printThresh, fragments)
+   subroutine rhoData_init(this, assignThresh, printThresh, fragments, preAssignThresh)
       class(rhoData_t), intent(inout) :: this
       real(r8), intent(in) :: assignThresh, printThresh
       integer, optional, intent(in) :: fragments(:)
+      real(r8), optional, intent(in) :: preAssignThresh
       integer :: i
 
       if (allocated(this%partitions)) deallocate(this%partitions)
       if (allocated(this%fragments)) deallocate(this%fragments)
 
       ! next lines use allocation on assignment
-      if (present(fragments)) then
+      if (PRESENT(fragments)) then
          this%fragments = fragments
       else
          this%fragments = [(i, i=1, getNNuc())]
@@ -70,18 +71,16 @@ contains
       this%nSamples = 0
       this%assignThresh = assignThresh
       this%printThresh = printThresh
+      if (PRESENT(preAssignThresh)) this%preAssignThresh = preAssignThresh
    end subroutine rhoData_init
 
-   function rhoData_constructor(assignThresh, printThresh, fragments) result(rhoData)
+   function rhoData_constructor(assignThresh, printThresh, fragments, preAssignThresh) result(rhoData)
       real(r8), intent(in) :: assignThresh, printThresh
       type(rhoData_t) :: rhoData
       integer, optional, intent(in) :: fragments(:)
+      real(r8), optional, intent(in) :: preAssignThresh
 
-      if (present(fragments)) then
-         call rhoData%init(assignThresh, printThresh, fragments)
-      else
-         call rhoData%init(assignThresh, printThresh)
-      end if
+      call rhoData%init(assignThresh, printThresh, fragments=fragments, preAssignThresh=preAssignThresh)
 
    end function rhoData_constructor
 
@@ -98,9 +97,10 @@ contains
       this%partitions = other%partitions
    end subroutine rhoData_copy
 
-   function rhoData_getBasin(this, r) result(basin)
+   function rhoData_getBasin(this, r, preAssign) result(basin)
       class(rhoData_t), intent(in) :: this
       real(r8), intent(in) :: r(3)
+      logical, optional, intent(in) :: preAssign
       integer :: basin
       integer :: j
       logical :: found
@@ -108,7 +108,11 @@ contains
 
       basin = 0
       found = .false.
-      minDist = this%assignThresh
+      if (PRESENT(preAssign) .and. preAssign) then
+         minDist = this%preAssignThresh
+      else
+         minDist = this%assignThresh
+      end if
       do j=1, getNNuc()
          dist = NORM2(r - atom_getPosition(atoms(j)))
          if (dist < minDist) then
@@ -124,7 +128,7 @@ contains
       class(rhoData_t), intent(inout) :: this
       integer, intent(in) :: basins(:)
       integer :: electronsPerFragment(MAXVAL(this%fragments) + 1)
-      integer :: i, basin, len
+      integer :: i
 
       electronsPerFragment = 0
       do i=1,SIZE(basins)

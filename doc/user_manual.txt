@@ -108,11 +108,12 @@ Macro commands are intended to be written by the user. A few are provided:
 
 $generate_sample(size=100) :   generates an independent sample of size 100
 $generate_walker()         :   generates an independent sample of size=1
-$jastrow_varmin_fast()     :   jastrow variance minimization, see examples
-$jastrow_varmin_safe()     :   if 'fast' fails
-$jastrow_emin_lin()        :   linear energy minimization, see examples
-$jastrow_emin_lm()         :   Levenber-Marquardt energy minimization
-$jastrow_emin_nw()         :   Newton-Raphson energy minimization
+$jas_varmin_fast()         :   jastrow variance minimization, see examples
+$jas_varmin_safe()         :   if 'fast' fails
+$jas_emin_lin()            :   linear energy minimization, see examples
+$jas_emin_lm()             :   Levenber-Marquardt energy minimization
+$jas_emin_nr()             :   Newton-Raphson energy minimization
+$jas_emin_snr()            :   stabilized Newton-Raphson energy minimization
 
 
 
@@ -320,7 +321,8 @@ full_localisation: ECP localization with Jastrow factor(default)
 [no_]random_rotation: use [fixed] random axis system for grid integration
 cutoff=x: if given, ECP cutoff is turned on. This calculates for each atom
   a cutoff radius for the non-local part. The calculated radii are shown with
-  verbose>=2.
+  verbose>=2. They are calculated as the radii where all local components are
+  smaller than the given cutoff value.
 [full|no|nonlocal]_cutoff: Cutoff for all channels (local and non-local)
                            no cutoff Cutoff only for non-local channels(default)
 grid_points=n: Set same integration grid points for all atoms.
@@ -330,6 +332,16 @@ grid_point_list=m: Set integration grid points for different atoms.
 
 
 ====================================================================================
+
+$eigenvect_analysis
+----------------
+
+no options. This command calculates the eigenvalues and -vectors of the Hessian for
+a given sample (.pos file) and writes the results into an eigenvect_analysis.yml file.
+
+$init_max_search() has to be called before to create the psiMax object.
+
+=====================================================================================
 
 $eloctest
 ---------
@@ -558,9 +570,28 @@ method=[bfgs|fire|steepest_descent|bfgst|newton] default: bfgs
 max_iter=1000        : maximal number of iterations (not function evaluations!)
 max_distance=dd      : if given total 3n-dim step is scaled to a max of dd for the largest step of one electron
 max_distance_one=dd  : if given each one-electron step is cut at dd (!just for testing atm)
-convergence_gradient=0.0001 : convergence if max(abs(gradient)) < 0.0001
+convergence_gradient=1.0e-4  : convergence if max(abs(gradient)) < 0.0001
+convergence_value=1.0e-3     : convergence if the value of the function to be minimized is below a certain threshold.
+numerical_denominator=1.0e-5 : numeric_denominator for the numerical evaluation of the gradient using the
+                               two-point formula.
 save_opt_paths       : triggers saving the maximization path in the .ref format. Data are stored at unit 300+taskid,
                        i.e. fort.300, fort.301, ... Entry (k, m) means: m-th iteration step of the k-th maximization
+negative_eigenvalues=0 : if non-zero checks number of negative eigenvalues of the Hessian, with absolute value larger
+                          than eigenvalue_threshold. Only critical points with given number of negative eigenvalues are
+                          analyzed.
+eigenvalue_threshold=1e-2 : only eigenvalues with absolute value larger than eigenvalue_threshold are considered for
+                            counting the number of negative eigenvalues.
+not_to_minimize      : list of indices of coordinates, which should not be optimized (e.g. =3;6;9 in order to not
+                       optimize the z coordinates of the 1st, 2nd, and 3rd electrons)
+minimize_this        : does the opposite of not_to_minimize
+minimize_grad_norm   : Instead of minimizing Phi, minimizes the magnitude of the gradient, in order to use the faster
+                       steepest descent method to find saddle points. (Note: This option can be used with every
+                       minimizer. However, it might not be sensible to use the Newton method.)
+max_electron_distance : (Important: only implemented for the bfgs minimizer!) Accepts either one double or
+                        three doubles (max_electron_distance=3.0 or max_electron_distance=1.0;2.0;3.0, for x, y, and z
+                        respectively. If only one value is given the max_electron_distance for the other coordinates is
+                        assumed to be the same). Checks if the coordinates of the electrons exceed the given value. If
+                        so the minimization process will be aborted.
 
 singularity correction parameters:
 correction_mode=[cut|umr|cut_all|umr_all|none]:
@@ -631,14 +662,16 @@ and the analysis of the results.
 all parameters of '$init_max_search' are valid.
 
 other parameters:
-verbose=nn          (default 0)         : sets verbosity (high values can generate lots
-                                          of output)
-assign_thresh=dd    (default 0.1)       : threshold to assign electrons to atoms after max-
-                                          imization of rho
-print_thresh=dd     (default 0.05)      : threshold to print occupations (weight)
-fragments=nn;nn;... (default 1;2;...;N) : assignment of atoms to fragments for partition output,
-                                          must be of length N (number of atoms)
-use_log                                 : use -ln(rho) instead of -rho as function to minimize
+verbose=nn           (default 0)         : sets verbosity (high values can generate lots
+                                           of output)
+assign_thresh=dd     (default 0.1)       : threshold to assign electrons to atoms AFTER max-
+                                           imization of rho
+assign_pre_thresh=dd (default 0.01)      : threshold to assign electrons to atoms BEFORE max-
+                                           imization of rho
+print_thresh=dd      (default 0.05)      : threshold to print occupations (weight)
+fragments=nn;nn;...  (default 1;2;...;N) : assignment of atoms to fragments for partition output,
+                                           must be of length N (number of atoms)
+use_log                                  : use -ln(rho) instead of -rho as function to minimize
 
 
 ====================================================================================
@@ -739,7 +772,8 @@ $maximize_walker
 This command maximizes psi^2 for one sample element and gives information about convergence
 and function evaluations. Maximization is done according to a preceding $init_max_search command.
 
-index=nn : index of the walker to be maximized
+index=nn                          : index of the walker to be maximized
+update_walker=ll (default .true.) : update walker after maximization
 
 
 =====================================================================================
@@ -762,12 +796,13 @@ options: energy_min|variance_min,params,method,optmode,eq_iter
 params=[jastrow|ci|mo|jas+ci|jas+mo|mo+ci,jas+mo+ci]
         The order is important.
 energy_min: (minimization w.r.t. the sample energy)
-  method=[newton|scaled_newton|lm_newton|tr_newton|eminlin|popt] default is lm_newton
-   newton: simple several Newton-Raphson energy minimization
-   scaled_newton: Newton step is scaled w.r.t a cost function
-   lm_newton: Levenberg-Marquardt Newton step. Hessian is modified to ensure it is positive definite
-   tr_newton: trust-region Newton-Raphson energy using the DNMTR code (newton or eminlin is preferable)
-   eminlin: linear energy minimization as suggested by C. Umrigar with scaling step
+  method=[nr|scaled_nr|snr|lm|tr_newton|lin|popt] default is snr
+   nr: simple several Newton-Raphson energy minimization
+   scaled_nr: Newton step is scaled w.r.t a cost function
+   snr: stabilized Newton-Raphson
+   lm: Levenberg-Marquardt Newton step. Hessian is modified to ensure it is positive definite
+   tr_newton: trust-region Newton-Raphson energy using the DNMTR code (nr or lin is preferable)
+   lin: linear energy minimization as suggested by C. Umrigar with scaling step
    popt: perturbative energy minimization Toulouse, Umrigar 2007
 variance_min: (minimization w.r.t. the sample variance)
   method=[varmin|lm] default is varmin
@@ -806,7 +841,7 @@ eq_call=subname: expects a $begin_subroutine(name=subname) ... $end_subroutine b
 
 wf_write: write the wf file for the parameters of each iteration step
 
-varmin options:
+varmin (variance_min) options:
   E_ref=dd:  reference energy(Optional but recommended).In case of absence,
     emean+emean*0.02 for first optimization cycle and emean for rest cycles will
     be used as E_ref. Note that "emean" is Sample's mean, local energy.
@@ -819,7 +854,7 @@ varmin options:
   NL2SOL_D_mode=[0,1]: NL2SOL scale vector mode (varmin2).default is "0".  Only needed when no changes in parameters.
  mo_noise_coeff=0.0  : Add gaussian white noise fo starting orbital rotation params aroung
                         zero (startin params will be mo_noise_coef* g_rand ).
-lm options:
+lm (variance_min) options:
   E_ref=dd:  reference energy(Optional but recommended). In case of absence,
     emean+emean*0.02 for first optimization cycle and emean for rest cycles will
     be used as E_ref. Note that "emean" is Sample's mean, local energy.
@@ -830,7 +865,7 @@ lm options:
   lambda=0.001: value of lambda in varmin1. The diagonal elements are scaled with 1+lambda, lambda is
                 increased by a factor of 10 with each itaration that didn't succeed in decreasing the variance.
 
-newton options:
+nr (energy_min) options:
   max_var=1.d9: terminate optimization iterations if this variance is reached
   nrmethod=1: Standard Newton-Raphson, no further options
   nrmethod=2: Use scaled Newton-Raphson step, step length obtained from fixed sample
@@ -845,7 +880,7 @@ newton options:
     delta_f_min=0.d0: if set do not change nu if the change in the fixed sample energy is smaller than delta_f_min
       (because of the unavoidable random noise in the fixed sample energy)
 
-eminlin options   :
+lin (energy_min) options   :
   E_lb=dd         : lower bound for eigenvalue selection : currently disabled
   max_Im=1.d-3    : max allowed value for imaginary part for eigenvalue selection : currently disabled
   max_ev=5        : eigenvalue selection by choosing lowest fixed sample variance of the lowest max_ev eigenvalues
@@ -860,7 +895,7 @@ eminlin options   :
   quad            : use a quadratic model to determine the step length with minimum energy
 
 
-popt options                :
+popt (energy_min) options                :
 max_var=1.d9                : terminate optimization iterations if this variance is reached
 write_de                    : writes delta E in file with .dat extension
 delta_e=                    : sets a fixed delta E for all parameters
@@ -869,6 +904,28 @@ delta_e_sample_size=        : use a subset of samples to calculate delta E
 delta_e_filename='filename' : reads delta E array from the file.
 quad                        : use a quadratic model to determine the step length with the minimum energy
 target_E, target_var        : required to determine step length (only when quad is present)
+
+
+MO opt input:
+For CASSCF orbitals, non-redundant orbital rotations include: inactive to active, inactive to virtual, active to virtual.
+For HF/KS orbitals: closed to open, closed to virtual, open to virtual.
+An orbital rotation class is e.g. inactive to active. Only rotations between orbitals with the same irrep are sensible.
+
+!!! Important note for the orbital_rotation_list block: if (number of orbitals > 30): the input for the given orbital type
+has to be continued in the next line !!!
+
+Input:
+orbital_rotation_list=
+<number of orbital rotation classes>
+<number of orbitals (n) for irrep a and type b> <orbital 1> ... <orbital n>
+<number of orbitals (m) for irrep a and type c> <orbital 1> ... <orbital m>
+...
+(! one blank line !)
+mo_symmetrise_list=
+<number of equivalent orbital rotations>
+<number of degenerate orbitals (n) > <orbital 1> ... <orbital n>
+...
+
 
 ====================================================================================
 
@@ -1066,6 +1123,10 @@ show_steps        : write block,step,E,var,stddev for each step to fort.900
 T_moves=[SIMPLE|SC]  : Only for DMC ECP calculations. For SIMPLE see DOI: 10.1103/PhysRevB.74.161102 and for SC
                        DOI: 10.1063/1.3380831. SIMPLE is available only comparisons and SC should be used for
                        productive calculations.
+
+fixed_electrons      : list of electrons, which should not be propagated (e.g. =3;6;9 in order to not
+                       move the electrons 3, 6, and 9 from the $init_walker section.) This is only implemented for the
+                       Reynolds and Umrigar propagator and is usefull for the systematic saddle point search.
 
 For an example usage of the accumulation, see examples/h_accumulate.in
 

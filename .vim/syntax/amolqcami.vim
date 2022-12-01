@@ -46,6 +46,12 @@ syn region amiMacro start='\$jastrow_emin_lm' end='('me=s-1
 syn region amiMacro start='\$jastrow_emin_nw' end='('me=s-1
 syn region amiMacro start='\$jastrow_varmin_fast' end='('me=s-1
 syn region amiMacro start='\$jastrow_varmin_safe' end='('me=s-1
+syn region amiMacro start='\$jas_emin_lin' end='('me=s-1
+syn region amiMacro start='\$jas_emin_lm' end='('me=s-1
+syn region amiMacro start='\$jas_emin_nr' end='('me=s-1
+syn region amiMacro start='\$jas_emin_snr' end='('me=s-1
+syn region amiMacro start='\$jas_varmin_fast' end='('me=s-1
+syn region amiMacro start='\$jas_varmin_safe' end='('me=s-1
 syn region amiMacro start='\$macro' end='('me=s-1
 
 " Key and Value within function calls

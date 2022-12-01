@@ -12,7 +12,7 @@ module optParamsPOpt_m
    use global_m
    use subloop_m, only: subloop
    use sorting_m, only: quickSortIndex
-   use rWSample_m
+   use rwSample_m
    use elocAndPsiTermsGen_m
    use wfParameters_m
    use waveFunction_m, only: writeWF
@@ -38,20 +38,19 @@ contains
    type(WFParamDef), pointer            :: WFP
    type(RWSample), intent(inout)        :: sample  ! (fixed) sample for optimization
    logical, intent(out)                 :: converged
-   integer                              :: nParams, np,npCI,npMO,npJ
+   integer                              :: np,npCI,npMO,npJ
    integer(i8)                            :: ii, deltaESampleSize,stpSampleSize
    real(r8), allocatable                  :: p(:),p0(:)       ! parameter vector
    real(r8), allocatable                  :: delta_p(:)       ! change of parameter vector
    real(r8), allocatable                  :: delta_e(:)       ! perturbation theory denominator
    real(r8), allocatable                  :: g(:) ,S(:,:)     ! gradient and overlap matrix
-   real(r8) e0, var, minVar, minE, lambdaOpt
+   real(r8) e0, var, lambdaOpt
    real(r8), allocatable                  :: fi(:),ELi(:),fiEL(:),fifj(:,:),fifjEL(:,:),fiELj(:,:)
    real(r8), allocatable                  :: bb(:),Imat(:,:)
-   integer lwork,iter,i,j,info,idxMin,maxDP, iflag, eqIter, eqStep, nSize,io,optIter
+   integer lwork,i,j,info,iflag, eqIter, eqStep, nSize,io,optIter
    integer, allocatable                 :: ipiv(:)
    real(r8), allocatable                  :: work(:)
    type(ElocAndPsiTermsGen)             :: EPsiTGen
-   type(ElocAndPsiTermsGen),pointer     :: EPsiTGenptr
    real(r8)                               :: targetE, targetVar,cffac,dmax,maxVar,lambdaMax
    character(len=80)                    :: subName, fname, deltaEFileName
    logical                              :: doWriteWF, doWriteDE, doReadDE, subSample, deltaEOnce, doDeltaE, found
@@ -471,7 +470,7 @@ contains
          integer(i8),intent(in), optional :: stpSampleSize! calculated optimal step length
 
          integer n
-         real(r8) d,cf(4),var,lambda(4),a(3)
+         real(r8) cf(4),var,lambda(4),a(3)
 
          if (NPCI >0 .and. npJ==0 .and. npMO==0) then
             lambdaOpt=1.d0
